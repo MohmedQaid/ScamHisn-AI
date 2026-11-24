@@ -165,7 +165,7 @@ Embed one-tap link and screenshot verification directly inside **TAMM** with aut
 
 #### Measured, not claimed
 
-On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 95 unit tests (`npm test`).
+On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 102 unit tests (`npm test`).
 
 #### Privacy
 
@@ -199,7 +199,7 @@ npm install
 npm run install:browser      # headless Chromium for the scanner
 cp .env.example .env         # then set GEMINI_API_KEY
 npm run dev                  # web on :5173, API on :3001
-npm test                     # 95 API unit tests
+npm test                     # 102 API unit tests
 ```
 
 The fallback chain is configured with environment variables; see [`docs/AI_FALLBACK_SETUP.md`](./docs/AI_FALLBACK_SETUP.md).
@@ -365,7 +365,7 @@ If you ever want to deploy your own free copy on **Render**:
 
 #### قياس لا ادّعاء
 
-على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 95 اختباراً آلياً (`npm test`).
+على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 102 اختباراً آلياً (`npm test`).
 
 #### الخصوصية
 
@@ -401,7 +401,7 @@ npm install
 npm run install:browser      # headless Chromium for the scanner
 cp .env.example .env         # then set GEMINI_API_KEY
 npm run dev                  # web on :5173, API on :3001
-npm test                     # 95 API unit tests
+npm test                     # 102 API unit tests
 ```
 
 </div>

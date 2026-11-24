@@ -12,7 +12,8 @@ export interface CompressedImagePayload {
 }
 
 const MAX_DIMENSION = 768;
-const JPEG_QUALITY = 0.78;
+const MAX_LONG_SIDE = 1568;
+const JPEG_QUALITY = 0.82;
 const MAX_RAW_FILE_BYTES = 12 * 1024 * 1024; // 12 MB pre-compression limit
 
 /**
@@ -47,8 +48,12 @@ export async function compressImageForScan(file: File): Promise<CompressedImageP
   let targetWidth = img.naturalWidth || img.width;
   let targetHeight = img.naturalHeight || img.height;
 
-  if (targetWidth > MAX_DIMENSION || targetHeight > MAX_DIMENSION) {
-    const ratio = Math.min(MAX_DIMENSION / targetWidth, MAX_DIMENSION / targetHeight);
+  // Cap the SHORT side at 768px and the long side at 1568px. Capping the long side at 768px shrank
+  // a tall phone screenshot (1170×2532) to ~355px wide, leaving links and Arabic text unreadable.
+  const shortSide = Math.min(targetWidth, targetHeight);
+  const longSide = Math.max(targetWidth, targetHeight);
+  if (shortSide > MAX_DIMENSION || longSide > MAX_LONG_SIDE) {
+    const ratio = Math.min(MAX_DIMENSION / shortSide, MAX_LONG_SIDE / longSide);
     targetWidth = Math.max(1, Math.round(targetWidth * ratio));
     targetHeight = Math.max(1, Math.round(targetHeight * ratio));
   }

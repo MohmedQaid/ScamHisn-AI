@@ -22,7 +22,9 @@ class ConcurrencySemaphore {
 
   constructor(private readonly maxConcurrency: number) {}
 
-  async acquire(timeoutMs = 10_000): Promise<void> {
+  // Scans take 5–40 s, so a queued request waits long enough for a slot to free up
+  // (several judges testing at once) instead of failing after 10 s.
+  async acquire(timeoutMs = 45_000): Promise<void> {
     if (this.active < this.maxConcurrency) {
       this.active++;
       return;

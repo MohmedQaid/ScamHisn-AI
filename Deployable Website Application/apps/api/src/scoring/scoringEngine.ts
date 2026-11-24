@@ -92,10 +92,13 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
   }
 
   // Smoking Gun C: Self-signed, expired, not-yet-valid, or mismatched SSL on login/payment page
+  // Only PROVEN certificate faults count. "Could not verify" (handshake timeout, or an incomplete
+  // chain that browsers repair by fetching the intermediate but Node does not) is common on
+  // genuine government sites and is not evidence of a scam.
   const hasBrokenSsl =
     tls.isHttps &&
     tls.checked &&
-    (tls.selfSigned || tls.expired || tls.notYetValid || tls.hostnameMismatch || !tls.valid);
+    (tls.selfSigned || tls.expired || tls.notYetValid || tls.hostnameMismatch);
 
   if (hasBrokenSsl && domAndForms.hasSensitiveInputs) {
     smokingGuns.push({
@@ -296,7 +299,12 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
     }
   }
 
-  if (mode === 'job' && aiAnalysis.jobAnalysis) {
+  // "Could not verify" is not "fraud": a company homepage with no job post, or a bare map pin with
+  // no business on it, yields low authenticity / unverified fields without anything being wrong.
+  // These floors therefore apply only when the AI itself also rates the link as risky.
+  const aiAlsoDistrusts = (aiAnalysis.aiScamScore ?? 0) >= 50;
+
+  if (mode === 'job' && aiAnalysis.jobAnalysis && aiAlsoDistrusts) {
     const auth = aiAnalysis.jobAnalysis.jobAuthenticityScore;
     if (auth <= 10) {
       raiseFloor(95, 'Confirmed fraudulent job listing (authenticity <= 10%)');
@@ -310,7 +318,11 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
       raiseFloor(86, 'Suspected contact number hijacking on map business listing');
     } else if (aiAnalysis.mapAnalysis.reviewInjectionOrScamLinksFound) {
       raiseFloor(80, 'Scam links or manipulative content detected in map reviews');
-    } else if (!aiAnalysis.mapAnalysis.businessExistsOnExternalSources && !aiAnalysis.mapAnalysis.placeVerified) {
+    } else if (
+      aiAlsoDistrusts &&
+      !aiAnalysis.mapAnalysis.businessExistsOnExternalSources &&
+      !aiAnalysis.mapAnalysis.placeVerified
+    ) {
       raiseFloor(72, 'Listed map business could not be verified on external sources');
     }
   }
