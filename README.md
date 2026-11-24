@@ -1,224 +1,252 @@
 <div align="center">
 
-<img src="./assets/logo.svg" alt="ScamHisn AI Logo" width="84" height="84" />
+<sub><strong>42 ABU DHABI × ABU DHABI POLICE — SCAMSHIELD AI HACKATHON</strong></sub>
+
+<br /><br />
+
+<img src="./assets/logo.svg" alt="ScamHisn AI Logo" width="80" height="80" />
 
 # ScamHisn AI · حصن الاحتيال
 
-**AI-Powered Scam & Link Inspector — Web App & Chrome Extension**
+*AI-Powered Scam & Link Inspector — Web App & Chrome Extension*
 
-<p>
-  <a href="https://scamhisn-ai.onrender.com/">
-    <img src="https://img.shields.io/badge/Live%20Website-scamhisn--ai.onrender.com-00732F?style=for-the-badge" alt="Live Website" />
-  </a>
-  <img src="https://img.shields.io/badge/42%20Abu%20Dhabi%20%C3%97%20Abu%20Dhabi%20Police-SCAMSHIELD%20AI-CE1126?style=for-the-badge" alt="SCAMSHIELD AI Hackathon" />
-  <img src="https://img.shields.io/badge/Team-Cybersound-111827?style=for-the-badge" alt="Team Cybersound" />
-</p>
+<br />
 
-<p>
-  <strong>🌐 Available in English &amp; Emirati Arabic · متوفر بالإنجليزية وبلهجتنا الإماراتية</strong><br />
-  <a href="#english-version">🇬🇧 English (Below)</a> &nbsp;·&nbsp;
-  <a href="#arabic-version">🇦🇪 العربية — لهجتنا الإماراتية (بالأسفل)</a> &nbsp;·&nbsp;
-  <a href="./README.ar.md">📄 Standalone Arabic README (<code>README.ar.md</code>)</a>
-</p>
+<a href="https://scamhisn-ai.onrender.com/">
+  <img src="./assets/badge-live.svg" alt="Live Demo: scamhisn-ai.onrender.com" />
+</a>
+
+<br />
+
+<img src="./assets/badge-team.svg" alt="Built by Team Cybersound" />
+
+<br /><br />
+
+**[English (EN)](#en)** &nbsp;·&nbsp; **[العربية (AR)](#ar)**
+
+<br />
+
+<img src="./assets/divider.svg" alt="" width="480" />
 
 </div>
 
----
+<br />
 
-<a id="english-version"></a>
+<a id="en"></a>
 
-## 🇬🇧 English
+## EN — Overview
 
-### What Is ScamHisn AI?
+**ScamHisn AI** is both a **Web Application** and a **Chrome Extension** that detects fraudulent links before users click them.
 
-Our submission for the **42 Abu Dhabi × Abu Dhabi Police — SCAMSHIELD AI Hackathon** is both a **Web Application** and a **Chromium Browser Extension**, named **ScamHisn AI (حصن الاحتيال)**.
-
-ScamHisn AI is an AI-based scam detector designed to work both **passively** (you paste or right-click a link to check it before clicking) and **proactively** (automatically scanning external links as they appear on open web pages like WhatsApp Web, Gmail, or LinkedIn).
+It supports **passive checking** (manual inspection on demand) and **proactive checking** (automatic scanning of links on open web pages).
 
 > [!IMPORTANT]
-> **Why only the passive (manual) version is deployed publicly:** We built both the passive and proactive versions (`Chrome Extension/deployable/` for production, and `Chrome Extension/dev/` for private developer testing). However, we only deployed the passive manual version online with a working API key—keeping proactive auto-scanning locked to *"Developers only"* in production—because exposing proactive background scanning publicly without user authentication could trigger unexpected API bills.
-
----
-
-### Try It Live Right Now
-
-👉 **Live Web App:** **[https://scamhisn-ai.onrender.com/](https://scamhisn-ai.onrender.com/)**
+> **Why only the passive version is deployed live:** Both versions are built (`Chrome Extension/deployable/` and `Chrome Extension/dev/`), but proactive scanning is locked to *"Developers only"* in production. Running unauthenticated background AI scans publicly could lead to runaway API bills.
 
 > [!NOTE]
-> **Fair-Use Rate Limits on the Live Demo:** Our live API key is rate-limited to **15 requests/minute**, **500 requests/day**, and **50,000 tokens/minute**. These limits won't affect normal testing unless many people test simultaneously—so please test thoughtfully. *(Render's free instance may also take ~30–50 seconds to wake up on the very first visit after sitting idle.)*
+> **Live Demo Rate Limits (`https://scamhisn-ai.onrender.com/`):** **15 req/min · 500 req/day · 50k tokens/min.**
+> Normal testing will run smoothly unless many users test at the exact same moment—please test thoughtfully. *(Free-tier cold start takes ~30–50s if idle.)*
 
 ---
 
 ### The Problem & Our Solution
 
-Everyday residents in the UAE face realistic scam links every day—fake **UAE PASS**, **TAMM**, **Abu Dhabi Police**, **Salik**, **Emirates Post**, and local bank payment pages, fake recruitment/visa-fee job listings, and hijacked **Google Maps** business listings with fake helpline numbers or scam links buried in user reviews. Scammers hide behind link shorteners, redirect chains, brand-new domains, and even hidden AI **prompt-injection** tricks.
+Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi Police**, local banks, fake job offers, and hijacked **Google Maps** numbers.
 
-**ScamHisn AI** checks any link safely before you click and gives you:
+**ScamHisn AI** opens suspicious links inside an isolated sandbox and delivers a decisive **0–100% scam score**—hitting **95–100%** immediately on fatal red flags instead of diluting them.
 
-- **Clear 0–100% Scam Score:** Simple enough for anyone to understand at a glance—while calibrated decisively so confirmed smoking guns (fake SSL on a login page, credential theft to a third-party domain, brand impersonation, or hidden prompt-injection attacks) immediately hit **95–100%** instead of being averaged down.
-- **Three Focused Inspection Modes:**
-  1. **General Link:** Catches phishing pages, redirects, fake payment portals, and UAE/global brand impersonation while keeping false positives low on official portals.
-  2. **Job Post:** Verifies whether the link and employer are real, returning both a scam likelihood score and a job authenticity check.
-  3. **Map Link:** Cross-checks the business location and audits descriptions and reviews for hijacked phone numbers, scam URLs, or hidden prompt-injection attacks.
-- **Simple for Everyone, Deep for Investigators:** Everyday users see a clean, minimal percentage summary. Digital investigators can click **"Show Details"** to view every finding, SSL certificate metadata, RDAP/WHOIS domain age, resolved IPs, redirect chain, security headers, and full raw JSON.
-- **Police-Ready PDF Evidence & Reporting Concept:** One click on **"Generate Report"** downloads a structured A4 PDF containing the scam probability, findings, WHOIS/TLS/IP telemetry, UTC timestamp, and full raw JSON—ready for investigation or takedown requests. Right next to it sits our conceptual **"Send to police for investigation"** button illustrating direct integration into police eCrime workflows.
-
----
-
-### How to Use It (No Technical Background Needed)
-
-#### 1. Using the Website (Phone or Laptop)
-1. Open **[https://scamhisn-ai.onrender.com/](https://scamhisn-ai.onrender.com/)**.
-2. Choose **General Link**, **Job Post**, or **Map Link**.
-3. Paste the suspicious link and press **Inspect Link**.
-4. Review the percentage verdict—click **Show Details** for full forensic evidence, or **Generate Report** to download a PDF.
-   - *Tip for Phone Chrome users:* Tap Chrome's menu (`⋮` on Android / Share `⬆` on iPhone) → **Add to Home screen** to use ScamHisn AI like an app.
-
-#### 2. Using the Chrome Extension (Laptop Chrome, Edge, Brave, Arc)
-1. Download the extension `.zip` from the bottom of **[https://scamhisn-ai.onrender.com/](https://scamhisn-ai.onrender.com/)** (or use `Chrome Extension/scamhisn-extension-prod.zip` in this repo) and unzip it.
-2. Open `chrome://extensions`, turn ON **Developer mode** (top right), click **Load unpacked**, and select the unzipped folder.
-3. Click the **ScamHisn AI** icon in your toolbar (or right-click any link on a webpage → *"Inspect link with ScamHisn AI"*). You get the exact same categories, **Show Details**, **Report PDF**, and conceptual **Send to police** button—with *"Check Everything"* safely locked as *"Developers only"*.
-
----
-
-### How It Works Under the Hood
-
-| Technology | What We Use It For |
+| Feature | What It Delivers |
 |---|---|
-| **Playwright (Chromium Headless Shell)** | Safely opens suspicious links in an isolated throwaway sandbox (downloads, cookies, and private IPs blocked), follows full redirect chains/shorteners, and uncovers hidden DOM cloaking. |
-| **Node.js `tls`, RDAP / WHOIS & `dns`** | Verifies SSL/TLS certificates, checks domain registration age to catch newly registered scam domains (`<30 days`), and inspects DNS/SPF/DMARC records. |
-| **Local Heuristic & UAE Brand Guard** | Catches Punycode/lookalike domains, credential-harvesting forms, and impersonation of UAE government & bank portals (UAE PASS, TAMM, Abu Dhabi Police, UAE banks, etc.) while avoiding false positives on official domains. |
-| **Anti-Prompt-Injection Shield** | Pre-scans visible text, hidden HTML, comments, and Maps reviews (English & Arabic, Base64, invisible Unicode tags) and isolates untrusted content inside cryptographic boundaries so scammers cannot trick the AI. |
-| **Google Gemini (`gemini-3.5-flash-lite`) + Search/Maps Grounding** | Cross-checks real-world company claims, job listings, and map places, returning structured bilingual English & Emirati Arabic forensic verdicts. |
-| **Versioned REST API (`/api/v1/scan`, `/api/v1/report/pdf`) + React** | One clean backend serving the web app, PDF generator, and Chrome extension—ready to scale into a police pilot. |
+| **3 Inspection Modes** | **General Link** (phishing & UAE brand spoofing) · **Job Post** (fake employers & visa fees) · **Map Link** (hijacked contacts & review attacks). |
+| **Simple + Deep Views** | Clean percentage verdict for everyday users; **"Show Details"** reveals SSL, RDAP/WHOIS age, IPs, redirects, hidden DOM, and raw JSON for investigators. |
+| **Police-Ready PDF** | One-click **"Generate Report"** exports a forensic A4 PDF (score, findings, WHOIS/TLS/IPs, UTC timestamp, raw JSON) for investigation or takedown. |
+| **Police Reporting Concept** | Includes a conceptual **"Send to police for investigation"** button illustrating direct escalation to Abu Dhabi Police eCrime workflows. |
 
 ---
 
-### Repository Contents
+### How to Use It
 
-```text
-ScamHisn AI/
-├── Deployable Website Application/   ← Self-hostable full-stack app (Docker + Render ready)
-├── Chrome Extension/                 ← Production (locked) & Dev (unlocked) extension + .zip
-├── assets/logo.svg                   ← Official minimal UAE-colored Hisn emblem
-├── .env.example                      ← Environment variable template (add your GEMINI_API_KEY)
-├── README.md                         ← Bilingual README (English + Emirati Arabic)
-└── README.ar.md                      ← Standalone Arabic README
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**Web App (Phone & Laptop)**
+
+1. Open **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+2. Pick **General**, **Job**, or **Map** and paste any link.
+3. Click **Inspect Link** → view score, **Show Details**, or **Generate Report (PDF)**.
+
+*Phone Chrome tip:* Tap menu → **Add to Home screen** to install it like an app.
+
+</td>
+<td width="50%" valign="top">
+
+**Chrome Extension (Desktop)**
+
+1. Download the `.zip` from the bottom of the website (or `Chrome Extension/scamhisn-extension-prod.zip`) and unzip it.
+2. Open `chrome://extensions` → enable **Developer mode** → click **Load unpacked**.
+3. Click the toolbar icon or right-click any link → **Inspect link with ScamHisn AI**.
+
+</td>
+</tr>
+</table>
+
+---
+
+### How It Works
+
+```mermaid
+flowchart LR
+    U["User Link<br/>Web or Extension"] --> S["SSRF Guard<br/>Block Private IPs"]
+    S --> B["Playwright Sandbox<br/>Redirects & Hidden DOM"]
+    S --> T["TLS · RDAP/WHOIS · DNS<br/>Certs & Domain Age"]
+    B --> P["Prompt-Injection Shield<br/>EN/AR · Hidden Text · Reviews"]
+    B --> H["UAE Brand & Phishing Heuristics"]
+    T --> H
+    P --> G["Gemini 3.5 Flash-Lite<br/>Search & Maps Grounding"]
+    H --> G
+    G --> R["Decisive 0–100% Score<br/>UI · PDF · JSON"]
 ```
 
+| Layer | Purpose |
+|---|---|
+| **Playwright Headless Shell** | Opens links safely in a throwaway sandbox (no downloads/cookies), follows redirects, and catches hidden cloaking. |
+| **Node `tls`, RDAP/WHOIS & DNS** | Verifies SSL certificates, flags newly registered domains (`<30d`), and checks SPF/DMARC records. |
+| **UAE Brand & Anomaly Guard** | Catches lookalike domains and impersonation of UAE portals (**TAMM**, **UAE PASS**, local banks) while keeping false positives low. |
+| **Anti-Prompt-Injection Shield** | Detects hidden AI-override attacks in HTML, comments, and Maps reviews, isolating untrusted text in cryptographic boundaries. |
+| **Gemini (`gemini-3.5-flash-lite`)** | Verifies real-world claims with Search/Maps grounding and outputs bilingual structured forensic findings. |
+| **Shared REST API (`/api/v1/scan`)** | Single backend powering the web app, PDF generator, and Chrome extension. |
+
 ---
 
-### Want to Host Your Own Copy? (Short Summary)
+### Future Vision: TAMM Ecosystem Integration
 
-Deploying takes a few minutes, so we already hosted a live version for you at **[https://scamhisn-ai.onrender.com/](https://scamhisn-ai.onrender.com/)**. If you want to host your own copy for free on **Render**:
+Integrating **ScamHisn AI** into Abu Dhabi's **TAMM** ecosystem unlocks proactive, resident-specific protection:
 
-1. Push the `Deployable Website Application/` folder to a GitHub repository.
-2. Create a new **Blueprint** (or Docker Web Service) on [Render](https://render.com) linked to that repository.
-3. Add your `GEMINI_API_KEY` (see `.env.example`) in Render's Environment Variables and deploy.
+- **Personalized Fact-Checking:** Cross-check scam claims against a resident's real TAMM records—instantly catching fake *"unpaid traffic fine"* or *"expired ID"* messages when the user has none.
+- **Native TAMM App Service:** Embed one-tap link verification inside the **TAMM** app with authenticated, direct reporting to **Abu Dhabi Police** cybercrime units.
+
+---
+
+### Host Your Own Copy (Optional)
+
+Deployment takes a few minutes, so we already hosted it live at **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**. To self-host for free on **Render**:
+
+1. Push `Deployable Website Application/` to GitHub.
+2. Create a **Blueprint** (or Docker Web Service) on Render connected to that repo.
+3. Add `GEMINI_API_KEY` (see `.env.example`) in Render's Environment Variables and deploy.
 
 ---
 
 ### Team Cybersound
 
-Built with pride in the UAE for the **SCAMSHIELD AI Hackathon (42 Abu Dhabi × Abu Dhabi Police)**:
+`Mohammed Ahmed Abdulnoor` · `Abdulrhman Ahmed Drizi` · `Khalid Ahmed Al Khawaldah` · `Ahmed Al Hashmi` · `Yousef Mohammed`
 
-- **Mohammed Ahmed Abdulnoor**
-- **Abdulrhman Ahmed Drizi**
-- **Khalid Ahmed Al Khawaldah**
-- **Ahmed Al Hashmi**
-- **Yousef Mohammed**
+<br />
 
----
+<div align="center">
+  <img src="./assets/divider.svg" alt="" width="480" />
+</div>
 
-<a id="arabic-version"></a>
+<br />
+
+<a id="ar"></a>
 
 <div dir="rtl">
 
-## 🇦🇪 العربية (بلهجتنا الإماراتية)
+## AR — نظرة عامة
 
-### حياكم الله في حصن الاحتيال (ScamHisn AI)
+**حصن الاحتيال (ScamHisn AI)** هو **تطبيق ويب** و**إضافة لمتصفح كروم** تعتمد على الذكاء الاصطناعي لاكتشاف الروابط الاحتيالية قبل النقر عليها.
 
-مشروعنا في **هاكاثون درع الجريمة الإلكتروني (42 أبوظبي × شرطة أبوظبي)** هو **حصن الاحتيال (ScamHisn AI)**، وهو عبارة عن **تطبيق ويب** و**إضافة لمتصفح كروم** تشتغل بالذكاء الاصطناعي عشان تكشف الروابط الاحتيالية وتحميك قبل ما تضغط عليها.
-
-النظام مصمم يشتغل بطريقتين: **الوضع اليدوي (Passive)** اللي تفحص فيه أي رابط بنفسك قبل ما تفتحه، و**الوضع التلقائي الاستباقي (Proactive)** اللي يراقب الروابط تلقائياً في الصفحات المفتوحة مثل واتساب ويب أو الإيميل.
+يدعم النظام **الفحص اليدوي (السلبي)** عند الطلب، و**الفحص الاستباقي (النشط)** لمراقبة الروابط تلقائياً في صفحات الويب المفتوحة.
 
 > [!IMPORTANT]
-> **ليش رفعنا الوضع اليدوي بس للعامة؟** نحن بنينا النسختين فعلياً (النسخة الرسمية `Chrome Extension/deployable` ونسخة المطورين `Chrome Extension/dev`). لكن في النسخة المنشورة أونلاين مع مفتاح الـ API شغّلنا الوضع اليدوي بس وخلّينا الفحص التلقائي مقفول تحت عبارة **"للمطورين فقط"**، لأن تشغيل الفحص التلقائي للكل بدون تسجيل دخول ممكن يستهلك رصيد الـ API بسرعة ويسبب فواتير عالية.
-
----
-
-### جرّب الموقع الحين مباشرة
-
-👉 **رابط التطبيق المباشر:** **[https://scamhisn-ai.onrender.com/](https://scamhisn-ai.onrender.com/)**
+> **لماذا نُشرت النسخة اليدوية فقط؟** تم تطوير النسختين معاً (`Chrome Extension/deployable/` و`Chrome Extension/dev/`)، غير أن وضع الفحص الاستباقي مقفل بعبارة **"للمطورين فقط"** في النسخة الرسمية، لأن تشغيل الفحص التلقائي للعامة دون مصادقة قد يؤدي إلى استهلاك مرتفع لمفتاح واجهة البرمجة وتكاليف غير متوقعة.
 
 > [!NOTE]
-> **ملاحظة بسيطة عن حدود الاستخدام:** مفتاح الـ API في النسخة التجريبية عليه حد أقصى: **15 طلب في الدقيقة**، و**500 طلب في اليوم**، و**50 ألف توكن في الدقيقة**. هالحدود ما بتأثر على تجربتك أبداً إلا لو وايد ناس جرّبوا الموقع في نفس الثانية، فجرّبوه على راحتكم وبهدوء. *(وإذا كان الموقع خامل شوي على Render، أول فتحة ممكن تاخذ 30 إلى 50 ثانية لين يشتغل).*
+> **حدود الاستخدام للنسخة المباشرة (`https://scamhisn-ai.onrender.com/`):** **15 طلباً/دقيقة · 500 طلب/يوم · 50 ألف رمز/دقيقة.**
+> هذه الحدود كافية تماماً للتجربة الاعتيادية ما لم يختبر عدد كبير من المستخدمين الموقع في اللحظة نفسها، لذا يُرجى الاستخدام باعتدال. *(قد يستغرق تشغيل الخادم المجاني على Render نحو 30–50 ثانية بعد فترة خمول).*
 
 ---
 
-### شو المشكلة؟ وشو الحل اللي نقدمه؟
+### المشكلة والحل
 
-الناس عندنا في الإمارات يتعرضون يومياً لروابط احتيال متقنة — مواقع تنتحل **الهوية الرقمية (UAE PASS)**، و**تم (TAMM)**، و**شرطة أبوظبي**، و**سالك**، و**بريد الإمارات**، والبنوك المحلية، أو إعلانات وظائف وهمية تطلب رسوم فيزا، أو حتى صفحات **خرائط جوجل** بأرقام تواصل مخترقة وروابط احتيال مخفية في التقييمات. وفوق هذا، المحتالين صاروا يستخدمون اختصار الروابط، والتحويلات المخفية، والنطاقات اليديدة، وحتى خدع **حقن الأوامر (Prompt Injection)** عشان يغشون أنظمة الذكاء الاصطناعي.
+يواجه المستخدمون يومياً روابط احتيال متقنة تنتحل **الهوية الرقمية (UAE PASS)**، و**منظومة تم (TAMM)**، و**شرطة أبوظبي**، والبنوك المحلية، وإعلانات التوظيف الوهمية، وأرقام التواصل المخترقة على **خرائط جوجل**.
 
-**حصن الاحتيال** يفحص الرابط في بيئة معزولة ويعطيك الزبدة بوضوح:
+يقوم **حصن الاحتيال** بفتح الرابط داخل بيئة معزولة تماماً، ويقدم **نسبة احتمال احتيال حاسمة (0–100%)** تصل فوراً إلى **95–100%** عند رصد أدلة قاطعة دون تمييعها بالمتوسطات.
 
-- **نسبة احتمال الاحتيال (0% إلى 100%):** واضحة وبسيطة لأي شخص، وحازمة بدون تمييع — إذا فيه دليل قاطع مثل شهادة أمان مزوّرة على صفحة دخول، أو سرقة بيانات لموقع خارجي، أو انتحال جهة رسمية، أو محاولة حقن أوامر، النسبة تطلع فوراً **95%–100% (احتيال مؤكد)**.
-- **ثلاثة أوضاع للفحص:**
-  1. **رابط عام:** يكشف صفحات التصيّد، والتحويلات المضللة، وانتحال الجهات والبنوك الإماراتية، بدون ما يغلط ويصنّف المواقع الرسمية الحقيقية كاحتيال.
-  2. **إعلان وظيفة:** يتأكد أول من شرعية الرابط، وبعدين يفحص مصداقية الشركة والوظيفة عشان يكشف إعلانات التوظيف الوهمية.
-  3. **رابط خريطة:** يتحقق من وجود المكان فعلياً ويدقق في الوصف والتقييمات لكشف الأرقام المخترقة أو الروابط الخبيثة أو أوامر التلاعب المخفية.
-- **سهل للشخص العادي، ومفصّل للمحقق الرقمي:** المستخدم العادي يشوف النسبة والخلاصة بشكل مرتب ومب معقّد. وإذا ضغطت **"عرض التفاصيل التقنية"** تطلع لك كل الأدلة: شهادة الأمان SSL، عمر النطاق (WHOIS/RDAP)، عناوين الـ IP، سلسلة التحويلات، العناصر المخفية، وملف الـ JSON الكامل.
-- **تقرير PDF جاهز للشرطة + فكرة الإبلاغ المباشر:** بضغطة زر **"إنشاء تقرير (PDF)"** تقدر تحمّل ملف PDF مرتب فيه نسبة الاحتيال، الملاحظات، وبيانات الـ WHOIS والـ IP والتوقيت والـ JSON عشان يكون دليل جاهز للتسليم أو طلب الإزالة. وحطينا جنبه زر تجريبي (Concept) باسم **"إرسال للشرطة للتحقيق"** يوضح كيف ممكن ينربط النظام مستقبلاً مع شرطة أبوظبي.
-
----
-
-### كيف تستخدمه؟ (وايد سهل وما يحتاج خبرة تقنية)
-
-#### 1. استخدام الموقع (على الهاتف أو اللابتوب)
-1. بطّل الرابط **[https://scamhisn-ai.onrender.com/](https://scamhisn-ai.onrender.com/)**.
-2. اختر نوع الرابط: **رابط عام**، أو **إعلان وظيفة**، أو **رابط خريطة**.
-3. الصق الرابط واضغط **افحص الرابط الحين**.
-4. بتطلع لك النسبة والنتيجة — وتقدر تضغط **عرض التفاصيل التقنية** أو تحمّل **تقرير PDF**.
-   - *لمستخدمي كروم على الهاتف:* اضغط قائمة كروم (`⋮` في أندرويد أو مشاركة `⬆` في آيفون) ← **إضافة إلى الشاشة الرئيسية** ويصير عندك مثل التطبيق.
-
-#### 2. استخدام إضافة كروم (على اللابتوب — Chrome / Edge / Brave)
-1. حمّل ملف الإضافة `.zip` من أسفل الموقع **[https://scamhisn-ai.onrender.com/](https://scamhisn-ai.onrender.com/)** (أو من مجلد `Chrome Extension/scamhisn-extension-prod.zip`) وفك الضغط عنه.
-2. افتح `chrome://extensions` في المتصفح، وفعّل **Developer mode** من فوق، واضغط **Load unpacked** واختر المجلد المفكوك.
-3. اضغط على أيقونة **حصن الاحتيال** في شريط المتصفح (أو اضغط بالزر اليمين على أي رابط في أي صفحة واختر *"Inspect link with ScamHisn AI"*). بتحصل نفس المزايا: التصنيف، **عرض التفاصيل**، **تقرير PDF**، وزر **إرسال للشرطة** التجريبي.
-
----
-
-### كيف يشتغل النظام من الداخل؟
-
-| التقنية | شو دورها في حصن الاحتيال؟ |
+| الميزة | الفائدة العملية |
 |---|---|
-| **Playwright (متصفح Chromium معزول)** | يفتح الرابط داخل بيئة معزولة تماماً (بدون تنزيلات أو كوكيز أو وصول للشبكة الداخلية)، ويتتبع التحويلات والروابط المختصرة ويكشف العناصر المخفية في الصفحة. |
-| **Node.js TLS و RDAP / WHOIS و DNS** | يفحص صلاحية شهادة الأمان SSL، ويكشف النطاقات المسجّلة حديثاً (أقل من 30 يوم)، ويتأكد من سجلات البريد والحماية SPF/DMARC. |
-| **محرك الفحص المحلي وقائمة الجهات الإماراتية** | يكشف تزوير الأحرف المتشابهة (Punycode)، وسرقة بيانات الدخول، وانتحال الجهات المحلية (مثل UAE PASS، تم، شرطة أبوظبي، البنوك الإماراتية) بدقة عالية. |
-| **درع صد حقن الأوامر (Anti-Prompt-Injection)** | يدقق النصوص الظاهرة والمخفية وتعليقات الـ HTML وتقييمات الخرائط (بالعربي والإنجليزي والـ Base64 والأحرف المخفية) ويعزل محتوى الصفحة بحدود مشفرة عشان محد يقدر يخدع الذكاء الاصطناعي. |
-| **Google Gemini (`gemini-3.5-flash-lite`) مع بحث وخرائط جوجل** | يتحقق من صحة الشركات والوظائف والأماكن على أرض الواقع، ويعطيك ملخص واضح باللغتين الإنجليزية والإماراتية. |
-| **واجهة برمجية موحّدة (`/api/v1/scan`) + React** | خادم واحد يخدم الموقع وتقارير الـ PDF وإضافة المتصفح بنفس الوقت، وجاهز للتوسع والتجربة الميدانية مع الجهات المختصة. |
+| **3 أوضاع للفحص** | **رابط عام** (التصيّد وانتحال الجهات الإماراتية) · **إعلان وظيفة** (كشف الشركات الوهمية) · **رابط خريطة** (الأرقام المخترقة وهجمات التقييمات). |
+| **عرض بسيط ومفصّل** | ملخص واضح وسريع للمستخدم العادي، مع زر **"عرض التفاصيل التقنية"** للمحقق الرقمي (شهادة SSL، عمر النطاق WHOIS/RDAP، عناوين IP، التحويلات، وJSON). |
+| **تقرير PDF جاهز للشرطة** | زر **"إنشاء تقرير (PDF)"** يصدر ملف أدلة جنائية منظماً (نسبة الخطر، الملاحظات، بيانات WHOIS/SSL/IP، التوقيت، وJSON الكامل) جاهزاً للتحقيق أو طلبات الإزالة. |
+| **مفهوم الإبلاغ للشرطة** | يتضمن زر **"إرسال للشرطة للتحقيق"** كنموذج أولي يوضح مسار الربط المباشر المستقبلي مع فرق مكافحة الجرائم الإلكترونية. |
 
 ---
 
-### حاب ترفع نسختك الخاصة؟ (باختصار)
+### طريقة الاستخدام
 
-بما إن رفع التطبيق على السيرفر ياخذ شوية وقت، نحن جهّزناه ورفعناه لكم جاهز للتجربة على **[https://scamhisn-ai.onrender.com/](https://scamhisn-ai.onrender.com/)**. لكن لو حاب تستضيف نسختك الخاصة مجاناً على **Render**:
+<table>
+<tr>
+<td width="50%" valign="top">
 
-1. ارفع مجلد `Deployable Website Application/` على حسابك في GitHub.
-2. سوّ **Blueprint** يديد (أو Docker Web Service) في موقع [Render](https://render.com) واربطه بالمستودع.
-3. ضيف مفتاح `GEMINI_API_KEY` (نفس الموجود في `.env.example`) في إعدادات Environment Variables وشغّل النشر.
+**تطبيق الويب (الهاتف والحاسوب)**
+
+1. افتح **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+2. اختر **رابط عام** أو **إعلان وظيفة** أو **رابط خريطة** ثم الصق الرابط.
+3. اضغط **افحص الرابط** لعرض النتيجة أو **عرض التفاصيل** أو **إنشاء تقرير (PDF)**.
+
+*لمستخدمي كروم على الهاتف:* من القائمة اختر **إضافة إلى الشاشة الرئيسية** لاستخدامه كتطبيق.
+
+</td>
+<td width="50%" valign="top">
+
+**إضافة كروم (الحاسوب)**
+
+1. حمّل ملف `.zip` من أسفل الموقع (أو من `Chrome Extension/scamhisn-extension-prod.zip`) وفك الضغط عنه.
+2. افتح `chrome://extensions` ← فعّل **وضع مطوّر البرامج** ← اضغط **Load unpacked** واختر المجلد.
+3. اضغط أيقونة الإضافة أو انقر بزر الفأرة الأيمن على أي رابط لفحصه فوراً.
+
+</td>
+</tr>
+</table>
+
+---
+
+### آلية العمل التقنية
+
+| التقنية | الدور داخل النظام |
+|---|---|
+| **Playwright (متصفح معزول)** | يفتح الروابط في بيئة مؤقتة آمنة (دون تنزيلات أو ملفات ارتباط)، ويتتبع التحويلات ويكشف العناصر المخفية. |
+| **Node `tls` و RDAP/WHOIS و DNS** | يفحص شهادات الأمان، ويرصد النطاقات المسجلة حديثاً (أقل من 30 يوماً)، ويتحقق من سجلات SPF/DMARC. |
+| **حماية العلامات الإماراتية** | يكشف النطاقات المقلّدة وانتحال الجهات المحلية (**تم**، **الهوية الرقمية**، البنوك) مع تقليل الإنذارات الكاذبة. |
+| **درع صد حقن الأوامر** | يرصد أوامر التلاعب المخفية في الصفحات وتقييمات الخرائط ويعزل النصوص غير الموثوقة بحدود مشفرة. |
+| **Gemini (`gemini-3.5-flash-lite`)** | يتحقق من الادعاءات والشركات والأماكن عبر البحث والخرائط، ويولّد تحليلاً منظماً ثنائي اللغة. |
+| **واجهة برمجية موحدة (`/api/v1/scan`)** | خادم واحد يغذي تطبيق الويب ومولّد تقارير PDF وإضافة المتصفح بسهولة وقابلية للتوسع. |
+
+---
+
+### الرؤية المستقبلية: التكامل مع منظومة «تم» (TAMM)
+
+يتيح دمج **حصن الاحتيال** ضمن بيئة **منظومة «تم» (TAMM)** نقلة نوعية في حماية المجتمع:
+
+- **كشف مخصّص للاحتيال عبر بيانات المستخدم:** التحقق الفوري من صحة ادعاءات الرسائل المشبوهة (مثل *"مخالفة مرورية غير مدفوعة"* أو *"انتهاء الهوية"*) مقارنةً بوضع المستفيد الفعلي في «تم»، مما يكشف المعلومات المغلوطة فوراً.
+- **خدمة مدمجة داخل تطبيق «تم»:** توفير أداة فحص الروابط مباشرةً داخل التطبيق مع إمكانية رفع البلاغات الموثقة مباشرةً إلى **شرطة أبوظبي**.
+
+---
+
+### الاستضافة الذاتية (اختياري)
+
+نظراً لأن النشر يستغرق بضع دقائق، وفرنا النسخة الجاهزة على **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**. ولنشر نسختك مجاناً عبر **Render**:
+
+1. ارفع مجلد `Deployable Website Application/` إلى مستودع GitHub.
+2. أنشئ **Blueprint** (أو Docker Web Service) على Render واربطه بالمستودع.
+3. أضف `GEMINI_API_KEY` (انظر `.env.example`) في متغيرات البيئة ثم ابدأ النشر.
 
 ---
 
 ### فريق العمل — Team Cybersound
 
-تم تطوير هذا المشروع في دولة الإمارات العربية المتحدة للمشاركة في **هاكاثون درع الجريمة الإلكتروني (42 أبوظبي × شرطة أبوظبي)** — والله يحفظكم ويبعد عنا وعنكم الشر:
-
-- **Mohammed Ahmed Abdulnoor**
-- **Abdulrhman Ahmed Drizi**
-- **Khalid Ahmed Al Khawaldah**
-- **Ahmed Al Hashmi**
-- **Yousef Mohammed**
+`Mohammed Ahmed Abdulnoor` · `Abdulrhman Ahmed Drizi` · `Khalid Ahmed Al Khawaldah` · `Ahmed Al Hashmi` · `Yousef Mohammed`
 
 </div>
