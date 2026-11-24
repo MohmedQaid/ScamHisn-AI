@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 276" width="920" height="276" role="img" aria-label="Live Website How It Works Diagram">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1218"/>
+      <stop offset="100%" stop-color="#0f1b24"/>
+    </linearGradient>
+    <linearGradient id="centerCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d2620"/>
+      <stop offset="100%" stop-color="#0b1c19"/>
+    </linearGradient>
+    <linearGradient id="accentBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#e11d48"/>
+      <stop offset="18%" stop-color="#e11d48"/>
+      <stop offset="18%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Container -->
+  <rect x="1" y="1" width="918" height="274" rx="20" fill="url(#bg)" stroke="#1e303e" stroke-width="1.5"/>
+  <rect x="24" y="1" width="120" height="3.5" rx="1.75" fill="url(#accentBar)"/>
+
+  <!-- Header -->
+  <text x="28" y="34" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">LIVE WEBSITE · HOW IT WORKS</text>
+  <text x="892" y="34" text-anchor="end" fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600">Links &amp; Images Supported</text>
+
+  <!-- STEP 1 CARD -->
+  <rect x="28" y="52" width="240" height="198" rx="16" fill="#111c26" stroke="#223444" stroke-width="1.2"/>
+  <rect x="44" y="68" width="28" height="28" rx="8" fill="#172a3a" stroke="#2a4359" stroke-width="1"/>
+  <text x="58" y="87" text-anchor="middle" fill="#38bdf8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800">1</text>
+  <text x="82" y="87" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">User Submits</text>
+
+  <text x="44" y="122" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="600">• Paste any suspicious link</text>
+  <text x="54" y="140" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5">(General, Job Post, or Map)</text>
+
+  <text x="44" y="172" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="600">• Or upload a screenshot</text>
+  <text x="54" y="190" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600">NEW · Live image preview</text>
+
+  <rect x="44" y="208" width="208" height="26" rx="8" fill="#0c151d" stroke="#1e303e" stroke-width="1"/>
+  <text x="148" y="225" text-anchor="middle" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Phone &amp; Laptop Ready</text>
+
+  <!-- ARROW 1 -> 2 -->
+  <line x1="274" y1="151" x2="306" y2="151" stroke="#10b981" stroke-width="2.2" stroke-linecap="round"/>
+  <polyline points="300,145 307,151 300,157" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- STEP 2 CARD (CENTER HIGHLIGHT) -->
+  <rect x="314" y="52" width="292" height="198" rx="16" fill="url(#centerCard)" stroke="#059669" stroke-width="1.6"/>
+  <rect x="330" y="68" width="28" height="28" rx="8" fill="#064e3b" stroke="#10b981" stroke-width="1"/>
+  <text x="344" y="87" text-anchor="middle" fill="#6ee7b7" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800">2</text>
+  <text x="368" y="87" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">ScamHisn AI Checks It</text>
+
+  <!-- Deterministic Pill -->
+  <rect x="330" y="108" width="260" height="58" rx="11" fill="#091815" stroke="#1e463b" stroke-width="1"/>
+  <text x="342" y="128" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700">Deterministic Technical Checks</text>
+  <text x="342" y="146" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">SSL Certs · SSRF Guard · Domain Age</text>
+  <text x="342" y="160" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5">DNS/SPF/DMARC · Headers · Sandbox</text>
+
+  <!-- Semantic Pill -->
+  <rect x="330" y="176" width="260" height="58" rx="11" fill="#091815" stroke="#1e463b" stroke-width="1"/>
+  <text x="342" y="196" fill="#38bdf8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700">Semantic AI &amp; Visual Checks</text>
+  <text x="342" y="214" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Suspicious Similarities · Scam Red Flags</text>
+  <text x="342" y="228" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5">Image Forgery · Prompt-Injection Shield</text>
+
+  <!-- ARROW 2 -> 3 -->
+  <line x1="612" y1="151" x2="644" y2="151" stroke="#10b981" stroke-width="2.2" stroke-linecap="round"/>
+  <polyline points="638,145 645,151 638,157" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- STEP 3 CARD -->
+  <rect x="652" y="52" width="240" height="198" rx="16" fill="#111c26" stroke="#223444" stroke-width="1.2"/>
+  <rect x="668" y="68" width="28" height="28" rx="8" fill="#172a3a" stroke="#2a4359" stroke-width="1"/>
+  <text x="682" y="87" text-anchor="middle" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800">3</text>
+  <text x="706" y="87" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700">Clear Verdict</text>
+
+  <text x="668" y="122" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="600">• 0–100% Scam Likelihood</text>
+  <text x="678" y="140" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5">&amp; Image Genuineness badge</text>
+
+  <text x="668" y="172" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="600">• Simple + "Show Details"</text>
+  <text x="678" y="190" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5">Full evidence for investigators</text>
+
+  <rect x="668" y="208" width="208" height="26" rx="8" fill="#1b1218" stroke="#5c2233" stroke-width="1"/>
+  <text x="772" y="225" text-anchor="middle" fill="#fda4af" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600">PDF Report · Police Concept</text>
+</svg>

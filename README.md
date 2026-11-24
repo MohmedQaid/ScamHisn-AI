@@ -105,36 +105,55 @@ Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi
 
 ### How It Works
 
-```mermaid
-flowchart LR
-    U["User Link<br/>Web or Extension"] --> S["SSRF Guard<br/>Block Private IPs"]
-    S --> B["Playwright Sandbox<br/>Redirects & Hidden DOM"]
-    S --> T["TLS · RDAP/WHOIS · DNS<br/>Certs & Domain Age"]
-    B --> P["Prompt-Injection Shield<br/>EN/AR · Hidden Text · Reviews"]
-    B --> H["UAE Brand & Phishing Heuristics"]
-    T --> H
-    P --> G["Gemini 3.5 Flash-Lite<br/>Search & Maps Grounding"]
-    H --> G
-    G --> R["Decisive 0–100% Score<br/>UI · PDF · JSON"]
-```
+Every scan combines **Deterministic Checks** *(SSL certificates, SSRF safety guard, domain age/WHOIS, DNS/SPF/DMARC, security headers, and isolated browser rendering)* with **Semantic AI Checks** *(suspicious similarities, scam red flags, visual image forgery, and prompt-injection defense)*.
+
+#### 1. Live Website (Links & Images)
+
+<p align="center">
+  <img src="./assets/diagram-webapp.svg" alt="Live Website — How It Works" width="100%" />
+</p>
+
+#### 2. Chrome Extension (Desktop Browsers)
+
+<p align="center">
+  <img src="./assets/diagram-extension.svg" alt="Chrome Extension — How It Works" width="100%" />
+</p>
 
 | Layer | Purpose |
 |---|---|
-| **Playwright Headless Shell** | Opens links safely in a throwaway sandbox (no downloads/cookies), follows redirects, and catches hidden cloaking. |
-| **Node `tls`, RDAP/WHOIS & DNS** | Verifies SSL certificates, flags newly registered domains (`<30d`), and checks SPF/DMARC records. |
-| **UAE Brand & Anomaly Guard** | Catches lookalike domains and impersonation of UAE portals (**TAMM**, **UAE PASS**, local banks) while keeping false positives low. |
-| **Anti-Prompt-Injection Shield** | Detects hidden AI-override attacks in HTML, comments, and Maps reviews, isolating untrusted text in cryptographic boundaries. |
-| **Gemini (`gemini-3.5-flash-lite`)** | Verifies links with Search/Maps grounding and inspects compressed screenshots (`≤768px` single tile + SHA-256 zero-token cache) for scams and forgery. |
+| **Deterministic Checks** | **SSRF Guard**, **Playwright Sandbox**, **Node `tls`**, **RDAP/WHOIS**, **DNS (SPF/DMARC)** & **Security Headers** catch unsafe certificates, disposable new domains, redirects, and hidden forms. |
+| **Semantic AI (`gemini-3.5-flash-lite`)** | Analyzes suspicious similarities, UAE brand spoofing, fake job/map claims, and **uploaded screenshots/images** (`≤768px` single tile + SHA-256 zero-token cache) while avoiding false positives on legitimate similar-named entities (e.g. ADIB vs. DIB). |
+| **Anti-Prompt-Injection Shield** | Detects hidden AI-override attacks in HTML, comments, Maps reviews, and images, isolating untrusted text in cryptographic boundaries. |
 | **Shared REST API (`/api/v1/scan` & `/scan-image`)** | Single backend powering the web app, image authenticity checker, PDF generator, and Chrome extension. |
 
 ---
 
 ### Future Vision: TAMM Ecosystem Integration
 
-Integrating **ScamHisn AI** into Abu Dhabi's **TAMM** ecosystem unlocks proactive, resident-specific protection:
+Integrating **ScamHisn AI** into Abu Dhabi's **TAMM** ecosystem unlocks proactive, resident-specific protection right inside the services residents already trust.
 
-- **Personalized Fact-Checking:** Cross-check scam claims against a resident's real TAMM records—instantly catching fake *"unpaid traffic fine"* or *"expired ID"* messages when the user has none.
-- **Native TAMM App Service:** Embed one-tap link verification inside the **TAMM** app with authenticated, direct reporting to **Abu Dhabi Police** cybercrime units.
+<p align="center">
+  <img src="./assets/diagram-tamm.svg" alt="Future Vision — TAMM Ecosystem Integration How It Works" width="100%" />
+</p>
+
+<table align="center">
+<tr>
+<td align="center" width="50%">
+<strong>Current TAMM Experience</strong><br /><br />
+<img src="./assets/tamm-current.jpg" alt="Current TAMM App Screen" width="270" />
+</td>
+<td align="center" width="50%">
+<strong>Concept: TAMM with ScamHisn AI</strong><br /><br />
+<img src="./assets/tamm-with-scamhisn.png" alt="Concept TAMM App Screen with ScamHisn AI" width="270" />
+</td>
+</tr>
+</table>
+
+- **Personalized Fact-Checking:** Cross-check scam claims against a resident's real TAMM records—instantly catching fake *"unpaid traffic fine"* or *"expired ID"* messages when their account shows *"All good, no fines."*
+- **Native TAMM App Service:** Embed one-tap link and screenshot verification inside **TAMM** with authenticated reporting to **Abu Dhabi Police** cybercrime units.
+
+> [!NOTE]
+> **Architecture Scope:** The exact integration design and which specific TAMM tools, APIs, or data boundaries ScamHisn AI connects to are intentionally left for **TAMM experts and system architects** to design.
 
 ---
 
@@ -237,25 +256,58 @@ However, if you want to deploy your own copy for free on **Render**:
 
 ---
 
-### آلية العمل التقنية
+### آلية العمل
 
-| التقنية | الدور داخل النظام |
+يجمع كل فحص بين **الفحوصات الحتمية (Deterministic)** *(شهادات SSL، درع SSRF، عمر النطاق WHOIS/RDAP، سجلات DNS/SPF/DMARC، ترويسات الأمان، والبيئة المعزولة)* وبين **الفحص الدلالي بالذكاء الاصطناعي (Semantic)** *(التشابه المشبوه، علامات الاحتيال، كشف تزوير الصور، وصد حقن الأوامر)*.
+
+#### 1. تطبيق الويب المباشر (الروابط والصور)
+
+<p align="center">
+  <img src="./assets/diagram-webapp.svg" alt="آلية عمل تطبيق الويب — حصن الاحتيال" width="100%" />
+</p>
+
+#### 2. إضافة متصفح كروم (للحاسوب)
+
+<p align="center">
+  <img src="./assets/diagram-extension.svg" alt="آلية عمل إضافة كروم — حصن الاحتيال" width="100%" />
+</p>
+
+| الطبقة | الدور داخل النظام |
 |---|---|
-| **Playwright (متصفح معزول)** | يفتح الروابط في بيئة مؤقتة آمنة (دون تنزيلات أو ملفات ارتباط)، ويتتبع التحويلات ويكشف العناصر المخفية. |
-| **Node `tls` و RDAP/WHOIS و DNS** | يفحص شهادات الأمان، ويرصد النطاقات المسجلة حديثاً (أقل من 30 يوماً)، ويتحقق من سجلات SPF/DMARC. |
-| **حماية العلامات الإماراتية** | يكشف النطاقات المقلّدة وانتحال الجهات المحلية (**تم**، **الهوية الرقمية**، البنوك) مع تقليل الإنذارات الكاذبة. |
-| **درع صد حقن الأوامر** | يرصد أوامر التلاعب المخفية في الصفحات وتقييمات الخرائط ويعزل النصوص غير الموثوقة بحدود مشفرة. |
-| **Gemini (`gemini-3.5-flash-lite`)** | يتحقق من الروابط عبر البحث والخرائط، ويفحص الصور المضغوطة (`≤768px` مع تخزين مؤقت SHA-256 بصفر رموز عند التكرار) لكشف التزوير والاحتيال. |
+| **الفحوصات الحتمية (Deterministic)** | **درع SSRF** و**متصفح Playwright المعزول** و**شهادات SSL** و**عمر النطاق RDAP/WHOIS** و**سجلات DNS/SPF/DMARC** لرصد النطاقات المؤقتة والتحويلات والنماذج المخفية. |
+| **الفحص الدلالي (`gemini-3.5-flash-lite`)** | يحلل التشابه المشبوه وانتحال الجهات الإماراتية وإعلانات الوظائف والخرائط، ويفحص **الصور ولقطات الشاشة المرفوعة** (`≤768px` مع تخزين مؤقت SHA-256 بصفر رموز عند التكرار) دون التباس بين الجهات الشرعية متشابهة الأسماء (مثل ADIB وDIB). |
+| **درع صد حقن الأوامر** | يرصد أوامر التلاعب المخفية في الصفحات وتقييمات الخرائط والصور، ويعزل النصوص غير الموثوقة بحدود مشفرة. |
 | **واجهة برمجية موحدة (`/api/v1/scan` و `/scan-image`)** | خادم واحد يغذي تطبيق الويب وفاحص الصور ومولّد تقارير PDF وإضافة المتصفح بسهولة وقابلية للتوسع. |
 
 ---
 
 ### الرؤية المستقبلية: التكامل مع منظومة «تم» (TAMM)
 
-يتيح دمج **حصن الاحتيال** ضمن بيئة **منظومة «تم» (TAMM)** نقلة نوعية في حماية المجتمع:
+يتيح دمج **حصن الاحتيال** ضمن بيئة **منظومة «تم» (TAMM)** حماية استباقية مخصّصة للمستخدم داخل الخدمات الحكومية التي يثق بها يومياً.
 
-- **كشف مخصّص للاحتيال عبر بيانات المستخدم:** التحقق الفوري من صحة ادعاءات الرسائل المشبوهة (مثل *"مخالفة مرورية غير مدفوعة"* أو *"انتهاء الهوية"*) مقارنةً بوضع المستفيد الفعلي في «تم»، مما يكشف المعلومات المغلوطة فوراً.
-- **خدمة مدمجة داخل تطبيق «تم»:** توفير أداة فحص الروابط مباشرةً داخل التطبيق مع إمكانية رفع البلاغات الموثقة مباشرةً إلى **شرطة أبوظبي**.
+<p align="center">
+  <img src="./assets/diagram-tamm.svg" alt="الرؤية المستقبلية — آلية التكامل مع منظومة تم" width="100%" />
+</p>
+
+<table align="center">
+<tr>
+<td align="center" width="50%">
+<strong>تطبيق «تم» الحالي</strong><br /><br />
+<img src="./assets/tamm-current.jpg" alt="واجهة تطبيق تم الحالية" width="270" />
+</td>
+<td align="center" width="50%">
+<strong>تصوّر مستقبلي: «تم» مع حصن الاحتيال</strong><br /><br />
+<img src="./assets/tamm-with-scamhisn.png" alt="تصور دمج حصن الاحتيال داخل تطبيق تم" width="270" />
+</td>
+</tr>
+</table>
+
+- **كشف مخصّص للاحتيال عبر بيانات المستخدم:** التحقق الفوري من صحة ادعاءات الرسائل المشبوهة (مثل *"مخالفة مرورية غير مدفوعة"*) مقارنةً بوضع المستفيد الفعلي في «تم» (مثل ظهور *"لا توجد مخالفات"* في سجل المركبات).
+- **خدمة مدمجة داخل تطبيق «تم»:** توفير فحص الروابط والصور بضغطة واحدة داخل التطبيق مع إمكانية رفع البلاغات الموثّقة مباشرةً إلى **شرطة أبوظبي**.
+
+> **نطاق التصميم المعماري:**
+>
+> تُترك تفاصيل آلية التكامل التقني والأدوات أو الخدمات المحددة التي يتصل بها «حصن الاحتيال» داخل منظومة «تم» **للخبراء ومهندسي الأنظمة المختصين** لتصميمها وفق أعلى معايير الأمان والخصوصية.
 
 ---
 
