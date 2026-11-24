@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ScamHisn AI</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="brand">
+          <img src="icons/icon48.png" alt="ScamHisn AI" class="brand-logo" />
+          <span id="brand-name" class="brand-name">ScamHisn AI</span>
+          <span id="dev-pill" class="dev-pill hidden">DEV</span>
+        </div>
+
+        <div class="topbar-actions">
+          <button id="lang-btn" type="button" class="icon-pill" title="Switch language">
+            العربية
+          </button>
+          <button id="theme-btn" type="button" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
+            <span id="theme-icon">☀</span>
+          </button>
+          <button id="settings-btn" type="button" class="icon-btn" title="API Settings" aria-label="API Settings">
+            ⚙
+          </button>
+        </div>
+      </header>
+
+      <!-- Collapsible API URL Settings -->
+      <section id="settings-panel" class="settings-panel hidden">
+        <label id="settings-label" for="api-url-input" class="settings-label">Backend API URL</label>
+        <div class="settings-row">
+          <input
+            id="api-url-input"
+            type="url"
+            dir="ltr"
+            class="input mono"
+            placeholder="https://scamhisn-ai.onrender.com"
+          />
+          <button id="settings-save-btn" type="button" class="btn-secondary small">Save</button>
+        </div>
+        <p id="settings-status" class="settings-status hidden"></p>
+      </section>
+
+      <!-- Two Mode Switcher: Check Manually | Check Everything -->
+      <nav class="mode-tabs" role="tablist">
+        <button id="tab-manual" type="button" role="tab" aria-selected="true" class="mode-tab active">
+          <span id="tab-manual-label">Check Manually</span>
+        </button>
+        <button id="tab-auto" type="button" role="tab" aria-selected="false" class="mode-tab">
+          <span id="tab-auto-lock" class="lock-icon" aria-hidden="true">🔒</span>
+          <span id="tab-auto-label">Check Everything</span>
+        </button>
+      </nav>
+
+      <!-- MODE 1: Check Manually -->
+      <main id="panel-manual" class="panel">
+        <!-- Category Selector: Icons + One Word ONLY -->
+        <div class="cat-grid" role="radiogroup" aria-label="Category">
+          <button type="button" role="radio" aria-checked="true" data-cat="general" class="cat-btn active">
+            <svg viewBox="0 0 24 24" class="cat-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            <span id="cat-general-label">General</span>
+          </button>
+
+          <button type="button" role="radio" aria-checked="false" data-cat="job" class="cat-btn">
+            <svg viewBox="0 0 24 24" class="cat-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+            <span id="cat-job-label">Job</span>
+          </button>
+
+          <button type="button" role="radio" aria-checked="false" data-cat="map" class="cat-btn">
+            <svg viewBox="0 0 24 24" class="cat-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span id="cat-map-label">Map</span>
+          </button>
+        </div>
+
+        <!-- URL Input + Quick Actions -->
+        <form id="scan-form" class="scan-form">
+          <input
+            id="url-input"
+            type="text"
+            dir="ltr"
+            autocomplete="off"
+            spellcheck="false"
+            class="input mono url-input"
+            placeholder="Paste a link or use current tab..."
+          />
+
+          <div class="input-helpers">
+            <button id="this-tab-btn" type="button" class="chip-btn">This Tab</button>
+            <button id="paste-btn" type="button" class="chip-btn">Paste</button>
+          </div>
+
+          <button id="inspect-btn" type="submit" class="btn-primary">
+            <span id="inspect-spinner" class="spinner hidden"></span>
+            <span id="inspect-btn-label">Inspect Link</span>
+          </button>
+        </form>
+
+        <!-- Error Banner -->
+        <div id="error-box" class="alert-box error hidden" role="alert"></div>
+
+        <!-- Minimal Result Card -->
+        <section id="result-card" class="result-card hidden">
+          <!-- Critical Prompt-Injection / Smoking-Gun Alert -->
+          <div id="critical-alert" class="alert-box critical hidden"></div>
+
+          <div class="result-top">
+            <!-- Compact SVG Percentage Ring -->
+            <div class="gauge-wrap">
+              <svg viewBox="0 0 84 84" class="gauge-svg">
+                <circle cx="42" cy="42" r="35" class="gauge-track" />
+                <circle id="gauge-arc" cx="42" cy="42" r="35" class="gauge-arc" />
+              </svg>
+              <div id="gauge-score" class="gauge-score">0%</div>
+            </div>
+
+            <div class="result-meta">
+              <div class="result-badges">
+                <span id="verdict-badge" class="verdict-badge safe">Likely Safe</span>
+                <span id="duration-pill" class="duration-pill">0.0s</span>
+              </div>
+              <p id="result-summary" class="result-summary"></p>
+              <p id="result-url" dir="ltr" class="result-url mono"></p>
+            </div>
+          </div>
+
+          <!-- Action Buttons: Show Details, Report PDF, Send to Police -->
+          <div class="result-actions">
+            <button id="details-btn" type="button" class="btn-secondary" aria-expanded="false">
+              <span id="details-btn-label">Show Details</span>
+              <span id="details-chevron">▾</span>
+            </button>
+
+            <button id="pdf-btn" type="button" class="btn-emerald-soft">
+              <span id="pdf-btn-label">Report PDF</span>
+            </button>
+
+            <button id="police-btn" type="button" class="btn-police">
+              <span id="police-btn-label">Send to police</span>
+              <span id="concept-badge" class="concept-pill">Concept</span>
+            </button>
+          </div>
+
+          <div id="police-notice" class="alert-box warn hidden"></div>
+
+          <!-- Expandable Technical Investigator Details -->
+          <div id="details-drawer" class="details-drawer hidden">
+            <div class="detail-block">
+              <h3 id="findings-heading" class="detail-heading">Detected Findings</h3>
+              <ul id="findings-list" class="findings-list"></ul>
+            </div>
+
+            <div class="detail-block">
+              <h3 id="tech-heading" class="detail-heading">Technical Forensics</h3>
+              <div id="tech-grid" class="tech-grid"></div>
+            </div>
+
+            <div class="detail-block">
+              <div class="raw-head">
+                <h3 id="raw-json-heading" class="detail-heading">Raw API JSON</h3>
+                <button id="copy-json-btn" type="button" class="chip-btn">Copy</button>
+              </div>
+              <pre id="raw-json-pre" dir="ltr" class="raw-json mono"></pre>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- MODE 2: Check Everything (Locked in Production / Unlocked in Private Dev) -->
+      <section id="panel-auto" class="panel hidden">
+        <!-- Production Locked View -->
+        <div id="auto-locked-view" class="locked-card">
+          <div class="locked-icon-wrap">🔒</div>
+          <span id="dev-only-pill" class="dev-only-pill">Developers only</span>
+          <h2 id="locked-title" class="locked-title">Developers Only</h2>
+          <p id="locked-body" class="locked-body">
+            Automatic page-wide link monitoring is locked in production and reserved for private developer testing.
+          </p>
+        </div>
+
+        <!-- Private Dev Unlocked View -->
+        <div id="auto-dev-view" class="dev-card hidden">
+          <div class="dev-card-head">
+            <span class="dev-pill">DEV</span>
+            <h2 id="dev-monitor-title" class="dev-title">Private Developer Monitor</h2>
+          </div>
+          <p id="dev-monitor-desc" class="dev-desc">
+            Automatically scans visible external links on open pages and shows inline risk badges.
+          </p>
+
+          <label class="toggle-row">
+            <span id="dev-monitor-toggle-label" class="toggle-label">Auto-Monitor Pages</span>
+            <input id="dev-monitor-checkbox" type="checkbox" class="toggle-input" />
+            <span class="toggle-slider"></span>
+          </label>
+
+          <p id="dev-monitor-status" class="dev-status">Monitoring paused</p>
+        </div>
+      </section>
+
+      <!-- Compact Footer -->
+      <footer class="footer">
+        <span id="footer-credit">Team Cybersound</span>
+        <span>•</span>
+        <span dir="ltr" class="mono">API v1</span>
+      </footer>
+    </div>
+
+    <script type="module" src="src/popup.js"></script>
+  </body>
+</html>

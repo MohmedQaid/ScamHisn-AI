@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-sans-en: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-sans-ar: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  html {
+    font-family: var(--font-sans-en);
+    scroll-behavior: smooth;
+  }
+
+  html[dir='rtl'] {
+    font-family: var(--font-sans-ar);
+  }
+
+  body {
+    background-color: #f6f8f7;
+    color: #0b1419;
+    transition: background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  html.dark body {
+    background-color: #070c10;
+    color: #f1f6f5;
+  }
+
+  code,
+  pre,
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Subtle Emirati architectural lattice backdrop */
+.bg-hisn-pattern {
+  background-image: radial-gradient(circle at 1px 1px, rgba(0, 115, 75, 0.08) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+html.dark .bg-hisn-pattern {
+  background-image: radial-gradient(circle at 1px 1px, rgba(16, 185, 129, 0.08) 1px, transparent 0);
+}
+
+/* Top ambient sovereign emerald & desert gold glow */
+.bg-hisn-aura {
+  background: radial-gradient(
+      ellipse 70% 45% at 50% -10%,
+      rgba(0, 115, 75, 0.12),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 45% 35% at 85% 5%,
+      rgba(197, 155, 39, 0.09),
+      transparent 65%
+    );
+}
+
+html.dark .bg-hisn-aura {
+  background: radial-gradient(
+      ellipse 70% 45% at 50% -10%,
+      rgba(16, 185, 129, 0.16),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 45% 35% at 85% 5%,
+      rgba(229, 188, 82, 0.08),
+      transparent 65%
+    );
+}
+
+@keyframes scanPulse {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.animate-twinkle {
+  animation: twinkle 2.4s ease-in-out infinite;
+}
+
+.animate-twinkle-delayed {
+  animation: twinkle 2.8s ease-in-out 0.9s infinite;
+}
+
+.animate-scan-pulse {
+  animation: scanPulse 2s ease-in-out infinite;
+}

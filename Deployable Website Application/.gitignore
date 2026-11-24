@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment & Secrets (NEVER commit)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Build outputs & caches
+dist/
+build/
+.vite/
+.turbo/
+*.tsbuildinfo
+coverage/
+
+# Documents / Reference PDFs (strictly excluded)
+*.pdf
+*.PDF
+
+# Logs & OS files
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+playwright-report/
+test-results/
