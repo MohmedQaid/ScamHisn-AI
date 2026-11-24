@@ -1,36 +1,62 @@
 import { useEffect, useState } from 'react';
-import { CheckCircle2, Loader2, Shield } from 'lucide-react';
+import { CheckCircle2, Image as ImageIcon, Loader2, Shield } from 'lucide-react';
 import { useLocale } from '../i18n/LocaleContext';
 
-export function ScanProgress() {
-  const { t } = useLocale();
+interface ScanProgressProps {
+  variant?: 'url' | 'image';
+}
+
+const IMAGE_STEPS = {
+  en: [
+    'Compressing image to low-token single-tile format',
+    'Checking visual genuineness, tampering & brand impersonation',
+    'Extracting visible links & computing authenticity verdict',
+  ],
+  ar: [
+    'ضغط الصورة لتوفير رصيد الفحص وسرعة الرفع',
+    'فحص الأصالة البصرية والتلاعب وانتحال الجهات الرسمية',
+    'استخراج الروابط المرصودة وحساب النتيجة النهائية',
+  ],
+} as const;
+
+export function ScanProgress({ variant = 'url' }: ScanProgressProps) {
+  const { locale, t } = useLocale();
+  const steps = variant === 'image' ? IMAGE_STEPS[locale] : t.progressSteps;
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
+    setActiveStep(0);
+    const intervalMs = variant === 'image' ? 900 : 1500;
     const timer = window.setInterval(() => {
-      setActiveStep((prev) => (prev < t.progressSteps.length - 1 ? prev + 1 : prev));
-    }, 1500);
+      setActiveStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
+    }, intervalMs);
     return () => window.clearInterval(timer);
-  }, [t.progressSteps.length]);
+  }, [steps.length, variant]);
 
   return (
     <div className="mx-auto mt-8 w-full max-w-2xl rounded-3xl border border-emerald-500/25 bg-white/95 p-6 shadow-xl shadow-emerald-900/5 dark:border-emerald-500/20 dark:bg-[#0e161e]/95">
       <div className="mb-5 flex items-center gap-3">
-        <div className="animate-scan-pulse flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-400">
-          <Shield className="h-5 w-5" />
+        <div className="animate-scan-pulse flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-400">
+          {variant === 'image' ? (
+            <ImageIcon className="h-5 w-5" />
+          ) : (
+            <Shield className="h-5 w-5" />
+          )}
         </div>
-        <div>
+        <div className="min-w-0">
           <h3 className="text-base font-bold text-slate-900 dark:text-white">
-            {t.progressTitle}
+            {variant === 'image' ? t.imageMode.inspectingBtn : t.progressTitle}
           </h3>
-          <p className="font-mono text-xs text-emerald-700 dark:text-emerald-400">
-            Playwright Headless Shell • TLS • RDAP • Gemini 3.5 Flash-Lite
+          <p className="truncate font-mono text-xs text-emerald-700 dark:text-emerald-400">
+            {variant === 'image'
+              ? 'Low-Token Vision • SHA-256 Cache • Gemini 3.5 Flash-Lite'
+              : 'Playwright Headless Shell • TLS • RDAP • Gemini 3.5 Flash-Lite'}
           </p>
         </div>
       </div>
 
       <ol className="space-y-3">
-        {t.progressSteps.map((label, idx) => {
+        {steps.map((label, idx) => {
           const isDone = idx < activeStep;
           const isCurrent = idx === activeStep;
           return (

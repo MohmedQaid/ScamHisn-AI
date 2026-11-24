@@ -1,6 +1,8 @@
 import {
   API_ENDPOINTS,
   type ApiErrorResponse,
+  type ImageScanRequest,
+  type ImageScanResponse,
   type Locale,
   type ScanMode,
   type ScanResponse,
@@ -47,6 +49,31 @@ export async function scanUrl(params: {
   }
 
   return data as ScanResponse;
+}
+
+export async function scanImage(params: ImageScanRequest): Promise<ImageScanResponse> {
+  const res = await fetch(`${API_BASE}${API_ENDPOINTS.scanImage}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      'X-ScamHisn-Client': 'web-app/1.0.0',
+    },
+    body: JSON.stringify(params),
+  });
+
+  const data = (await res.json().catch(() => null)) as ImageScanResponse | ApiErrorResponse | null;
+
+  if (!res.ok) {
+    const apiErr = (data as ApiErrorResponse | null)?.error;
+    throw new ApiClientError(
+      apiErr?.code ?? 'IMAGE_SCAN_FAILED',
+      apiErr?.message ?? `Image scan failed with HTTP ${res.status}`,
+      apiErr?.messageAr,
+    );
+  }
+
+  return data as ImageScanResponse;
 }
 
 export async function downloadForensicReportPdf(

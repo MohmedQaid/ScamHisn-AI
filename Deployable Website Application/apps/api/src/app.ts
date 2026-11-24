@@ -44,7 +44,7 @@ export function createApp(): express.Express {
           scriptSrc: ["'self'"],
           styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
           fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
-          imgSrc: ["'self'", 'data:', 'https:'],
+          imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
           connectSrc: ["'self'"],
         },
       },
@@ -67,7 +67,7 @@ export function createApp(): express.Express {
     }),
   );
 
-  app.use(express.json({ limit: '512kb' }));
+  app.use(express.json({ limit: '2.5mb' }));
 
   // Versioned REST API (shared contract for Web SPA + future browser extensions)
   app.use(API_V1_PREFIX, createV1Router());

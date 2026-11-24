@@ -3,6 +3,7 @@ export const API_V1_PREFIX = '/api/v1';
 export const API_ENDPOINTS = {
   health: `${API_V1_PREFIX}/health`,
   scan: `${API_V1_PREFIX}/scan`,
+  scanImage: `${API_V1_PREFIX}/scan-image`,
   reportPdf: `${API_V1_PREFIX}/report/pdf`,
 } as const;
 

@@ -4,6 +4,8 @@ export interface Translations {
   brandName: string;
   brandSubtitle: string;
   heroTitle: string;
+  updateBannerBadge: string;
+  updateBannerText: string;
   modePrompt: string;
   modes: Record<
     ScanMode,
@@ -13,6 +15,31 @@ export interface Translations {
       placeholder: string;
     }
   >;
+  imageMode: {
+    label: string;
+    shortDesc: string;
+    newBadge: string;
+    uploadTitle: string;
+    uploadHint: string;
+    chooseFileBtn: string;
+    previewLabel: string;
+    changeBtn: string;
+    removeBtn: string;
+    inspectBtn: string;
+    inspectingBtn: string;
+    optimizedTag: string;
+    cachedTag: string;
+    authenticityLabel: string;
+    authenticity: Record<'genuine' | 'suspicious' | 'forged_or_scam', string>;
+    authenticityAnalysisTitle: string;
+    extractedUrlsTitle: string;
+    extractedPhonesTitle: string;
+    deepScanBtn: string;
+    visualInjectionAlert: string;
+    errUnsupported: string;
+    errTooLarge: string;
+    errFailedRead: string;
+  };
   urlLabel: string;
   pasteBtn: string;
   scanBtn: string;
@@ -127,7 +154,9 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     brandName: 'ScamHisn AI',
     brandSubtitle: 'Digital Fraud Inspector',
     heroTitle: 'Inspect Any Link Before You Click',
-    modePrompt: 'Link Type',
+    updateBannerBadge: 'NEW',
+    updateBannerText: 'Screenshot & Image Authenticity Check is now live',
+    modePrompt: 'What would you like to inspect?',
     modes: {
       general: {
         label: 'General Link',
@@ -144,6 +173,35 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
         shortDesc: 'Fake places & review attacks',
         placeholder: 'Paste a Google Maps or location link... e.g. https://maps.app.goo.gl/...',
       },
+    },
+    imageMode: {
+      label: 'Image Check',
+      shortDesc: 'Screenshots & genuineness',
+      newBadge: 'NEW',
+      uploadTitle: 'Upload or paste a screenshot / image',
+      uploadHint: 'JPG, PNG, or WebP — auto-compressed to save API quota',
+      chooseFileBtn: 'Choose Image',
+      previewLabel: 'Uploaded Image Preview',
+      changeBtn: 'Change',
+      removeBtn: 'Remove',
+      inspectBtn: 'Inspect Image',
+      inspectingBtn: 'Inspecting Image...',
+      optimizedTag: 'Optimized',
+      cachedTag: 'Cached · 0 tokens',
+      authenticityLabel: 'Authenticity',
+      authenticity: {
+        genuine: 'Genuine',
+        suspicious: 'Suspicious',
+        forged_or_scam: 'Scam / Forged',
+      },
+      authenticityAnalysisTitle: 'Authenticity & Visual Forgery Analysis',
+      extractedUrlsTitle: 'Links Spotted Inside Image',
+      extractedPhonesTitle: 'Phone Numbers Spotted',
+      deepScanBtn: 'Deep-Scan Link',
+      visualInjectionAlert: 'Visual Prompt-Injection Attempt Detected Inside Image!',
+      errUnsupported: 'Unsupported file type. Please upload a JPG, PNG, or WebP image.',
+      errTooLarge: 'Image is larger than 12 MB. Please choose a smaller screenshot.',
+      errFailedRead: 'Could not process that image. Please try another file.',
     },
     urlLabel: 'Target URL',
     pasteBtn: 'Paste',
@@ -291,7 +349,9 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     brandName: 'حصن الاحتيال',
     brandSubtitle: 'فاحص الروابط والاحتيال الرقمي',
     heroTitle: 'افحص الرابط وتأكد قبل ما تضغط',
-    modePrompt: 'شو نوع الرابط؟',
+    updateBannerBadge: 'جديد',
+    updateBannerText: 'تمت إضافة ميزة فحص الصور ولقطات الشاشة للتحقق من مصداقيتها',
+    modePrompt: 'شو حاب تفحص؟',
     modes: {
       general: {
         label: 'رابط عام',
@@ -308,6 +368,35 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
         shortDesc: 'المكان والتقييمات المخترقة',
         placeholder: 'الصق رابط خرائط جوجل أو الموقع هني... مثلاً https://maps.app.goo.gl/...',
       },
+    },
+    imageMode: {
+      label: 'فحص صورة',
+      shortDesc: 'لقطات شاشة وكشف التزوير',
+      newBadge: 'جديد',
+      uploadTitle: 'ارفع أو الصق صورة أو لقطة شاشة',
+      uploadHint: 'JPG أو PNG أو WebP — يتم ضغطها تلقائياً لتوفير رصيد الفحص',
+      chooseFileBtn: 'اختر صورة',
+      previewLabel: 'معاينة الصورة المرفوعة',
+      changeBtn: 'تغيير',
+      removeBtn: 'إزالة',
+      inspectBtn: 'افحص الصورة الحين',
+      inspectingBtn: 'جاري فحص الصورة...',
+      optimizedTag: 'محسّنة الحجم',
+      cachedTag: 'من الذاكرة · 0 توكن',
+      authenticityLabel: 'الأصالة',
+      authenticity: {
+        genuine: 'أصلية وسليمة',
+        suspicious: 'مشبوهة',
+        forged_or_scam: 'احتيال أو مزوّرة',
+      },
+      authenticityAnalysisTitle: 'تحليل الأصالة وكشف التزوير البصري',
+      extractedUrlsTitle: 'روابط مرصودة داخل الصورة',
+      extractedPhonesTitle: 'أرقام هواتف مرصودة',
+      deepScanBtn: 'فحص الرابط بعمق',
+      visualInjectionAlert: 'تم رصد محاولة حقن أوامر خفية داخل الصورة!',
+      errUnsupported: 'صيغة الملف غير مدعومة. يرجى رفع صورة JPG أو PNG أو WebP.',
+      errTooLarge: 'حجم الصورة أكبر من 12 ميغابايت. اختر صورة أصغر.',
+      errFailedRead: 'تعذّرت معالجة هذه الصورة. حاول برفع صورة أخرى.',
     },
     urlLabel: 'الرابط المطلوب فحصه',
     pasteBtn: 'لصق',

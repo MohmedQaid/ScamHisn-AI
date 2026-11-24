@@ -1,30 +1,46 @@
 import { useState } from 'react';
-import { Download, ShieldCheck, Users } from 'lucide-react';
-import type { ScanMode, ScanResponse } from '@scamhisn/shared';
+import { Download, ShieldCheck, Sparkles, Users } from 'lucide-react';
+import type { ImageScanResponse, ScanMode, ScanResponse } from '@scamhisn/shared';
 import { LocaleProvider, useLocale } from './i18n/LocaleContext';
 import { TEAM_MEMBERS } from './i18n/translations';
 import { ThemeProvider } from './theme/ThemeContext';
-import { ApiClientError, scanUrl } from './api/client';
+import { ApiClientError, scanImage, scanUrl } from './api/client';
+import type { CompressedImagePayload } from './utils/imageCompress';
 import { Header } from './components/Header';
 import { HisnLogo } from './components/HisnLogo';
-import { ScanForm } from './components/ScanForm';
+import { ScanForm, type InspectorTab } from './components/ScanForm';
 import { ScanProgress } from './components/ScanProgress';
 import { ResultsDashboard } from './components/ResultsDashboard';
+import { ImageResultsCard } from './components/ImageResultsCard';
 
 function ScamHisnShell() {
   const { locale, t } = useLocale();
   const [url, setUrl] = useState('');
-  const [mode, setMode] = useState<ScanMode>('general');
+  const [mode, setMode] = useState<InspectorTab>('general');
+  const [selectedImage, setSelectedImage] = useState<CompressedImagePayload | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [scanningVariant, setScanningVariant] = useState<'url' | 'image'>('url');
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ScanResponse | null>(null);
+  const [imageResult, setImageResult] = useState<{
+    data: ImageScanResponse;
+    previewDataUrl: string;
+    fileName: string;
+  } | null>(null);
 
-  const handleScan = async (targetUrl: string, targetMode: ScanMode) => {
+  const handleModeChange = (nextMode: InspectorTab) => {
+    setMode(nextMode);
+    setError(null);
+  };
+
+  const handleScanUrl = async (targetUrl: string, targetMode: ScanMode) => {
     setIsScanning(true);
+    setScanningVariant('url');
     setError(null);
 
     try {
       const response = await scanUrl({ url: targetUrl, mode: targetMode, locale });
+      setImageResult(null);
       setResult(response);
     } catch (err) {
       if (err instanceof ApiClientError) {
@@ -43,6 +59,47 @@ function ScamHisnShell() {
     }
   };
 
+  const handleScanImage = async (img: CompressedImagePayload) => {
+    setIsScanning(true);
+    setScanningVariant('image');
+    setError(null);
+
+    try {
+      const response = await scanImage({
+        imageBase64: img.imageBase64,
+        mimeType: img.mimeType,
+        fileName: img.fileName,
+        locale,
+      });
+      setResult(null);
+      setImageResult({
+        data: response,
+        previewDataUrl: img.previewDataUrl,
+        fileName: img.fileName,
+      });
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        setError(locale === 'ar' && err.messageAr ? err.messageAr : err.message);
+      } else {
+        setError(
+          locale === 'ar'
+            ? 'تعذّر فحص الصورة المرفوعة. تأكد من الاتصال وحاول مرة ثانية.'
+            : err instanceof Error
+              ? err.message
+              : 'Failed to inspect the uploaded image.',
+        );
+      }
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const handleDeepScanExtractedUrl = (extractedUrl: string) => {
+    setMode('general');
+    setUrl(extractedUrl);
+    void handleScanUrl(extractedUrl, 'general');
+  };
+
   return (
     <div className="bg-hisn-pattern relative flex min-h-screen flex-col overflow-x-clip">
       <div className="bg-hisn-aura pointer-events-none fixed inset-0 -z-10" />
@@ -50,7 +107,7 @@ function ScamHisnShell() {
       <Header />
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 pt-10 sm:px-6 sm:pt-14">
-        {/* Centered Gemini / ChatGPT-Style Brand Title + Minimal Instruction */}
+        {/* Centered Gemini / ChatGPT-Style Brand Title + Minimal Instruction + New Feature Update Pill */}
         <div className="mx-auto mb-7 max-w-2xl text-center">
           <div className="inline-flex items-center justify-center gap-3">
             <HisnLogo className="h-11 w-11 drop-shadow-md sm:h-12 sm:w-12" />
@@ -61,22 +118,52 @@ function ScamHisnShell() {
           <p className="mt-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 sm:text-base">
             {t.heroTitle}
           </p>
+
+          {/* Subtle Clickable Feature Update Announcement */}
+          <div className="mt-3.5 flex justify-center">
+            <button
+              type="button"
+              onClick={() => handleModeChange('image')}
+              className="inline-flex max-w-full cursor-pointer items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-50/85 px-3 py-1.5 text-start text-xs font-semibold text-emerald-900 shadow-xs transition-all hover:border-emerald-500/60 hover:bg-emerald-100/80 dark:border-emerald-400/30 dark:bg-emerald-950/55 dark:text-emerald-200 dark:hover:bg-emerald-950/85 sm:rounded-full sm:py-1"
+            >
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-700 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white dark:bg-emerald-400 dark:text-slate-950">
+                <Sparkles className="h-2.5 w-2.5" />
+                {t.updateBannerBadge}
+              </span>
+              <span className="leading-snug">{t.updateBannerText}</span>
+            </button>
+          </div>
         </div>
 
         {/* Inspection Form */}
         <ScanForm
           url={url}
           mode={mode}
+          selectedImage={selectedImage}
           isScanning={isScanning}
           error={error}
           onUrlChange={setUrl}
-          onModeChange={setMode}
-          onSubmit={handleScan}
+          onModeChange={handleModeChange}
+          onImageSelect={(img) => {
+            setSelectedImage(img);
+            if (!img) setImageResult(null);
+          }}
+          onError={setError}
+          onSubmitUrl={handleScanUrl}
+          onSubmitImage={handleScanImage}
         />
 
         {/* Progress or Results */}
         {isScanning ? (
-          <ScanProgress />
+          <ScanProgress variant={scanningVariant} />
+        ) : imageResult ? (
+          <ImageResultsCard
+            key={imageResult.data.scanId}
+            result={imageResult.data}
+            previewDataUrl={imageResult.previewDataUrl}
+            fileName={imageResult.fileName}
+            onDeepScanUrl={handleDeepScanExtractedUrl}
+          />
         ) : (
           result && <ResultsDashboard key={result.scanId} result={result} />
         )}

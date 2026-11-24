@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Check, ChevronDown, Code2, Copy } from 'lucide-react';
-import type { ScanResponse } from '@scamhisn/shared';
 import { useLocale } from '../i18n/LocaleContext';
 
 interface RawMetadataViewerProps {
-  result: ScanResponse;
+  result: unknown;
 }
 
 export function RawMetadataViewer({ result }: RawMetadataViewerProps) {

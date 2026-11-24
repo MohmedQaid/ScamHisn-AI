@@ -322,3 +322,59 @@ export const ApiErrorResponseSchema = z.object({
   }),
 });
 export type ApiErrorResponse = z.infer<typeof ApiErrorResponseSchema>;
+
+// =============================================================================
+// Screenshot / Image Scam & Authenticity Inspection Schemas
+// =============================================================================
+
+export const AllowedImageMimeSchema = z.enum(['image/jpeg', 'image/png', 'image/webp']);
+export type AllowedImageMime = z.infer<typeof AllowedImageMimeSchema>;
+
+export const ImageAuthenticityStatusSchema = z.enum([
+  'genuine',
+  'suspicious',
+  'forged_or_scam',
+]);
+export type ImageAuthenticityStatus = z.infer<typeof ImageAuthenticityStatusSchema>;
+
+export const ImageScanRequestSchema = z.object({
+  imageBase64: z
+    .string()
+    .min(100, 'Image data is required')
+    .max(2_000_000, 'Image payload is too large after compression (max ~1.4 MB)'),
+  mimeType: AllowedImageMimeSchema,
+  fileName: z.string().max(180).optional(),
+  locale: LocaleSchema.optional().default('en'),
+});
+export type ImageScanRequest = z.infer<typeof ImageScanRequestSchema>;
+
+export const ImageFindingSchema = z.object({
+  severity: SeveritySchema,
+  titleEn: z.string(),
+  titleAr: z.string(),
+  detailEn: z.string(),
+  detailAr: z.string(),
+});
+export type ImageFinding = z.infer<typeof ImageFindingSchema>;
+
+export const ImageScanResponseSchema = z.object({
+  scanId: z.string(),
+  scannedAt: z.string(),
+  durationMs: z.number(),
+  cached: z.boolean(),
+  model: z.string(),
+  scamScore: z.number().min(0).max(100),
+  verdict: VerdictLevelSchema,
+  authenticityStatus: ImageAuthenticityStatusSchema,
+  isGenuine: z.boolean(),
+  visualPromptInjectionDetected: z.boolean(),
+  impersonatedEntity: z.string().nullable(),
+  extractedUrls: z.array(z.string()),
+  extractedPhones: z.array(z.string()),
+  summaryEn: z.string(),
+  summaryAr: z.string(),
+  authenticityNotesEn: z.string(),
+  authenticityNotesAr: z.string(),
+  findings: z.array(ImageFindingSchema),
+});
+export type ImageScanResponse = z.infer<typeof ImageScanResponseSchema>;

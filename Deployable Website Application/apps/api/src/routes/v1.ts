@@ -2,6 +2,7 @@ import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import {
+  ImageScanRequestSchema,
   LocaleSchema,
   ScanRequestSchema,
   ScanResponseSchema,
@@ -11,6 +12,7 @@ import { config } from '../config.js';
 import { SsrfError } from '../security/ssrfGuard.js';
 import { runUrlScan } from '../services/scanOrchestrator.js';
 import { generateForensicPdf } from '../services/pdfReportGenerator.js';
+import { inspectUploadedImage } from '../ai/geminiImageAnalyzer.js';
 
 const PdfReportRequestSchema = z.object({
   report: ScanResponseSchema,
@@ -30,6 +32,21 @@ export function createV1Router(): Router {
         code: 'RATE_LIMIT_EXCEEDED',
         message: 'Too many scan requests. Please wait a moment and try again.',
         messageAr: 'وصلت للحد المسموح من الفحوصات مؤقتاً، تريّث شوي وحاول مرة ثانية.',
+      },
+    },
+  });
+
+  // Dedicated stricter limiter for multimodal image uploads to protect shared Gemini API quota
+  const imageScanLimiter = rateLimit({
+    windowMs: config.rateLimitWindowMs,
+    max: Math.min(config.rateLimitMax, 10),
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+      error: {
+        code: 'IMAGE_RATE_LIMIT_EXCEEDED',
+        message: 'Image scan rate limit reached to protect API quota. Please wait a minute and try again.',
+        messageAr: 'تم الوصول للحد المؤقت لفحص الصور لحماية رصيد الخدمة، انتظر دقيقة وحاول مرة ثانية.',
       },
     },
   });
@@ -81,6 +98,65 @@ export function createV1Router(): Router {
           code: 'SCAN_INTERNAL_ERROR',
           message: 'An unexpected error occurred while inspecting the URL.',
           messageAr: 'صار خطأ غير متوقع أثناء فحص الرابط. حاول مرة ثانية.',
+        },
+      });
+    }
+  });
+
+  router.post('/scan-image', imageScanLimiter, async (req, res) => {
+    const parsed = ImageScanRequestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: parsed.error.issues[0]?.message ?? 'Invalid image upload payload.',
+          messageAr: 'صيغة الصورة أو حجمها غير صالح. يُسمح بملفات JPG و PNG و WebP فقط.',
+        },
+      });
+      return;
+    }
+
+    try {
+      const result = await inspectUploadedImage(parsed.data);
+      res.status(200).json(result);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg === 'AI_NOT_CONFIGURED') {
+        res.status(503).json({
+          error: {
+            code: 'AI_UNAVAILABLE',
+            message: 'GEMINI_API_KEY is not configured on the server for image inspection.',
+            messageAr: 'مفتاح GEMINI_API_KEY غير مفعّل على الخادم لفحص الصور.',
+          },
+        });
+        return;
+      }
+      if (msg === 'IMAGE_TOO_LARGE' || msg === 'INVALID_IMAGE_DATA') {
+        res.status(400).json({
+          error: {
+            code: msg,
+            message: 'Please upload a valid JPG, PNG, or WebP image (under 1.5 MB compressed).',
+            messageAr: 'يرجى رفع صورة صالحة بصيغة JPG أو PNG أو WebP.',
+          },
+        });
+        return;
+      }
+      if (msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED')) {
+        res.status(429).json({
+          error: {
+            code: 'AI_RATE_LIMITED',
+            message: 'API rate limit reached temporarily. Please wait a minute and try again.',
+            messageAr: 'تم الوصول للحد المؤقت لاستخدام الذكاء الاصطناعي، يرجى الانتظار دقيقة والمحاولة مرة أخرى.',
+          },
+        });
+        return;
+      }
+      console.error('[ScamHisn API] Image scan error:', err);
+      res.status(500).json({
+        error: {
+          code: 'IMAGE_SCAN_ERROR',
+          message: 'Could not inspect the uploaded image. Please try again.',
+          messageAr: 'تعذّر فحص الصورة المرفوعة. حاول مرة ثانية.',
         },
       });
     }

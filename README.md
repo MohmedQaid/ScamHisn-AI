@@ -8,7 +8,7 @@
 
 # ScamHisn AI · حصن الاحتيال
 
-*AI-Powered Scam & Link Inspector — Web App & Chrome Extension*
+*AI-Powered Link, Image & Scam Inspector — Web App & Chrome Extension*
 
 <br />
 
@@ -42,9 +42,12 @@
 
 ## EN — Overview
 
-**ScamHisn AI** is both a **Web Application** and a **Chrome Extension** that detects fraudulent links before users click them.
+**ScamHisn AI** is both a **Web Application** and a **Chrome Extension** that detects fraudulent links and forged/scam screenshots before users fall for them.
 
-It supports **passive checking** (manual inspection on demand) and **proactive checking** (automatic scanning of links on open web pages).
+It supports **passive checking** (manual link & image inspection on demand) and **proactive checking** (automatic scanning of links on open web pages).
+
+> [!TIP]
+> **Latest Update — Screenshot & Image Authenticity Check (`NEW`):** Upload or paste any suspicious SMS, WhatsApp, email, or receipt screenshot to preview it live and verify whether it is **Genuine**, **Suspicious**, or **Scam / Forged**. Images are auto-compressed client-side (`≤768px` single vision tile) and cached via SHA-256 (**0 tokens** on repeat scans) to protect live API limits.
 
 > [!IMPORTANT]
 > **Why only the passive version is deployed live:** Both versions are built (`Chrome Extension/deployable/` and `Chrome Extension/dev/`), but proactive scanning is locked to *"Developers only"* in production. Running unauthenticated background AI scans publicly could lead to runaway API bills.
@@ -63,8 +66,9 @@ Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi
 
 | Feature | What It Delivers |
 |---|---|
-| **3 Inspection Modes** | **General Link** (phishing & UAE brand spoofing) · **Job Post** (fake employers & visa fees) · **Map Link** (hijacked contacts & review attacks). |
-| **Simple + Deep Views** | Clean percentage verdict for everyday users; **"Show Details"** reveals SSL, RDAP/WHOIS age, IPs, redirects, hidden DOM, and raw JSON for investigators. |
+| **4 Inspection Modes** | **General Link** (phishing & UAE brand spoofing) · **Job Post** (fake employers & visa fees) · **Map Link** (hijacked contacts & review attacks) · **Image Check (`NEW`)** (screenshot genuineness, tampering & visual scam detection). |
+| **Live Image Preview & Low-Token AI** | Preview uploaded images right inside the app, spot forged receipts or smishing screenshots, extract hidden URLs for 1-click deep scanning, and save quota via `768px` compression + SHA-256 caching. |
+| **Simple + Deep Views** | Clean percentage verdict for everyday users; **"Show Details"** reveals SSL, RDAP/WHOIS age, IPs, redirects, hidden DOM, authenticity analysis, and raw JSON for investigators. |
 | **Police-Ready PDF** | One-click **"Generate Report"** exports a forensic A4 PDF (score, findings, WHOIS/TLS/IPs, UTC timestamp, raw JSON) for investigation or takedown. |
 | **Police Reporting Concept** | Includes a conceptual **"Send to police for investigation"** button illustrating direct escalation to Abu Dhabi Police eCrime workflows. |
 
@@ -79,8 +83,8 @@ Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi
 **Web App (Phone & Laptop)**
 
 1. Open **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
-2. Pick **General**, **Job**, or **Map** and paste any link.
-3. Click **Inspect Link** → view score, **Show Details**, or **Generate Report (PDF)**.
+2. Pick **General**, **Job**, **Map**, or **Image Check (`NEW`)** — paste a link or upload a screenshot with live preview.
+3. Click **Inspect** → view score & genuineness verdict, **Show Details**, or **Generate Report (PDF)**.
 
 *Phone Chrome tip:* Tap menu → **Add to Home screen** to install it like an app.
 
@@ -120,8 +124,8 @@ flowchart LR
 | **Node `tls`, RDAP/WHOIS & DNS** | Verifies SSL certificates, flags newly registered domains (`<30d`), and checks SPF/DMARC records. |
 | **UAE Brand & Anomaly Guard** | Catches lookalike domains and impersonation of UAE portals (**TAMM**, **UAE PASS**, local banks) while keeping false positives low. |
 | **Anti-Prompt-Injection Shield** | Detects hidden AI-override attacks in HTML, comments, and Maps reviews, isolating untrusted text in cryptographic boundaries. |
-| **Gemini (`gemini-3.5-flash-lite`)** | Verifies real-world claims with Search/Maps grounding and outputs bilingual structured forensic findings. |
-| **Shared REST API (`/api/v1/scan`)** | Single backend powering the web app, PDF generator, and Chrome extension. |
+| **Gemini (`gemini-3.5-flash-lite`)** | Verifies links with Search/Maps grounding and inspects compressed screenshots (`≤768px` single tile + SHA-256 zero-token cache) for scams and forgery. |
+| **Shared REST API (`/api/v1/scan` & `/scan-image`)** | Single backend powering the web app, image authenticity checker, PDF generator, and Chrome extension. |
 
 ---
 
@@ -164,9 +168,15 @@ However, if you want to deploy your own copy for free on **Render**:
 
 ## AR — نظرة عامة
 
-**حصن الاحتيال (ScamHisn AI)** هو **تطبيق ويب** و**إضافة لمتصفح كروم** تعتمد على الذكاء الاصطناعي لاكتشاف الروابط الاحتيالية قبل النقر عليها.
+**حصن الاحتيال (ScamHisn AI)** هو **تطبيق ويب** و**إضافة لمتصفح كروم** تعتمد على الذكاء الاصطناعي لاكتشاف الروابط الاحتيالية وفحص الصور ولقطات الشاشة المشبوهة قبل الوقوع في فخ الاحتيال.
 
-يدعم النظام **الفحص اليدوي (السلبي)** عند الطلب، و**الفحص الاستباقي (النشط)** لمراقبة الروابط تلقائياً في صفحات الويب المفتوحة.
+يدعم النظام **الفحص اليدوي (السلبي)** للروابط والصور عند الطلب، و**الفحص الاستباقي (النشط)** لمراقبة الروابط تلقائياً في صفحات الويب المفتوحة.
+
+> **تحديث جديد — فحص الصور ولقطات الشاشة والتحقق من مصداقيتها:**
+>
+> يمكنك الآن رفع أو لصق أي لقطة شاشة مشبوهة (رسائل نصية، واتساب، بريد إلكتروني، أو إيصالات) مع معاينة فورية للصورة المرفوعة، للتحقق مما إذا كانت **أصلية وسليمة** أم **مشبوهة** أم **احتيال أو مزوّرة**. يتم ضغط الصور تلقائياً على جهاز المستخدم (`≤768px`) وتخزين نتائجها مؤقتاً ببصمة SHA-256 (**0 توكن** عند التكرار) للحفاظ على حدود استخدام مفتاح واجهة البرمجة.
+
+<br />
 
 > **تنويه مهم — لماذا نُشرت النسخة اليدوية فقط؟**
 >
@@ -190,8 +200,9 @@ However, if you want to deploy your own copy for free on **Render**:
 
 | الميزة | الفائدة العملية |
 |---|---|
-| **3 أوضاع للفحص** | **رابط عام** (التصيّد وانتحال الجهات الإماراتية) · **إعلان وظيفة** (كشف الشركات الوهمية) · **رابط خريطة** (الأرقام المخترقة وهجمات التقييمات). |
-| **عرض بسيط ومفصّل** | ملخص واضح وسريع للمستخدم العادي، مع زر **"عرض التفاصيل التقنية"** للمحقق الرقمي (شهادة SSL، عمر النطاق WHOIS/RDAP، عناوين IP، التحويلات، وJSON). |
+| **4 أوضاع للفحص** | **رابط عام** (التصيّد وانتحال الجهات الإماراتية) · **إعلان وظيفة** (كشف الشركات الوهمية) · **رابط خريطة** (الأرقام المخترقة وهجمات التقييمات) · **فحص صورة (جديد)** (التحقق من أصالة الصور وكشف التزوير والاحتيال البصري). |
+| **معاينة فورية واستهلاك اقتصادي للرموز** | عرض واضح للصورة المرفوعة قبل الفحص وداخل بطاقة النتيجة، مع استخراج الروابط المرصودة لفحصها بضغطة زر، وضغط تلقائي `768px` وتخزين مؤقت SHA-256 لحماية الرصيد. |
+| **عرض بسيط ومفصّل** | ملخص واضح وسريع للمستخدم العادي، مع زر **"عرض التفاصيل التقنية"** للمحقق الرقمي (شهادة SSL، عمر النطاق WHOIS/RDAP، عناوين IP، التحويلات، تحليل الأصالة، وJSON). |
 | **تقرير PDF جاهز للشرطة** | زر **"إنشاء تقرير (PDF)"** يصدر ملف أدلة جنائية منظماً (نسبة الخطر، الملاحظات، بيانات WHOIS/SSL/IP، التوقيت، وJSON الكامل) جاهزاً للتحقيق أو طلبات الإزالة. |
 | **مفهوم الإبلاغ للشرطة** | يتضمن زر **"إرسال للشرطة للتحقيق"** كنموذج أولي يوضح مسار الربط المباشر المستقبلي مع فرق مكافحة الجرائم الإلكترونية. |
 
@@ -206,8 +217,8 @@ However, if you want to deploy your own copy for free on **Render**:
 **تطبيق الويب (الهاتف والحاسوب)**
 
 1. افتح **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
-2. اختر **رابط عام** أو **إعلان وظيفة** أو **رابط خريطة** ثم الصق الرابط.
-3. اضغط **افحص الرابط** لعرض النتيجة أو **عرض التفاصيل** أو **إنشاء تقرير (PDF)**.
+2. اختر **رابط عام** أو **إعلان وظيفة** أو **رابط خريطة** أو **فحص صورة (جديد)** — الصق رابطاً أو ارفع صورة مع معاينة فورية.
+3. اضغط **افحص** لعرض النتيجة وتقييم الأصالة أو **عرض التفاصيل** أو **إنشاء تقرير (PDF)**.
 
 *لمستخدمي كروم على الهاتف:* من القائمة اختر **إضافة إلى الشاشة الرئيسية** لاستخدامه كتطبيق.
 
@@ -234,8 +245,8 @@ However, if you want to deploy your own copy for free on **Render**:
 | **Node `tls` و RDAP/WHOIS و DNS** | يفحص شهادات الأمان، ويرصد النطاقات المسجلة حديثاً (أقل من 30 يوماً)، ويتحقق من سجلات SPF/DMARC. |
 | **حماية العلامات الإماراتية** | يكشف النطاقات المقلّدة وانتحال الجهات المحلية (**تم**، **الهوية الرقمية**، البنوك) مع تقليل الإنذارات الكاذبة. |
 | **درع صد حقن الأوامر** | يرصد أوامر التلاعب المخفية في الصفحات وتقييمات الخرائط ويعزل النصوص غير الموثوقة بحدود مشفرة. |
-| **Gemini (`gemini-3.5-flash-lite`)** | يتحقق من الادعاءات والشركات والأماكن عبر البحث والخرائط، ويولّد تحليلاً منظماً ثنائي اللغة. |
-| **واجهة برمجية موحدة (`/api/v1/scan`)** | خادم واحد يغذي تطبيق الويب ومولّد تقارير PDF وإضافة المتصفح بسهولة وقابلية للتوسع. |
+| **Gemini (`gemini-3.5-flash-lite`)** | يتحقق من الروابط عبر البحث والخرائط، ويفحص الصور المضغوطة (`≤768px` مع تخزين مؤقت SHA-256 بصفر رموز عند التكرار) لكشف التزوير والاحتيال. |
+| **واجهة برمجية موحدة (`/api/v1/scan` و `/scan-image`)** | خادم واحد يغذي تطبيق الويب وفاحص الصور ومولّد تقارير PDF وإضافة المتصفح بسهولة وقابلية للتوسع. |
 
 ---
 
