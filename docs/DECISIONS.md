@@ -24,7 +24,8 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 | 7 | One-click samples include a fake fine link and a scam SMS. | Done |
 | 8 | The police button lists the official Aman channels (800 2626, SMS 2828, aman@adpolice.gov.ae). eCrime is Dubai Police. | Done, verified on adpolice.gov.ae |
 | 9 | No police dashboard. Out of scope for the time we have. | Decided |
-| 10 | Local model: Jais 2 is the target, but its download is gated behind a Hugging Face login. Falcon-H1 7B (TII) is installed and working on the team PC in the meantime. Swapping is one setting. | Falcon-H1: 9 of 9 smoke cases, about 10 s per check. Jais 2: waiting on the login |
+| 10 | Local model: Falcon-H1 7B (TII, Abu Dhabi) on the team PC. Jais 2 was downloaded and tried, but llama.cpp gives garbage output for it on the GPU (Vulkan and CUDA builds) and only 8 tokens a second on the processor, so it is not used. Swapping models is one setting. | Falcon-H1: 9 of 9 smoke cases, about 6.5 s per check. Jais 2: blocked by the runner, see AI_FALLBACK_SETUP.md |
+| 10a | The Chrome extension popup uses the same look, wording, verdict rules and Aman channels as the website; its icons and the site favicon use the new mark. | Done |
 | 11 | Gemini stays the main model. Local models cannot search Google or Maps and cannot read images. | Decided |
 | 12a | In-app Impact page with cited problem figures, measured accuracy, cost and savings estimates. | Done |
 | 12b | Certificate, Map and Job scoring no longer treat "could not verify" as fraud. | Done, tested |
@@ -39,7 +40,7 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 | 15 | Feature Map mode as "the scam with no link" only if it tests reliably. | Map mode not yet tested live |
 | 16 | The deck keeps three short slides the rules require: architecture, why these models, privacy. | Proposed |
 | 17 | Pitch video. | Postponed; a new idea is coming |
-| 18 | Possible visual redesign of the home screen and result card. | Under discussion |
+| 18 | Visual redesign to the paper-and-ink look chosen by the team, across the website and the extension. | Done |
 
 ## Contradictions we found and how we resolved them
 

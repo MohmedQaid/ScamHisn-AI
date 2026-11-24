@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" dir="ltr" class="dark">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,23 +8,46 @@
   </head>
   <body>
     <div class="app">
-      <!-- Top Bar -->
+      <!-- Top bar: sketch logo, wordmark, language, theme, settings -->
       <header class="topbar">
         <div class="brand">
-          <img src="icons/icon48.png" alt="ScamHisn AI" class="brand-logo" />
+          <svg class="brand-logo" viewBox="0 0 40 40" fill="none" aria-hidden="true" focusable="false">
+            <path
+              d="M9.2 36.4 10 19.6H7.4l.2-6.2 5-.2.1 2.9 3.6.1.1-3 6.3-.1.1 3 3.7-.1v-2.9l5 .1.3 6.3-2.6.1.9 16.8Z"
+              fill="var(--brand)"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M16.6 36.3v-6.2c0-2.2 1.5-3.7 3.5-3.7s3.4 1.5 3.4 3.7v6.2"
+              fill="var(--page)"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linejoin="round"
+            />
+            <path d="M13.4 22.6h3M23.8 23.4h2.8" stroke="var(--page)" stroke-width="1.3" stroke-linecap="round" />
+            <path d="M19.6 13.2V2.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <rect x="20.3" y="2.6" width="3.2" height="7.2" fill="#C8102E" />
+            <rect x="23.5" y="2.6" width="8.3" height="2.4" fill="#00843D" />
+            <rect x="23.5" y="5" width="8.3" height="2.4" fill="#FFFFFF" />
+            <rect x="23.5" y="7.4" width="8.3" height="2.4" fill="#111111" />
+            <rect x="20.3" y="2.6" width="11.5" height="7.2" stroke="currentColor" stroke-width="1" stroke-linejoin="round" />
+          </svg>
           <span id="brand-name" class="brand-name">ScamHisn AI</span>
           <span id="dev-pill" class="dev-pill hidden">DEV</span>
         </div>
 
         <div class="topbar-actions">
-          <button id="lang-btn" type="button" class="icon-pill" title="Switch language">
-            العربية
-          </button>
+          <button id="lang-btn" type="button" class="text-btn" title="Switch language">العربية</button>
           <button id="theme-btn" type="button" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
-            <span id="theme-icon">☀</span>
+            <span id="theme-icon" class="icon-slot"></span>
           </button>
           <button id="settings-btn" type="button" class="icon-btn" title="API Settings" aria-label="API Settings">
-            ⚙
+            <svg viewBox="0 0 24 24" class="icon" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
           </button>
         </div>
       </header>
@@ -33,132 +56,154 @@
       <section id="settings-panel" class="settings-panel hidden">
         <label id="settings-label" for="api-url-input" class="settings-label">Backend API URL</label>
         <div class="settings-row">
-          <input
-            id="api-url-input"
-            type="url"
-            dir="ltr"
-            class="input mono"
-            placeholder="https://scamhisn-ai.onrender.com"
-          />
-          <button id="settings-save-btn" type="button" class="btn-secondary small">Save</button>
+          <input id="api-url-input" type="url" dir="ltr" class="input mono" placeholder="https://scamhisn-ai.onrender.com" />
+          <button id="settings-save-btn" type="button" class="btn-outline small">Save</button>
         </div>
         <p id="settings-status" class="settings-status hidden"></p>
       </section>
 
-      <!-- Two Mode Switcher: Check Manually | Check Everything -->
+      <!-- Two modes: Check Manually | Check Everything -->
       <nav class="mode-tabs" role="tablist">
         <button id="tab-manual" type="button" role="tab" aria-selected="true" class="mode-tab active">
           <span id="tab-manual-label">Check Manually</span>
         </button>
         <button id="tab-auto" type="button" role="tab" aria-selected="false" class="mode-tab">
-          <span id="tab-auto-lock" class="lock-icon" aria-hidden="true">🔒</span>
+          <svg id="tab-auto-lock" viewBox="0 0 24 24" class="icon small" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
           <span id="tab-auto-label">Check Everything</span>
         </button>
       </nav>
 
       <!-- MODE 1: Check Manually -->
       <main id="panel-manual" class="panel">
-        <!-- Category Selector: Icons + One Word ONLY -->
+        <form id="scan-form" class="scan-form">
+          <div class="input-row">
+            <svg viewBox="0 0 24 24" class="icon muted" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 17H7A5 5 0 0 1 7 7h2" />
+              <path d="M15 7h2a5 5 0 1 1 0 10h-2" />
+              <line x1="8" x2="16" y1="12" y2="12" />
+            </svg>
+            <input
+              id="url-input"
+              type="text"
+              dir="auto"
+              autocomplete="off"
+              spellcheck="false"
+              class="url-input"
+              placeholder="Paste a link or the whole message"
+            />
+            <button id="inspect-btn" type="submit" class="btn-primary">
+              <span id="inspect-spinner" class="spinner hidden"></span>
+              <span id="inspect-btn-label">Check</span>
+            </button>
+          </div>
+
+          <div class="input-helpers">
+            <button id="this-tab-btn" type="button" class="link-btn">This Tab</button>
+            <button id="paste-btn" type="button" class="link-btn">Paste</button>
+          </div>
+        </form>
+
+        <!-- Category: icon over one label, like the website's tabs -->
         <div class="cat-grid" role="radiogroup" aria-label="Category">
           <button type="button" role="radio" aria-checked="true" data-cat="general" class="cat-btn active">
-            <svg viewBox="0 0 24 24" class="cat-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            <svg viewBox="0 0 24 24" class="cat-icon" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 17H7A5 5 0 0 1 7 7h2" />
+              <path d="M15 7h2a5 5 0 1 1 0 10h-2" />
+              <line x1="8" x2="16" y1="12" y2="12" />
             </svg>
-            <span id="cat-general-label">General</span>
+            <span id="cat-general-label">Link</span>
           </button>
 
           <button type="button" role="radio" aria-checked="false" data-cat="job" class="cat-btn">
-            <svg viewBox="0 0 24 24" class="cat-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            <svg viewBox="0 0 24 24" class="cat-icon" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
-            <span id="cat-job-label">Job</span>
+            <span id="cat-job-label">Job post</span>
           </button>
 
           <button type="button" role="radio" aria-checked="false" data-cat="map" class="cat-btn">
-            <svg viewBox="0 0 24 24" class="cat-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-              <circle cx="12" cy="10" r="3"/>
+            <svg viewBox="0 0 24 24" class="cat-icon" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
             </svg>
-            <span id="cat-map-label">Map</span>
+            <span id="cat-map-label">Map listing</span>
           </button>
         </div>
 
-        <!-- URL Input + Quick Actions -->
-        <form id="scan-form" class="scan-form">
-          <input
-            id="url-input"
-            type="text"
-            dir="ltr"
-            autocomplete="off"
-            spellcheck="false"
-            class="input mono url-input"
-            placeholder="Paste a link or use current tab..."
-          />
-
-          <div class="input-helpers">
-            <button id="this-tab-btn" type="button" class="chip-btn">This Tab</button>
-            <button id="paste-btn" type="button" class="chip-btn">Paste</button>
-          </div>
-
-          <button id="inspect-btn" type="submit" class="btn-primary">
-            <span id="inspect-spinner" class="spinner hidden"></span>
-            <span id="inspect-btn-label">Inspect Link</span>
-          </button>
-        </form>
-
-        <!-- Error Banner -->
+        <!-- Error -->
         <div id="error-box" class="alert-box error hidden" role="alert"></div>
 
-        <!-- Minimal Result Card -->
+        <!-- Result -->
         <section id="result-card" class="result-card hidden">
-          <!-- Critical Prompt-Injection / Smoking-Gun Alert -->
           <div id="critical-alert" class="alert-box critical hidden"></div>
 
-          <div class="result-top">
-            <!-- Compact SVG Percentage Ring -->
-            <div class="gauge-wrap">
-              <svg viewBox="0 0 84 84" class="gauge-svg">
-                <circle cx="42" cy="42" r="35" class="gauge-track" />
-                <circle id="gauge-arc" cx="42" cy="42" r="35" class="gauge-arc" />
+          <!-- Verdict band: tinted by verdict, huge percentage, label, one sentence -->
+          <div id="verdict-band" class="verdict-band tone-safe">
+            <div class="band-row">
+              <svg class="band-icon icon-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                <path d="M12 8v4" />
+                <path d="M12 16h.01" />
               </svg>
-              <div id="gauge-score" class="gauge-score">0%</div>
+              <svg class="band-icon icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <span id="gauge-score" class="band-score">0%</span>
+              <span class="band-divider" aria-hidden="true"></span>
+              <span id="verdict-badge" class="band-label">Likely Safe</span>
             </div>
-
-            <div class="result-meta">
-              <div class="result-badges">
-                <span id="verdict-badge" class="verdict-badge safe">Likely Safe</span>
-                <span id="duration-pill" class="duration-pill">0.0s</span>
-              </div>
-              <p id="result-summary" class="result-summary"></p>
-              <p id="result-url" dir="ltr" class="result-url mono"></p>
-            </div>
+            <p id="result-summary" class="band-summary"></p>
           </div>
 
-          <!-- Action Buttons: Show Details, Report PDF, Send to Police -->
+          <!-- How much of the analysis ran -->
+          <p id="coverage-chip" class="coverage-chip hidden"></p>
+
+          <!-- Evidence: the top findings, up front -->
+          <h3 id="evidence-heading" class="section-heading">Evidence</h3>
+          <ul id="evidence-list" class="evidence-list"></ul>
+
+          <!-- Checked link: plain text, never clickable -->
+          <p id="result-url" dir="ltr" class="checked-link mono"></p>
+
           <div class="result-actions">
-            <button id="details-btn" type="button" class="btn-secondary" aria-expanded="false">
-              <span id="details-btn-label">Show Details</span>
-              <span id="details-chevron">▾</span>
+            <button id="pdf-btn" type="button" class="btn-primary wide">
+              <svg viewBox="0 0 24 24" class="icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 15V3" />
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <path d="m7 10 5 5 5-5" />
+              </svg>
+              <span id="pdf-btn-label">Download report</span>
             </button>
 
-            <button id="pdf-btn" type="button" class="btn-emerald-soft">
-              <span id="pdf-btn-label">Report PDF</span>
-            </button>
-
-            <button id="police-btn" type="button" class="btn-police">
-              <span id="police-btn-label">Send to police</span>
-              <span id="concept-badge" class="concept-pill">Concept</span>
+            <button id="police-btn" type="button" class="btn-outline wide">
+              <svg viewBox="0 0 24 24" class="icon" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+              </svg>
+              <span id="police-btn-label">Report to Abu Dhabi Police</span>
             </button>
           </div>
 
-          <div id="police-notice" class="alert-box warn hidden"></div>
+          <div id="police-notice" class="aman-panel hidden"></div>
 
-          <!-- Expandable Technical Investigator Details -->
+          <button id="details-btn" type="button" class="details-toggle" aria-expanded="false">
+            <span id="details-btn-label">Show Details</span>
+            <svg id="details-chevron" viewBox="0 0 24 24" class="icon small chevron" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+
+          <!-- Technical details -->
           <div id="details-drawer" class="details-drawer hidden">
             <div class="detail-block">
-              <h3 id="findings-heading" class="detail-heading">Detected Findings</h3>
+              <div class="raw-head">
+                <h3 id="findings-heading" class="detail-heading">Detected Findings</h3>
+                <span id="duration-pill" class="duration-pill mono">0.0s</span>
+              </div>
               <ul id="findings-list" class="findings-list"></ul>
             </div>
 
@@ -170,7 +215,7 @@
             <div class="detail-block">
               <div class="raw-head">
                 <h3 id="raw-json-heading" class="detail-heading">Raw API JSON</h3>
-                <button id="copy-json-btn" type="button" class="chip-btn">Copy</button>
+                <button id="copy-json-btn" type="button" class="link-btn">Copy</button>
               </div>
               <pre id="raw-json-pre" dir="ltr" class="raw-json mono"></pre>
             </div>
@@ -178,11 +223,13 @@
         </section>
       </main>
 
-      <!-- MODE 2: Check Everything (Locked in Production / Unlocked in Private Dev) -->
+      <!-- MODE 2: Check Everything (locked in production, unlocked in the private dev build) -->
       <section id="panel-auto" class="panel hidden">
-        <!-- Production Locked View -->
         <div id="auto-locked-view" class="locked-card">
-          <div class="locked-icon-wrap">🔒</div>
+          <svg viewBox="0 0 24 24" class="locked-icon" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
           <span id="dev-only-pill" class="dev-only-pill">Developers only</span>
           <h2 id="locked-title" class="locked-title">Developers Only</h2>
           <p id="locked-body" class="locked-body">
@@ -190,7 +237,6 @@
           </p>
         </div>
 
-        <!-- Private Dev Unlocked View -->
         <div id="auto-dev-view" class="dev-card hidden">
           <div class="dev-card-head">
             <span class="dev-pill">DEV</span>
@@ -210,11 +256,8 @@
         </div>
       </section>
 
-      <!-- Compact Footer -->
       <footer class="footer">
         <span id="footer-credit">Team Cybersound</span>
-        <span>•</span>
-        <span dir="ltr" class="mono">API v1</span>
       </footer>
     </div>
 
