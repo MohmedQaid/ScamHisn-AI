@@ -4,6 +4,7 @@ import type { ImageScanRequest, ImageScanResponse } from '@scamhisn/shared';
 import { config } from '../config.js';
 import { scoreToVerdict } from '../scoring/scoringEngine.js';
 import { isTransientAiError } from './aiChain.js';
+import { combineImageScores, judgeImageExtraction } from './imageJudge.js';
 import {
   assertFeatureAvailable,
   geminiModels,
@@ -63,6 +64,11 @@ const IMAGE_RESPONSE_SCHEMA: Schema = {
       type: Type.STRING,
       description: 'Brief 1-2 sentence assessment of visual genuineness or tampering in clear Arabic.',
     },
+    transcribedText: {
+      type: Type.STRING,
+      description:
+        'Verbatim transcription of the main message text visible in the image, in its original language, at most 1200 characters. Empty string if the image has no readable message.',
+    },
     findings: {
       type: Type.ARRAY,
       items: {
@@ -109,7 +115,8 @@ TASK (be concise and decisive to conserve tokens):
    - Check visual authenticity: altered fonts, misaligned numbers, edited payment receipts/bank transfer slips, mismatched UI elements, or AI-generated forgery signs.
    - SIMILAR-NAME RULE: Do NOT flag a legitimate organization as a scam or impersonator merely because its name/acronym resembles another entity (e.g., ADIB vs. DIB, ADCB vs. CBD). Only flag name similarity when you are certain there is no distinct legitimate organization with that name.
 2. Extract any visible URLs/domains and phone numbers.
-3. Keep findings concise (1 to 4 highest-signal items) and keep all summaries under 2 sentences in both English and clear Arabic.`;
+3. Keep findings concise (1 to 4 highest-signal items) and keep all summaries under 2 sentences in both English and clear Arabic.
+4. Copy the main message text you can read in the image into transcribedText, word for word, in its original language.`;
 
 interface RawImageAiJson {
   scamScore?: number;
@@ -124,6 +131,7 @@ interface RawImageAiJson {
   authenticityNotesEn?: string;
   authenticityNotesAr?: string;
   findings?: ImageScanResponse['findings'];
+  transcribedText?: string;
 }
 
 export function stripDataUriPrefix(raw: string): string {
@@ -254,6 +262,33 @@ export async function inspectUploadedImage(req: ImageScanRequest): Promise<Image
 
   let scamScore = Math.max(0, Math.min(100, Math.round(Number(parsed.scamScore) || 0)));
   const visualPromptInjectionDetected = Boolean(parsed.visualPromptInjectionDetected);
+
+  // Hybrid mode: Gemini read the image; the self-hosted judge decides from the text it read.
+  // If the judge is down or its reply is unusable, Gemini's own verdict stands.
+  let judgeSummary: { en: string; ar: string } | null = null;
+  if (config.aiPipeline === 'hybrid' && config.localLlm && parsed.transcribedText?.trim()) {
+    try {
+      const judged = await judgeImageExtraction(config.localLlm, {
+        transcribedText: parsed.transcribedText,
+        impersonatedEntity: parsed.impersonatedEntity ?? null,
+        extractedUrls: (parsed.extractedUrls ?? []).filter(Boolean),
+        extractedPhones: (parsed.extractedPhones ?? []).filter(Boolean),
+        readerSummaryEn: parsed.summaryEn ?? '',
+        readerNotesEn: parsed.authenticityNotesEn ?? '',
+        readerScamScore: scamScore,
+        visualPromptInjectionDetected,
+      });
+      scamScore = combineImageScores(scamScore, judged.scamScore);
+      judgeSummary = { en: judged.summaryEn, ar: judged.summaryAr };
+      usedModel = `${config.localLlm.model} (judge) + ${usedModel} (reader)`;
+    } catch (err) {
+      console.warn(
+        `[ScamHisn AI chain] image judge ${config.localLlm.model} failed: ${
+          err instanceof Error ? err.message.slice(0, 200) : String(err)
+        }`,
+      );
+    }
+  }
   if (visualPromptInjectionDetected && scamScore < 98) {
     scamScore = 98;
   }
@@ -279,8 +314,8 @@ export async function inspectUploadedImage(req: ImageScanRequest): Promise<Image
     impersonatedEntity: parsed.impersonatedEntity ?? null,
     extractedUrls: (parsed.extractedUrls ?? []).filter(Boolean).slice(0, 5),
     extractedPhones: (parsed.extractedPhones ?? []).filter(Boolean).slice(0, 5),
-    summaryEn: parsed.summaryEn || 'Image forensic inspection completed.',
-    summaryAr: parsed.summaryAr || 'تم فحص الصورة والتحقق من مصداقيتها بنجاح.',
+    summaryEn: judgeSummary?.en || parsed.summaryEn || 'Image forensic inspection completed.',
+    summaryAr: judgeSummary?.ar || parsed.summaryAr || 'تم فحص الصورة والتحقق من مصداقيتها بنجاح.',
     authenticityNotesEn:
       parsed.authenticityNotesEn ||
       (isGenuine
