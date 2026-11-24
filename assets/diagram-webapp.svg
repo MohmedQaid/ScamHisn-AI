@@ -34,7 +34,7 @@
   <text x="54" y="140" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5">(General, Job Post, or Map)</text>
 
   <text x="44" y="172" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12.5" font-weight="600">• Or upload a screenshot</text>
-  <text x="54" y="190" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600">NEW · Live image preview</text>
+  <text x="54" y="190" fill="#34d399" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600">With live image preview</text>
 
   <rect x="44" y="208" width="208" height="26" rx="8" fill="#0c151d" stroke="#1e303e" stroke-width="1"/>
   <text x="148" y="225" text-anchor="middle" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11">Phone &amp; Laptop Ready</text>

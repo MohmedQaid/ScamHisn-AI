@@ -46,9 +46,6 @@
 
 It supports **passive checking** (manual link & image inspection on demand) and **proactive checking** (automatic scanning of links on open web pages).
 
-> [!TIP]
-> **Latest Update — Screenshot & Image Authenticity Check (`NEW`):** Upload or paste any suspicious SMS, WhatsApp, email, or receipt screenshot to preview it live and verify whether it is **Genuine**, **Suspicious**, or **Scam / Forged**. Images are auto-compressed client-side (`≤768px` single vision tile) and cached via SHA-256 (**0 tokens** on repeat scans) to protect live API limits.
-
 > [!IMPORTANT]
 > **Why only the passive version is deployed live:** Both versions are built (`Chrome Extension/deployable/` and `Chrome Extension/dev/`), but proactive scanning is locked to *"Developers only"* in production. Running unauthenticated background AI scans publicly could lead to runaway API bills.
 
@@ -66,7 +63,7 @@ Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi
 
 | Feature | What It Delivers |
 |---|---|
-| **4 Inspection Modes** | **General Link** (phishing & UAE brand spoofing) · **Job Post** (fake employers & visa fees) · **Map Link** (hijacked contacts & review attacks) · **Image Check (`NEW`)** (screenshot genuineness, tampering & visual scam detection). |
+| **4 Inspection Modes** | **General Link** (phishing & UAE brand spoofing) · **Job Post** (fake employers & visa fees) · **Map Link** (hijacked contacts & review attacks) · **Image Check** (screenshot genuineness, tampering & visual scam detection). |
 | **Live Image Preview & Low-Token AI** | Preview uploaded images right inside the app, spot forged receipts or smishing screenshots, extract hidden URLs for 1-click deep scanning, and save quota via `768px` compression + SHA-256 caching. |
 | **Simple + Deep Views** | Clean percentage verdict for everyday users; **"Show Details"** reveals SSL, RDAP/WHOIS age, IPs, redirects, hidden DOM, authenticity analysis, and raw JSON for investigators. |
 | **Police-Ready PDF** | One-click **"Generate Report"** exports a forensic A4 PDF (score, findings, WHOIS/TLS/IPs, UTC timestamp, raw JSON) for investigation or takedown. |
@@ -83,7 +80,7 @@ Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi
 **Web App (Phone & Laptop)**
 
 1. Open **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
-2. Pick **General**, **Job**, **Map**, or **Image Check (`NEW`)** — paste a link or upload a screenshot with live preview.
+2. Pick **General**, **Job**, **Map**, or **Image Check** — paste a link or upload a screenshot with live preview.
 3. Click **Inspect** → view score & genuineness verdict, **Show Details**, or **Generate Report (PDF)**.
 
 *Phone Chrome tip:* Tap menu → **Add to Home screen** to install it like an app.
@@ -191,12 +188,6 @@ However, if you want to deploy your own copy for free on **Render**:
 
 يدعم النظام **الفحص اليدوي (السلبي)** للروابط والصور عند الطلب، و**الفحص الاستباقي (النشط)** لمراقبة الروابط تلقائياً في صفحات الويب المفتوحة.
 
-> **تحديث جديد — فحص الصور ولقطات الشاشة والتحقق من مصداقيتها:**
->
-> يمكنك الآن رفع أو لصق أي لقطة شاشة مشبوهة (رسائل نصية، واتساب، بريد إلكتروني، أو إيصالات) مع معاينة فورية للصورة المرفوعة، للتحقق مما إذا كانت **أصلية وسليمة** أم **مشبوهة** أم **احتيال أو مزوّرة**. يتم ضغط الصور تلقائياً على جهاز المستخدم (`≤768px`) وتخزين نتائجها مؤقتاً ببصمة SHA-256 (**0 توكن** عند التكرار) للحفاظ على حدود استخدام مفتاح واجهة البرمجة.
-
-<br />
-
 > **تنويه مهم — لماذا نُشرت النسخة اليدوية فقط؟**
 >
 > تم تطوير النسختين معاً (النسخة الرسمية ونسخة المطورين)، غير أن وضع الفحص الاستباقي مقفل بعبارة **«للمطورين فقط»** في النسخة الرسمية، لأن تشغيل الفحص التلقائي للعامة دون مصادقة قد يؤدي إلى استهلاك مرتفع لمفتاح واجهة البرمجة وتكاليف غير متوقعة.
@@ -219,7 +210,7 @@ However, if you want to deploy your own copy for free on **Render**:
 
 | الميزة | الفائدة العملية |
 |---|---|
-| **4 أوضاع للفحص** | **رابط عام** (التصيّد وانتحال الجهات الإماراتية) · **إعلان وظيفة** (كشف الشركات الوهمية) · **رابط خريطة** (الأرقام المخترقة وهجمات التقييمات) · **فحص صورة (جديد)** (التحقق من أصالة الصور وكشف التزوير والاحتيال البصري). |
+| **4 أوضاع للفحص** | **رابط عام** (التصيّد وانتحال الجهات الإماراتية) · **إعلان وظيفة** (كشف الشركات الوهمية) · **رابط خريطة** (الأرقام المخترقة وهجمات التقييمات) · **فحص صورة** (التحقق من أصالة الصور وكشف التزوير والاحتيال البصري). |
 | **معاينة فورية واستهلاك اقتصادي للرموز** | عرض واضح للصورة المرفوعة قبل الفحص وداخل بطاقة النتيجة، مع استخراج الروابط المرصودة لفحصها بضغطة زر، وضغط تلقائي `768px` وتخزين مؤقت SHA-256 لحماية الرصيد. |
 | **عرض بسيط ومفصّل** | ملخص واضح وسريع للمستخدم العادي، مع زر **"عرض التفاصيل التقنية"** للمحقق الرقمي (شهادة SSL، عمر النطاق WHOIS/RDAP، عناوين IP، التحويلات، تحليل الأصالة، وJSON). |
 | **تقرير PDF جاهز للشرطة** | زر **"إنشاء تقرير (PDF)"** يصدر ملف أدلة جنائية منظماً (نسبة الخطر، الملاحظات، بيانات WHOIS/SSL/IP، التوقيت، وJSON الكامل) جاهزاً للتحقيق أو طلبات الإزالة. |
@@ -236,7 +227,7 @@ However, if you want to deploy your own copy for free on **Render**:
 **تطبيق الويب (الهاتف والحاسوب)**
 
 1. افتح **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
-2. اختر **رابط عام** أو **إعلان وظيفة** أو **رابط خريطة** أو **فحص صورة (جديد)** — الصق رابطاً أو ارفع صورة مع معاينة فورية.
+2. اختر **رابط عام** أو **إعلان وظيفة** أو **رابط خريطة** أو **فحص صورة** — الصق رابطاً أو ارفع صورة مع معاينة فورية.
 3. اضغط **افحص** لعرض النتيجة وتقييم الأصالة أو **عرض التفاصيل** أو **إنشاء تقرير (PDF)**.
 
 *لمستخدمي كروم على الهاتف:* من القائمة اختر **إضافة إلى الشاشة الرئيسية** لاستخدامه كتطبيق.
