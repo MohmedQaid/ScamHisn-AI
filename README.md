@@ -87,9 +87,9 @@ Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi
 </td>
 <td width="50%" valign="top">
 
-**Chrome Extension (Desktop)**
+**Chrome Extension (Desktop Browsers Only)**
 
-1. **[Download Chrome Extension (.zip)](https://scamhisn-ai.onrender.com/scamhisn-extension.zip)** and unzip it.
+1. **[Download Chrome Extension (.zip)](https://scamhisn-ai.onrender.com/scamhisn-extension.zip)** *(also linked at the very bottom of the web app)* and unzip it.
 2. Open `chrome://extensions` → enable **Developer mode** → click **Load unpacked**.
 3. Click the toolbar icon or right-click any link → **Inspect link with ScamHisn AI**.
 
@@ -134,9 +134,11 @@ Integrating **ScamHisn AI** into Abu Dhabi's **TAMM** ecosystem unlocks proactiv
 
 ---
 
-### Host Your Own Copy (Optional)
+### Hosting & Deployment (Not Required — Already Live!)
 
-Deployment takes a few minutes, so we already hosted it live at **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**. To self-host for free on **Render**:
+**You do not need to host or deploy anything yourself** — we already deployed the live application for you at **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+
+However, if you want to deploy your own copy for free on **Render**:
 
 1. Push `Deployable Website Application/` to GitHub.
 2. Create a **Blueprint** (or Docker Web Service) on Render connected to that repo.
@@ -166,11 +168,16 @@ Deployment takes a few minutes, so we already hosted it live at **[scamhisn-ai.o
 
 يدعم النظام **الفحص اليدوي (السلبي)** عند الطلب، و**الفحص الاستباقي (النشط)** لمراقبة الروابط تلقائياً في صفحات الويب المفتوحة.
 
-> [!IMPORTANT]
-> **لماذا نُشرت النسخة اليدوية فقط؟** تم تطوير النسختين معاً (`Chrome Extension/deployable/` و`Chrome Extension/dev/`)، غير أن وضع الفحص الاستباقي مقفل بعبارة **"للمطورين فقط"** في النسخة الرسمية، لأن تشغيل الفحص التلقائي للعامة دون مصادقة قد يؤدي إلى استهلاك مرتفع لمفتاح واجهة البرمجة وتكاليف غير متوقعة.
+> **تنويه مهم — لماذا نُشرت النسخة اليدوية فقط؟**
+>
+> تم تطوير النسختين معاً (النسخة الرسمية ونسخة المطورين)، غير أن وضع الفحص الاستباقي مقفل بعبارة **«للمطورين فقط»** في النسخة الرسمية، لأن تشغيل الفحص التلقائي للعامة دون مصادقة قد يؤدي إلى استهلاك مرتفع لمفتاح واجهة البرمجة وتكاليف غير متوقعة.
 
-> [!NOTE]
-> **حدود الاستخدام للنسخة المباشرة (`https://scamhisn-ai.onrender.com/`):** **15 طلباً/دقيقة · 500 طلب/يوم · 50 ألف رمز/دقيقة.**
+<br />
+
+> **حدود الاستخدام للنسخة المباشرة (`scamhisn-ai.onrender.com`):**
+>
+> **15 طلباً/دقيقة · 500 طلب/يوم · 50 ألف رمز/دقيقة.**
+>
 > هذه الحدود كافية تماماً للتجربة الاعتيادية ما لم يختبر عدد كبير من المستخدمين الموقع في اللحظة نفسها، لذا يُرجى الاستخدام باعتدال. *(قد يستغرق تشغيل الخادم المجاني على Render نحو 30–50 ثانية بعد فترة خمول).*
 
 ---
@@ -207,9 +214,9 @@ Deployment takes a few minutes, so we already hosted it live at **[scamhisn-ai.o
 </td>
 <td width="50%" valign="top">
 
-**إضافة كروم (الحاسوب)**
+**إضافة كروم (لمتصفحات الحاسوب فقط)**
 
-1. **[تحميل إضافة كروم (.zip)](https://scamhisn-ai.onrender.com/scamhisn-extension.zip)** ثم فك الضغط عن الملف.
+1. **[تحميل إضافة كروم (.zip)](https://scamhisn-ai.onrender.com/scamhisn-extension.zip)** *(كما يتوفر رابط التحميل في نهاية صفحة تطبيق الويب)* ثم فك الضغط عن الملف.
 2. افتح `chrome://extensions` ← فعّل **وضع مطوّر البرامج** ← اضغط **Load unpacked** واختر المجلد.
 3. اضغط أيقونة الإضافة أو انقر بزر الفأرة الأيمن على أي رابط لفحصه فوراً.
 
@@ -241,9 +248,11 @@ Deployment takes a few minutes, so we already hosted it live at **[scamhisn-ai.o
 
 ---
 
-### الاستضافة الذاتية (اختياري)
+### الاستضافة والنشر (غير مطلوب — التطبيق منشور وجاهز!)
 
-نظراً لأن النشر يستغرق بضع دقائق، وفرنا النسخة الجاهزة على **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**. ولنشر نسختك مجاناً عبر **Render**:
+**لا حاجة لاستضافة التطبيق أو نشره بنفسك**؛ فقد قمنا بنشر النسخة المباشرة وجعلها جاهزة للاستخدام الفوري عبر **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+
+ومع ذلك، إذا رغبت في نشر نسختك الخاصة مجاناً على **Render**:
 
 1. ارفع مجلد `Deployable Website Application/` إلى مستودع GitHub.
 2. أنشئ **Blueprint** (أو Docker Web Service) على Render واربطه بالمستودع.

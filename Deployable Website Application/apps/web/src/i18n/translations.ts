@@ -107,13 +107,9 @@ export interface Translations {
     apiNoteDesc: string;
     sandboxNote: string;
     privacyNote: string;
-    extensionTitle: string;
-    extensionSubtitle: string;
     downloadExtensionBtn: string;
-    laptopTitle: string;
-    laptopSteps: string[];
-    phoneTitle: string;
-    phoneSteps: string[];
+    extensionDesktopOnly: string;
+    extensionBriefSteps: string;
   };
   severity: Record<'critical' | 'high' | 'medium' | 'low' | 'info', string>;
 }
@@ -277,22 +273,10 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
         'All inspected URLs are opened inside an isolated ephemeral headless browser with downloads, cookies, and internal network ranges strictly blocked.',
       privacyNote:
         'Automated scores are decision-support forensics—never enter passwords, OTP codes, or card details on unverified links.',
-      extensionTitle: 'Try the ScamHisn AI Chrome Extension',
-      extensionSubtitle:
-        'Inspect links directly from your browser toolbar or right-click menu on Laptop Chrome, or install ScamHisn AI on Phone Chrome.',
       downloadExtensionBtn: 'Download Chrome Extension (.zip)',
-      laptopTitle: 'Laptop / Desktop Chrome (Edge, Brave, Arc)',
-      laptopSteps: [
-        'Click "Download Chrome Extension (.zip)" and unzip the downloaded file.',
-        'Open chrome://extensions in a new tab and turn ON "Developer mode" (top right).',
-        'Click "Load unpacked", select the unzipped folder, then open the extension (⚙) to confirm your server URL.',
-      ],
-      phoneTitle: 'Phone Chrome (Android & iPhone)',
-      phoneSteps: [
-        'Standard mobile Chrome does not support installing .zip extensions directly.',
-        'To use ScamHisn AI like an app on your phone: tap Chrome’s menu (⋮ on Android or Share ⬆ on iPhone) → "Add to Home screen".',
-        'Optional (Android): If you want the actual extension on Android, load the .zip in Kiwi Browser or Mises Browser.',
-      ],
+      extensionDesktopOnly: 'Desktop browsers only (Chrome, Edge, Brave, Arc)',
+      extensionBriefSteps:
+        'Unzip → open chrome://extensions (Developer mode ON) → click Load unpacked.',
     },
     severity: {
       critical: 'Critical',
@@ -453,22 +437,10 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
         'يتم فتح جميع الروابط داخل متصفح معزول بالكامل مع منع التحميل والكوكيز وحظر الوصول للشبكات الداخلية.',
       privacyNote:
         'نتائج الفحص مساعدة تقنية للتحقق — لا تدخل أبداً كلمات السر أو رموز OTP أو بيانات البطاقة في صفحات غير موثّقة.',
-      extensionTitle: 'جرّب إضافة حصن الاحتيال لمتصفح كروم',
-      extensionSubtitle:
-        'افحص أي رابط مباشرةً من شريط المتصفح أو بالضغط بالزر اليمين على اللابتوب، أو ثبّت الموقع كتطبيق على كروم الهاتف.',
       downloadExtensionBtn: 'تحميل إضافة كروم (.zip)',
-      laptopTitle: 'كروم اللابتوب والكمبيوتر (Chrome / Edge / Brave)',
-      laptopSteps: [
-        'اضغط على "تحميل إضافة كروم (.zip)" وفك الضغط عن الملف.',
-        'افتح chrome://extensions في تبويب جديد وفعّل "وضع مطوّر البرامج" (Developer mode) من الأعلى.',
-        'اضغط "تحميل إضافة غير مضغوطة" (Load unpacked) واختر المجلد المفكوك، وتقدر تعدّل رابط الخادم من أيقونة الإعدادات (⚙).',
-      ],
-      phoneTitle: 'كروم الهاتف (أندرويد وآيفون)',
-      phoneSteps: [
-        'متصفح كروم العادي على الهاتف ما يدعم تثبيت إضافات الـ .zip بشكل مباشر.',
-        'لتثبيت حصن الاحتيال كتطبيق سريع على هاتفك: اضغط قائمة كروم (⋮ في أندرويد أو مشاركة ⬆ في آيفون) ← "إضافة إلى الشاشة الرئيسية".',
-        'خيار إضافي (أندرويد): لو حاب تجرّب الإضافة نفسها على الهاتف، تقدر تحمّل ملف الـ .zip داخل متصفح Kiwi أو Mises.',
-      ],
+      extensionDesktopOnly: 'لمتصفحات الحاسوب فقط (Chrome / Edge / Brave / Arc)',
+      extensionBriefSteps:
+        'فك الضغط ← افتح chrome://extensions (فعّل وضع المطوّر) ← اختر Load unpacked.',
     },
     severity: {
       critical: 'حرج',

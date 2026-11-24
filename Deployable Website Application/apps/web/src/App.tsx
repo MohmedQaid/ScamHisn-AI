@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, Laptop, Puzzle, ShieldCheck, Smartphone, Users } from 'lucide-react';
+import { Download, ShieldCheck, Users } from 'lucide-react';
 import type { ScanMode, ScanResponse } from '@scamhisn/shared';
 import { LocaleProvider, useLocale } from './i18n/LocaleContext';
 import { TEAM_MEMBERS } from './i18n/translations';
@@ -82,65 +82,9 @@ function ScamHisnShell() {
         )}
       </main>
 
-      {/* Bottom Extension Download, Important Notes & Team Cybersound Attribution */}
+      {/* Bottom Important Notes, Team Cybersound & Compact Desktop Extension Link */}
       <footer className="border-t border-slate-200/80 bg-white/75 py-8 backdrop-blur-md dark:border-slate-800/80 dark:bg-[#070c10]/85">
-        <div className="mx-auto max-w-5xl space-y-5 px-4 text-xs sm:px-6">
-          {/* Chrome Extension & Phone Chrome Install Card */}
-          <div className="overflow-hidden rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-50/60 via-white to-slate-50/80 p-4 sm:p-5 dark:border-emerald-500/20 dark:from-emerald-950/25 dark:via-[#0e161e] dark:to-[#0e161e]">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 text-slate-900 dark:text-white">
-                  <Puzzle className="h-4.5 w-4.5 shrink-0 text-emerald-700 dark:text-emerald-400" />
-                  <h2 className="text-sm font-extrabold">{t.footer.extensionTitle}</h2>
-                </div>
-                <p className="mt-1 leading-relaxed text-slate-600 dark:text-slate-400">
-                  {t.footer.extensionSubtitle}
-                </p>
-              </div>
-
-              <a
-                href="/scamhisn-extension.zip"
-                download="scamhisn-extension.zip"
-                className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#00734B] via-[#059669] to-[#047857] px-4 text-xs font-bold text-white shadow-sm shadow-emerald-900/20 transition-all hover:brightness-110 dark:from-emerald-600 dark:via-emerald-500 dark:to-teal-500 dark:text-slate-950"
-              >
-                <Download className="h-4 w-4" />
-                <span>{t.footer.downloadExtensionBtn}</span>
-              </a>
-            </div>
-
-            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-              {/* Laptop Chrome Instructions */}
-              <div className="rounded-xl border border-slate-200/80 bg-white/85 p-3.5 dark:border-slate-800 dark:bg-slate-900/60">
-                <div className="mb-2 flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                  <Laptop className="h-4 w-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
-                  <span>{t.footer.laptopTitle}</span>
-                </div>
-                <ol className="list-decimal space-y-1.5 ps-4 leading-relaxed text-slate-600 dark:text-slate-300">
-                  {t.footer.laptopSteps.map((step, idx) => (
-                    <li key={idx} className="break-words">
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-
-              {/* Phone Chrome Instructions */}
-              <div className="rounded-xl border border-slate-200/80 bg-white/85 p-3.5 dark:border-slate-800 dark:bg-slate-900/60">
-                <div className="mb-2 flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                  <Smartphone className="h-4 w-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
-                  <span>{t.footer.phoneTitle}</span>
-                </div>
-                <ol className="list-decimal space-y-1.5 ps-4 leading-relaxed text-slate-600 dark:text-slate-300">
-                  {t.footer.phoneSteps.map((step, idx) => (
-                    <li key={idx} className="break-words">
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </div>
-          </div>
-
+        <div className="mx-auto max-w-5xl space-y-4 px-4 text-xs sm:px-6">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {/* Team Cybersound */}
             <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-[#0e161e]/80">
@@ -184,6 +128,27 @@ function ScamHisnShell() {
                 <li>• {t.footer.privacyNote}</li>
               </ul>
             </div>
+          </div>
+
+          {/* Very End of Page: Compact Desktop-Only Chrome Extension Strip */}
+          <div className="flex flex-col items-start justify-between gap-2.5 rounded-2xl border border-slate-200/80 bg-slate-50/60 px-4 py-3 sm:flex-row sm:items-center dark:border-slate-800/90 dark:bg-[#0e161e]/70">
+            <div className="min-w-0 space-y-0.5">
+              <p className="font-semibold text-slate-700 dark:text-slate-200">
+                {t.footer.extensionDesktopOnly}
+              </p>
+              <p className="break-words text-[11px] text-slate-500 dark:text-slate-400">
+                {t.footer.extensionBriefSteps}
+              </p>
+            </div>
+
+            <a
+              href="/scamhisn-extension.zip"
+              download="scamhisn-extension.zip"
+              className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/35 bg-emerald-50/80 px-3.5 text-xs font-bold text-emerald-800 transition-colors hover:bg-emerald-100/80 dark:border-emerald-400/30 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>{t.footer.downloadExtensionBtn}</span>
+            </a>
           </div>
         </div>
       </footer>
