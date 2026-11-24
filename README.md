@@ -18,6 +18,12 @@
 
 <br />
 
+<a href="https://scamhisn-ai.onrender.com/scamhisn-extension.zip">
+  <img src="./assets/badge-extension.svg" alt="Download Chrome Extension (.zip)" />
+</a>
+
+<br />
+
 <img src="./assets/badge-team.svg" alt="Built by Team Cybersound" />
 
 <br /><br />
@@ -83,7 +89,7 @@ Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi
 
 **Chrome Extension (Desktop)**
 
-1. Download the `.zip` from the bottom of the website (or `Chrome Extension/scamhisn-extension-prod.zip`) and unzip it.
+1. **[Download Chrome Extension (.zip)](https://scamhisn-ai.onrender.com/scamhisn-extension.zip)** and unzip it.
 2. Open `chrome://extensions` → enable **Developer mode** → click **Load unpacked**.
 3. Click the toolbar icon or right-click any link → **Inspect link with ScamHisn AI**.
 
@@ -203,7 +209,7 @@ Deployment takes a few minutes, so we already hosted it live at **[scamhisn-ai.o
 
 **إضافة كروم (الحاسوب)**
 
-1. حمّل ملف `.zip` من أسفل الموقع (أو من `Chrome Extension/scamhisn-extension-prod.zip`) وفك الضغط عنه.
+1. **[تحميل إضافة كروم (.zip)](https://scamhisn-ai.onrender.com/scamhisn-extension.zip)** ثم فك الضغط عن الملف.
 2. افتح `chrome://extensions` ← فعّل **وضع مطوّر البرامج** ← اضغط **Load unpacked** واختر المجلد.
 3. اضغط أيقونة الإضافة أو انقر بزر الفأرة الأيمن على أي رابط لفحصه فوراً.
 

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="276" height="38" viewBox="0 0 276 38" fill="none">
+  <defs>
+    <linearGradient id="extBg" x1="0" y1="0" x2="276" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#14B8A6" />
+    </linearGradient>
+  </defs>
+  <rect x="0.75" y="0.75" width="274.5" height="36.5" rx="18.25" fill="url(#extBg)" stroke="#5EEAD4" stroke-opacity="0.45" stroke-width="1.2" />
+  <g stroke="#03150E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(22, 10.5)">
+    <path d="M8 2v9" />
+    <path d="M4.5 7.5L8 11l3.5-3.5" />
+    <path d="M2 13v1.5A1.5 1.5 0 0 0 3.5 16h9A1.5 1.5 0 0 0 14 14.5V13" />
+  </g>
+  <text x="48" y="23.5" fill="#03150E" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="0.1">Download Chrome Extension (.zip)</text>
+</svg>
