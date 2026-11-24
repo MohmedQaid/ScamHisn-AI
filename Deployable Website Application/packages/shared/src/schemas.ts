@@ -280,6 +280,34 @@ export const TechnicalChecksSchema = z.object({
 });
 export type TechnicalChecks = z.infer<typeof TechnicalChecksSchema>;
 
+/**
+ * How much of the analysis actually ran. The UI must never present an incomplete check as "safe".
+ * - full:         page opened AND a grounded AI answered (live Google Search / Maps lookups)
+ * - partial:      an AI answered, but without live lookups (backup model) or the page could not be opened
+ * - rules_only:   no AI answered — deterministic technical checks only
+ * - address_only: the domain does not resolve — verdict is based on the address itself
+ */
+export const CoverageLevelSchema = z.enum(['full', 'partial', 'rules_only', 'address_only']);
+export type CoverageLevel = z.infer<typeof CoverageLevelSchema>;
+
+/**
+ * - gemini / gemini_backup: a Gemini key+model answered alone
+ * - local:  the self-hosted model answered alone (no live lookups)
+ * - hybrid: Gemini gathered the live evidence and the self-hosted model made the judgment
+ */
+export const AiProviderKindSchema = z.enum(['gemini', 'gemini_backup', 'local', 'hybrid', 'none']);
+export type AiProviderKind = z.infer<typeof AiProviderKindSchema>;
+
+export const AnalysisCoverageSchema = z.object({
+  level: CoverageLevelSchema,
+  domainResolved: z.boolean(),
+  pageLoaded: z.boolean(),
+  aiProvider: AiProviderKindSchema,
+  aiModel: z.string().nullable(),
+  liveSourcesChecked: z.boolean(),
+});
+export type AnalysisCoverage = z.infer<typeof AnalysisCoverageSchema>;
+
 export const ScanResponseSchema = z.object({
   scanId: z.string(),
   scannedAt: z.string(),
@@ -300,8 +328,38 @@ export const ScanResponseSchema = z.object({
   technicalChecks: TechnicalChecksSchema,
   promptInjection: PromptInjectionReportSchema,
   aiAnalysis: AiForensicAnalysisSchema,
+  coverage: AnalysisCoverageSchema.optional(),
 });
 export type ScanResponse = z.infer<typeof ScanResponseSchema>;
+
+/**
+ * Which features can run right now. Job, Map and Image checks need Gemini (live lookups and
+ * vision); when every Gemini key is exhausted they are switched off for a cool-down instead of
+ * returning weaker answers. General link checks always run (local model, then rules).
+ */
+export const FeatureAvailabilitySchema = z.object({
+  available: z.boolean(),
+  reason: z.enum(['ok', 'gemini_not_configured', 'gemini_cooling_down']),
+  /** ISO time at which the feature is retried; null unless cooling down. */
+  retryAt: z.string().nullable(),
+});
+export type FeatureAvailability = z.infer<typeof FeatureAvailabilitySchema>;
+
+export const AiCapabilitiesSchema = z.object({
+  pipeline: z.enum(['hybrid', 'gemini_first']),
+  geminiConfigured: z.boolean(),
+  geminiAvailable: z.boolean(),
+  geminiRetryAt: z.string().nullable(),
+  localModelConfigured: z.boolean(),
+  localModel: z.string().nullable(),
+  features: z.object({
+    general: FeatureAvailabilitySchema,
+    job: FeatureAvailabilitySchema,
+    map: FeatureAvailabilitySchema,
+    image: FeatureAvailabilitySchema,
+  }),
+});
+export type AiCapabilities = z.infer<typeof AiCapabilitiesSchema>;
 
 export const HealthResponseSchema = z.object({
   status: z.enum(['ok', 'degraded']),
@@ -310,6 +368,7 @@ export const HealthResponseSchema = z.object({
   model: z.string(),
   aiConfigured: z.boolean(),
   timestamp: z.string(),
+  capabilities: AiCapabilitiesSchema.optional(),
 });
 export type HealthResponse = z.infer<typeof HealthResponseSchema>;
 
@@ -319,6 +378,8 @@ export const ApiErrorResponseSchema = z.object({
     message: z.string(),
     messageAr: z.string().optional(),
     details: z.unknown().optional(),
+    /** Set on FEATURE_UNAVAILABLE: when the feature will be tried again. */
+    retryAt: z.string().nullable().optional(),
   }),
 });
 export type ApiErrorResponse = z.infer<typeof ApiErrorResponseSchema>;

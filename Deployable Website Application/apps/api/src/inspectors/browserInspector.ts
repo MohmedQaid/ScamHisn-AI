@@ -300,7 +300,8 @@ export async function inspectInHeadlessBrowser(
       }
       // If we partially loaded DOM before timeout, still try to inspect; otherwise return error
       const currentUrl = page.url();
-      if (!currentUrl || currentUrl === 'about:blank') {
+      // (chrome-error:// is Chromium's internal page for refused / reset connections)
+      if (!currentUrl || currentUrl === 'about:blank' || currentUrl.startsWith('chrome-error:')) {
         return {
           ...fallback,
           maxHopsExceeded,

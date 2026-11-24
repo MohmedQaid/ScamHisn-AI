@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-11-24T17:37:11.868Z",
+  "layer": "address analysis only (no page rendering, no AI)",
+  "flagThreshold": 45,
+  "dataset": {
+    "legitimate": 76,
+    "scamLookalikesSynthetic": 65,
+    "note": "Blind holdout written before the first run and never tuned on. Scam addresses are synthetic."
+  },
+  "confusion": {
+    "truePositives": 53,
+    "falseNegatives": 12,
+    "falsePositives": 0,
+    "trueNegatives": 76
+  },
+  "metrics": {
+    "accuracyPct": 91.5,
+    "precisionPct": 100,
+    "recallPct": 81.5,
+    "falseAlarmRatePct": 0
+  },
+  "falsePositives": [],
+  "falseNegatives": [
+    "paypa1-login.com",
+    "g00gle-verify.com",
+    "abudhabi-fines.com",
+    "uae-traffic-fines.com",
+    "gov-ae-payment.com",
+    "trafficfines-ae.top",
+    "my-parcel-fee.top",
+    "ae-customs-clearance.com",
+    "visa-fee-uae.online",
+    "faceb00k-login.com",
+    "tammservices-ae.com",
+    "secure-otp-verify.xyz"
+  ]
+}

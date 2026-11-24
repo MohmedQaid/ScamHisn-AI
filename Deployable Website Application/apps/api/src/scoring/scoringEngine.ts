@@ -15,6 +15,8 @@ export interface ScoringInput {
   heuristicFlags: BilingualFlag[];
   promptInjection: PromptInjectionReport;
   aiAnalysis: AiForensicAnalysis;
+  /** True when the final host is on our verified list of official domains (brand catalog). */
+  isOfficialDomain?: boolean;
 }
 
 export interface ScoringResult {
@@ -92,10 +94,13 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
   }
 
   // Smoking Gun C: Self-signed, expired, not-yet-valid, or mismatched SSL on login/payment page
+  // Only PROVEN certificate faults count. "Could not verify" (handshake timeout, or an incomplete
+  // chain that browsers repair by fetching the intermediate but Node does not) is common on
+  // genuine government sites and is not evidence of a scam.
   const hasBrokenSsl =
     tls.isHttps &&
     tls.checked &&
-    (tls.selfSigned || tls.expired || tls.notYetValid || tls.hostnameMismatch || !tls.valid);
+    (tls.selfSigned || tls.expired || tls.notYetValid || tls.hostnameMismatch);
 
   if (hasBrokenSsl && domAndForms.hasSensitiveInputs) {
     smokingGuns.push({
@@ -296,7 +301,12 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
     }
   }
 
-  if (mode === 'job' && aiAnalysis.jobAnalysis) {
+  // "Could not verify" is not "fraud": a company homepage with no job post, or a bare map pin with
+  // no business on it, yields low authenticity / unverified fields without anything being wrong.
+  // These floors therefore apply only when the AI itself also rates the link as risky.
+  const aiAlsoDistrusts = (aiAnalysis.aiScamScore ?? 0) >= 50;
+
+  if (mode === 'job' && aiAnalysis.jobAnalysis && aiAlsoDistrusts) {
     const auth = aiAnalysis.jobAnalysis.jobAuthenticityScore;
     if (auth <= 10) {
       raiseFloor(95, 'Confirmed fraudulent job listing (authenticity <= 10%)');
@@ -310,7 +320,11 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
       raiseFloor(86, 'Suspected contact number hijacking on map business listing');
     } else if (aiAnalysis.mapAnalysis.reviewInjectionOrScamLinksFound) {
       raiseFloor(80, 'Scam links or manipulative content detected in map reviews');
-    } else if (!aiAnalysis.mapAnalysis.businessExistsOnExternalSources && !aiAnalysis.mapAnalysis.placeVerified) {
+    } else if (
+      aiAlsoDistrusts &&
+      !aiAnalysis.mapAnalysis.businessExistsOnExternalSources &&
+      !aiAnalysis.mapAnalysis.placeVerified
+    ) {
       raiseFloor(72, 'Listed map business could not be verified on external sources');
     }
   }
@@ -360,7 +374,14 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
   const aiScore = aiAnalysis.aiScamScore;
   let combinedScore: number;
 
-  if (aiScore !== null) {
+  // A verified official domain with clean technical checks is not doubted on a model's vague
+  // unease (small models hedge at 40-50 over things like missing headers). Concrete evidence
+  // still wins: any smoking gun or floor above, including a high-confidence AI "confirmed scam",
+  // bypasses this.
+  const trustOfficialDomain =
+    Boolean(input.isOfficialDomain) && smokingGuns.length === 0 && appliedFloor === null;
+
+  if (aiScore !== null && !trustOfficialDomain) {
     // Max-biased fusion: the higher risk signal leads, with modest corroboration boost
     // when both technical checks and AI detect risk.
     const dominant = Math.max(deterministicRiskPoints, aiScore);

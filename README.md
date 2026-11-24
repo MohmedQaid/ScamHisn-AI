@@ -67,7 +67,7 @@ Fatal red flags immediately score **95–100%** instead of being diluted, while 
 Everyday users get a clear verdict at a glance; **"Show Details"** reveals technical findings for deeper investigation.
 
 #### Forensic PDF & Police Escalation Concept
-Export an investigation-ready **PDF report** in one click, alongside a conceptual **"Send to police for investigation"** button illustrating direct eCrime reporting.
+Export an investigation-ready **PDF report** in one click. The **"Report to Abu Dhabi Police"** button lists the official **Aman** channels (800 2626, SMS 2828, aman@adpolice.gov.ae); it does not submit anything for you.
 
 ---
 
@@ -150,6 +150,64 @@ Embed one-tap link and screenshot verification directly inside **TAMM** with aut
 
 ---
 
+### Engineering Notes
+
+#### Why we built it this way
+
+| Choice | Why | Trade-off |
+|---|---|---|
+| **Open the link in a real headless browser** | Phishing pages hide behind redirects and scripts. Only rendering shows the real forms. | Takes seconds, not milliseconds. |
+| **Rules decide first, AI second** | A clear red flag, such as a card form posting to another domain, must never be averaged away. Every point has a stated reason. | Rules need upkeep and miss lures that name no brand. |
+| **Gemini Flash-Lite as the AI layer** | Reads Arabic and English, reads images, and checks Google Search and Maps live. The free tier fits a prototype. | A third-party service with rate limits and outages. |
+| **Two AI roles, no single point of failure** | Gemini researches live sources; a self-hosted UAE-built model (TII Falcon-H1 7B) makes the judgment. Either can be missing: Gemini judges alone, or the local model does, or the rules do. | Job, Map and Image checks need Gemini, so they pause for a cool-down when every key is exhausted. |
+| **Never "safe" on an incomplete check** | If the AI or the page is unavailable, the result reads "Incomplete check". | More cautious results during outages. |
+| **A verdict for dead links** | Scam domains die within days. The address itself often names the brand it imitates. | An address-only verdict cannot see the page. |
+
+#### Measured, not claimed
+
+On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 139 unit tests (`npm test`).
+
+The problem figures, cost model and savings estimate are on the in-app **Impact** page (`#/impact`) and in [`docs/IMPACT.md`](./docs/IMPACT.md). All 67 references are in [`docs/research/sources.md`](./docs/research/sources.md); the UAE open-data files we used are in [`data/open-data/`](./data/open-data/).
+
+#### Privacy
+
+- No accounts, no database, no analytics. Nothing you scan is written to disk.
+- Links, page excerpts and screenshots are sent to Google's Gemini API for analysis. Screenshots are shrunk in your browser first.
+- Image results, not the images, are cached in memory for 30 minutes by SHA-256 fingerprint.
+- Each page opens in a throwaway browser context that is discarded after the scan.
+- Server logs record errors only.
+
+#### What we left out
+
+- A police-side dashboard that groups reports into campaigns.
+- Direct submission to the police. The report button lists the official Aman channels; the user sends the report.
+- The TAMM claim-check. It is a concept and needs a government integration.
+- On-device text reading for screenshots, so screenshots currently leave the device.
+- Public threat feeds, user accounts, and Chrome Web Store publication.
+
+#### What we would do differently with more time
+
+- Judge private content (messages, screenshots) on a self-hosted model first, and send only public names to Gemini for lookups.
+- Build a labelled Arabic and Emirati-dialect scam corpus and measure the full pipeline, not one layer.
+- Fine-tune a small Arabic model on that corpus.
+- Sign the PDF reports so they cannot be forged.
+- Run Chromium as a non-root user with its own sandbox enabled.
+
+#### Run it locally
+
+```bash
+cd "Deployable Website Application"
+npm install
+npm run install:browser      # headless Chromium for the scanner
+cp .env.example .env         # then set GEMINI_API_KEY
+npm run dev                  # web on :5173, API on :3001
+npm test                     # 139 API unit tests
+```
+
+The AI pipeline (hybrid mode, fallbacks, cool-down, running the local model) is configured with environment variables; see [`docs/AI_FALLBACK_SETUP.md`](./docs/AI_FALLBACK_SETUP.md).
+
+---
+
 ### Hosting & Deployment (Not Required — Already Live!)
 
 **You do not need to host or deploy anything yourself** — the live app is already running at **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
@@ -210,7 +268,7 @@ If you ever want to deploy your own free copy on **Render**:
 يظهر ملخص واضح وسريع للمستخدم العادي، مع زر **«عرض التفاصيل التقنية»** لعرض الأدلة المعمّقة عند الحاجة.
 
 #### تقرير PDF ومفهوم الإبلاغ للشرطة
-إمكانية تصدير **تقرير أدلة بصيغة PDF** بضغطة زر، إلى جانب زر تجريبي **«إرسال للشرطة للتحقيق»** يوضح مسار الربط المستقبلي.
+إمكانية تصدير **تقرير أدلة بصيغة PDF** بضغطة زر. وزر **«بلّغ شرطة أبوظبي»** يعرض قنوات خدمة **«أمان»** الرسمية (8002626، رسالة نصية 2828، aman@adpolice.gov.ae) ولا يرسل شيئاً بالنيابة عنك.
 
 ---
 
@@ -291,6 +349,68 @@ If you ever want to deploy your own free copy on **Render**:
 > **نطاق التصميم المعماري:**
 >
 > تُترك تفاصيل آلية التكامل التقني والأدوات أو الخدمات المحددة التي يتصل بها «حصن الاحتيال» داخل منظومة «تم» **للخبراء ومهندسي الأنظمة المختصين** لتصميمها وفق أعلى معايير الأمان والخصوصية.
+
+---
+
+### ملاحظات هندسية
+
+#### لماذا بنيناه بهذه الطريقة
+
+| الاختيار | السبب | المقابل |
+|---|---|---|
+| **فتح الرابط في متصفح حقيقي معزول** | صفحات التصيّد تختبئ خلف التحويلات والسكربتات، ولا تظهر نماذجها الحقيقية إلا عند فتحها. | يستغرق ثواني لا أجزاء من الثانية. |
+| **القواعد أولاً ثم الذكاء الاصطناعي** | الدليل القاطع، مثل نموذج بطاقة يرسل البيانات لنطاق آخر، لا يجوز أن يذوب في المتوسطات. ولكل نقطة سبب معلن. | القواعد تحتاج صيانة ولا تلتقط الطُعم الذي لا يذكر اسم جهة. |
+| **Gemini Flash-Lite للتحليل الذكي** | يقرأ العربية والإنجليزية والصور، ويتحقق مباشرةً من بحث وخرائط جوجل، والباقة المجانية تكفي لنموذج أولي. | خدمة خارجية لها حدود استخدام وانقطاعات. |
+| **دوران للذكاء الاصطناعي بلا نقطة فشل واحدة** | Gemini يبحث في المصادر المباشرة، ونموذج إماراتي مستضاف ذاتياً (Falcon-H1 7B من TII) يصدر الحكم. يمكن غياب أي منهما: يحكم Gemini وحده، أو النموذج المحلي، أو القواعد. | فحص الوظائف والخرائط والصور يحتاج Gemini، فيتوقف مؤقتاً لفترة تهدئة عند استنفاد كل المفاتيح. |
+| **لا نقول «آمن» في فحص غير مكتمل** | إذا تعذّر الذكاء الاصطناعي أو فتح الصفحة تظهر النتيجة «فحص غير مكتمل». | نتائج أكثر تحفظاً وقت الانقطاع. |
+| **حُكم على الروابط المتوقفة** | نطاقات الاحتيال تختفي خلال أيام، والعنوان نفسه كثيراً ما يكشف الجهة المنتحَلة. | الحكم من العنوان فقط لا يرى الصفحة. |
+
+#### قياس لا ادّعاء
+
+على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 139 اختباراً آلياً (`npm test`).
+
+أرقام المشكلة ونموذج التكلفة وتقدير التوفير معروضة في صفحة **الأثر** داخل التطبيق (`#/impact`) وفي [`docs/IMPACT.md`](./docs/IMPACT.md). المراجع الـ67 كلها في [`docs/research/sources.md`](./docs/research/sources.md)، وملفات البيانات المفتوحة الإماراتية المستخدمة في [`data/open-data/`](./data/open-data/).
+
+#### الخصوصية
+
+- لا حسابات ولا قاعدة بيانات ولا تتبّع، ولا يُحفظ أي شيء تفحصه على القرص.
+- تُرسل الروابط ومقتطفات الصفحات ولقطات الشاشة إلى واجهة Gemini من جوجل للتحليل، وتُصغَّر اللقطات داخل متصفحك أولاً.
+- تُحفظ نتائج فحص الصور، لا الصور نفسها، في الذاكرة 30 دقيقة ببصمة SHA-256.
+- تُفتح كل صفحة في جلسة متصفح مؤقتة تُحذف بعد الفحص.
+- سجلات الخادم تدوّن الأخطاء فقط.
+
+#### ما لم ننفّذه
+
+- لوحة للشرطة تجمع البلاغات في حملات.
+- إرسال البلاغ مباشرةً للشرطة؛ فزر الإبلاغ يعرض قنوات «أمان» الرسمية والمستخدم هو من يرسل.
+- التحقق من الادعاء عبر «تم»؛ وهو تصوّر يحتاج تكاملاً حكومياً.
+- قراءة نص اللقطات على الجهاز نفسه، ولذلك تغادر اللقطات الجهاز حالياً.
+- قوائم التهديدات العامة، وحسابات المستخدمين، والنشر في متجر كروم.
+
+#### ما كنا سنغيّره لو توفر وقت أكثر
+
+- تحليل المحتوى الخاص (الرسائل واللقطات) على نموذج مستضاف ذاتياً أولاً، وإرسال الأسماء العامة فقط إلى Gemini للتحقق.
+- بناء مجموعة بيانات عربية وإماراتية مصنّفة لرسائل الاحتيال، وقياس المنظومة كاملة لا طبقة واحدة.
+- تدريب نموذج عربي صغير على تلك المجموعة.
+- توقيع تقارير PDF رقمياً حتى لا تُزوَّر.
+- تشغيل Chromium بمستخدم محدود الصلاحيات مع تفعيل عزله الداخلي.
+
+#### التشغيل محلياً
+
+<div dir="ltr">
+
+```bash
+cd "Deployable Website Application"
+npm install
+npm run install:browser      # headless Chromium for the scanner
+cp .env.example .env         # then set GEMINI_API_KEY
+npm run dev                  # web on :5173, API on :3001
+npm test                     # 139 API unit tests
+```
+
+</div>
+
+إعداد سلسلة البدائل يتم بمتغيرات البيئة؛ انظر [`docs/AI_FALLBACK_SETUP.md`](./docs/AI_FALLBACK_SETUP.md).
 
 ---
 

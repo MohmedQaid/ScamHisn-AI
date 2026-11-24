@@ -4,6 +4,29 @@ export interface Translations {
   brandName: string;
   brandSubtitle: string;
   heroTitle: string;
+  /** Home hero: two heading lines, the last word carries the scribble underline. */
+  hero: {
+    line1: string;
+    line2: string;
+    scribbleWord: string;
+    sub: string;
+  };
+  /** Short labels for the four mode tabs. */
+  tabs: Record<ScanMode | 'image', string>;
+  /** Short placeholder for the input, per link mode. */
+  inputPlaceholder: Record<ScanMode, string>;
+  checkBtn: string;
+  evidence: {
+    title: string;
+    /** "{count}" is replaced with the number of findings. */
+    showAll: string;
+    showFewer: string;
+  };
+  checkedLink: {
+    title: string;
+    copy: string;
+    copied: string;
+  };
   updateBannerBadge: string;
   updateBannerText: string;
   modePrompt: string;
@@ -45,7 +68,32 @@ export interface Translations {
   scanBtn: string;
   scanningBtn: string;
   trySampleLabel: string;
-  samples: Array<{ label: string; url: string; mode: ScanMode }>;
+  samples: Array<{ label: string; url: string; mode: ScanMode; tone?: 'danger' }>;
+  /** Plain statement of how much of the analysis actually ran. */
+  coverage: {
+    incompleteLabel: string;
+    full: string;
+    partialBackup: string;
+    partialPageNotLoaded: string;
+    rulesOnly: string;
+    officialNoAi: string;
+    addressOnly: string;
+  };
+  /** Features that need Gemini are paused while every Gemini key is cooling down. */
+  availability: {
+    pausedTag: string;
+    coolingDown: string;
+    notConfigured: string;
+    backIn: string;
+    backSoon: string;
+    generalStillWorks: string;
+  };
+  nav: {
+    check: string;
+    impact: string;
+    pitch: string;
+    back: string;
+  };
   progressTitle: string;
   progressSteps: string[];
   scamLikelihoodLabel: string;
@@ -69,10 +117,17 @@ export interface Translations {
     showDetails: string;
     hideDetails: string;
     generateReport: string;
+    downloadReport: string;
     generatingReport: string;
     sendToPolice: string;
     conceptBadge: string;
     policeConceptNotice: string;
+    amanTitle: string;
+    amanPhoneLabel: string;
+    amanSmsLabel: string;
+    amanEmailLabel: string;
+    amanWebLabel: string;
+    amanNote: string;
     reportError: string;
   };
   labels: {
@@ -154,6 +209,34 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     brandName: 'ScamHisn AI',
     brandSubtitle: 'Digital Fraud Inspector',
     heroTitle: 'Inspect Any Link Before You Click',
+    hero: {
+      line1: 'Check before',
+      line2: 'you',
+      scribbleWord: 'click.',
+      sub: 'A UAE-focused AI tool to detect scam links, fake websites, and misleading messages.',
+    },
+    tabs: {
+      general: 'Link',
+      job: 'Job post',
+      map: 'Map listing',
+      image: 'Screenshot',
+    },
+    inputPlaceholder: {
+      general: 'Paste a link or the whole message',
+      job: 'Paste a job post link',
+      map: 'Paste a map or location link',
+    },
+    checkBtn: 'Check',
+    evidence: {
+      title: 'Evidence',
+      showAll: 'Show all {count}',
+      showFewer: 'Show fewer',
+    },
+    checkedLink: {
+      title: 'Checked link',
+      copy: 'Copy link',
+      copied: 'Copied',
+    },
     updateBannerBadge: 'NEW',
     updateBannerText: 'Screenshot & Image Authenticity Check is now live',
     modePrompt: 'What would you like to inspect?',
@@ -210,8 +293,42 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     trySampleLabel: 'Quick test:',
     samples: [
       { label: 'UAE Portal (u.ae)', url: 'https://u.ae/en', mode: 'general' },
-      { label: 'Example.com', url: 'https://example.com', mode: 'general' },
+      {
+        label: 'Fake fine link',
+        url: 'https://adpolice-fines-pay.top/verify',
+        mode: 'general',
+        tone: 'danger',
+      },
+      {
+        label: 'Scam SMS',
+        url: 'Abu Dhabi Police: you have an unpaid traffic fine of AED 150. Pay within 24 hours at tamm-login.xyz/pay to avoid court.',
+        mode: 'general',
+        tone: 'danger',
+      },
     ],
+    coverage: {
+      incompleteLabel: 'Incomplete check',
+      full: 'Full check: page opened, AI analysis, live sources.',
+      partialBackup: 'AI analysis ran, but live Google sources were not checked.',
+      partialPageNotLoaded: 'The page could not be opened. This result uses the address, registry data and AI lookups.',
+      rulesOnly: 'AI analysis was unavailable. This result uses technical checks only, so treat it as incomplete.',
+      officialNoAi: 'This is an official domain on our verified list, and the technical checks are clean. AI analysis was unavailable.',
+      addressOnly: 'This address is offline. The result is based on the address itself.',
+    },
+    availability: {
+      pausedTag: 'Paused',
+      coolingDown: 'This check is paused: Gemini is over its limit or not answering.',
+      notConfigured: 'This check needs a Gemini key, and none is set on this server.',
+      backIn: 'Back in about {time}.',
+      backSoon: 'Back shortly.',
+      generalStillWorks: 'General link checks still work.',
+    },
+    nav: {
+      check: 'Check',
+      impact: 'Impact',
+      pitch: 'Watch the pitch',
+      back: 'Back to the inspector',
+    },
     progressTitle: 'Running Isolated Forensic Pipeline',
     progressSteps: [
       'Validating URL & blocking SSRF private IP ranges',
@@ -263,11 +380,19 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       showDetails: 'Show Details',
       hideDetails: 'Hide Details',
       generateReport: 'Generate Report',
+      downloadReport: 'Download evidence report',
       generatingReport: 'Generating PDF...',
-      sendToPolice: 'Send to police for investigation',
-      conceptBadge: 'Concept',
+      sendToPolice: 'Report to Abu Dhabi Police',
+      conceptBadge: 'Aman',
       policeConceptNotice:
-        'Concept preview: Direct law-enforcement submission is not connected to an active police API yet. You can download the full forensic PDF using "Generate Report" and attach it to your official eCrime report.',
+        'ScamHisn does not send anything for you. Download the report with "Download evidence report" and share it through one of these official Aman channels.',
+      amanTitle: 'Aman service, Abu Dhabi Police (free, 24/7, confidential)',
+      amanPhoneLabel: 'Call',
+      amanSmsLabel: 'SMS',
+      amanEmailLabel: 'Email',
+      amanWebLabel: 'Website',
+      amanNote:
+        'Aman receives information. If you lost money, also file a police report and tell your bank at once.',
       reportError: 'Could not generate the PDF report. Please try again.',
     },
     labels: {
@@ -328,7 +453,7 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       apiNoteLabel: 'REST API v1 Ready',
       apiNoteDesc: 'Versioned endpoint ready for web clients and future browser extensions.',
       sandboxNote:
-        'All inspected URLs are opened inside an isolated ephemeral headless browser with downloads, cookies, and internal network ranges strictly blocked.',
+        'Links are opened for you in a throwaway headless browser on our server: downloads are blocked, nothing is kept after the scan, and internal network addresses are refused.',
       privacyNote:
         'Automated scores are decision-support forensics—never enter passwords, OTP codes, or card details on unverified links.',
       downloadExtensionBtn: 'Download Chrome Extension (.zip)',
@@ -349,6 +474,34 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     brandName: 'حصن الاحتيال',
     brandSubtitle: 'فاحص الروابط والاحتيال الرقمي',
     heroTitle: 'افحص الرابط وتأكد قبل ما تضغط',
+    hero: {
+      line1: 'افحص قبل',
+      line2: 'أن',
+      scribbleWord: 'تضغط.',
+      sub: 'أداة ذكاء اصطناعي مخصّصة للإمارات تكشف الروابط الاحتيالية والمواقع المزيّفة والرسائل المضلّلة.',
+    },
+    tabs: {
+      general: 'رابط',
+      job: 'إعلان وظيفة',
+      map: 'رابط خريطة',
+      image: 'لقطة شاشة',
+    },
+    inputPlaceholder: {
+      general: 'الصق الرابط أو الرسالة كاملة',
+      job: 'الصق رابط إعلان الوظيفة',
+      map: 'الصق رابط الخريطة أو الموقع',
+    },
+    checkBtn: 'افحص',
+    evidence: {
+      title: 'الأدلة',
+      showAll: 'عرض الكل ({count})',
+      showFewer: 'عرض أقل',
+    },
+    checkedLink: {
+      title: 'الرابط المفحوص',
+      copy: 'نسخ الرابط',
+      copied: 'تم النسخ',
+    },
     updateBannerBadge: 'جديد',
     updateBannerText: 'تمت إضافة ميزة فحص الصور ولقطات الشاشة للتحقق من مصداقيتها',
     modePrompt: 'شو حاب تفحص؟',
@@ -405,8 +558,42 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     trySampleLabel: 'جرّب رابط سريع:',
     samples: [
       { label: 'حكومة الإمارات (u.ae)', url: 'https://u.ae/ar', mode: 'general' },
-      { label: 'Example.com', url: 'https://example.com', mode: 'general' },
+      {
+        label: 'رابط مخالفة مزيّف',
+        url: 'https://adpolice-fines-pay.top/verify',
+        mode: 'general',
+        tone: 'danger',
+      },
+      {
+        label: 'رسالة احتيال',
+        url: 'شرطة أبوظبي: لديك مخالفة مرورية غير مدفوعة بقيمة 150 درهماً. ادفع خلال 24 ساعة عبر tamm-login.xyz/pay لتجنب الإحالة للمحكمة.',
+        mode: 'general',
+        tone: 'danger',
+      },
     ],
+    coverage: {
+      incompleteLabel: 'فحص غير مكتمل',
+      full: 'فحص كامل: فتحنا الصفحة، وحلّلها الذكاء الاصطناعي، وتحققنا من المصادر المباشرة.',
+      partialBackup: 'تم التحليل الذكي، لكن لم يتم التحقق من مصادر جوجل المباشرة.',
+      partialPageNotLoaded: 'تعذّر فتح الصفحة. النتيجة مبنية على العنوان وبيانات التسجيل وبحث الذكاء الاصطناعي.',
+      rulesOnly: 'التحليل الذكي غير متاح حالياً. النتيجة مبنية على الفحوصات التقنية فقط، فاعتبرها غير مكتملة.',
+      officialNoAi: 'هذا نطاق رسمي ضمن قائمتنا الموثّقة، والفحوصات التقنية سليمة. التحليل الذكي غير متاح حالياً.',
+      addressOnly: 'هذا العنوان متوقف. النتيجة مبنية على العنوان نفسه فقط.',
+    },
+    availability: {
+      pausedTag: 'متوقف',
+      coolingDown: 'هذا الفحص متوقف مؤقتاً: Gemini تجاوز حدّه أو لا يستجيب.',
+      notConfigured: 'هذا الفحص يحتاج مفتاح Gemini، ولا يوجد مفتاح مفعّل على هذا الخادم.',
+      backIn: 'يرجع خلال {time} تقريباً.',
+      backSoon: 'يرجع بعد قليل.',
+      generalStillWorks: 'فحص الروابط العامة شغّال.',
+    },
+    nav: {
+      check: 'الفحص',
+      impact: 'الأثر',
+      pitch: 'شاهد العرض',
+      back: 'رجوع إلى الفاحص',
+    },
     progressTitle: 'جاري تشغيل منظومة الفحص المعزول',
     progressSteps: [
       'التحقق من سلامة الرابط وحظر العناوين الداخلية (SSRF)',
@@ -418,7 +605,7 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     scamLikelihoodLabel: 'نسبة الاحتيال',
     verdicts: {
       safe: {
-        label: 'الرابط آمن',
+        label: 'آمن على الأرجح',
         desc: 'ما رصدنا أي مؤشرات احتيال أو انتحال أو مخاطر تقنية واضحة على هذا الرابط.',
       },
       caution: {
@@ -458,11 +645,19 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       showDetails: 'عرض التفاصيل التقنية',
       hideDetails: 'إخفاء التفاصيل التقنية',
       generateReport: 'إنشاء تقرير (PDF)',
+      downloadReport: 'تنزيل تقرير الأدلة',
       generatingReport: 'جاري تجهيز التقرير...',
-      sendToPolice: 'إرسال للشرطة للتحقيق',
-      conceptBadge: 'نموذج تجريبي',
+      sendToPolice: 'بلّغ شرطة أبوظبي',
+      conceptBadge: 'أمان',
       policeConceptNotice:
-        'ميزة تجريبية (Concept): الربط المباشر مع أنظمة الشرطة غير مفعّل حالياً. تقدر تحمّل التقرير الجنائي الكامل بصيغة PDF من زر "إنشاء تقرير (PDF)" وتقدمه مباشرةً للجهات المختصة.',
+        'حصن الاحتيال لا يرسل أي شيء بالنيابة عنك. حمّل التقرير من زر "تنزيل تقرير الأدلة" وشاركه عبر إحدى قنوات «أمان» الرسمية.',
+      amanTitle: 'خدمة «أمان» من شرطة أبوظبي (مجانية، على مدار الساعة، بسرية تامة)',
+      amanPhoneLabel: 'اتصال',
+      amanSmsLabel: 'رسالة نصية',
+      amanEmailLabel: 'بريد إلكتروني',
+      amanWebLabel: 'الموقع',
+      amanNote:
+        '«أمان» قناة لاستقبال المعلومات. إذا خسرت مالاً فافتح بلاغاً لدى الشرطة أيضاً وأبلغ بنكك فوراً.',
       reportError: 'تعذّر إنشاء تقرير الـ PDF حالياً. حاول مرة ثانية.',
     },
     labels: {
@@ -523,7 +718,7 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       apiNoteLabel: 'واجهة برمجية v1 جاهزة',
       apiNoteDesc: 'نقطة فحص برمجية موحّدة وجاهزة للربط مع تطبيقات الويب وإضافات المتصفح مستقبلاً.',
       sandboxNote:
-        'يتم فتح جميع الروابط داخل متصفح معزول بالكامل مع منع التحميل والكوكيز وحظر الوصول للشبكات الداخلية.',
+        'نفتح الرابط بدلاً منك في متصفح مؤقت على خادمنا: التحميل ممنوع، ولا يُحفظ شيء بعد الفحص، وتُرفض عناوين الشبكات الداخلية.',
       privacyNote:
         'نتائج الفحص مساعدة تقنية للتحقق — لا تدخل أبداً كلمات السر أو رموز OTP أو بيانات البطاقة في صفحات غير موثّقة.',
       downloadExtensionBtn: 'تحميل إضافة كروم (.zip)',

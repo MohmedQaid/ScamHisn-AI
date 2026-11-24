@@ -36,7 +36,7 @@ async function storageSet(area, obj) {
 
 const state = {
   locale: 'en',
-  theme: 'dark',
+  theme: 'light',
   activeTab: 'manual',
   category: 'general',
   apiBaseUrl: EXTENSION_CONFIG.DEFAULT_API_BASE,
@@ -53,10 +53,61 @@ function t() {
   return TRANSLATIONS[state.locale] || TRANSLATIONS.en;
 }
 
+// Static icon markup (not user data): sun shown in dark mode, moon in light mode
+const ICON_SUN =
+  '<svg viewBox="0 0 24 24" class="icon" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+const ICON_MOON =
+  '<svg viewBox="0 0 24 24" class="icon" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+
 function applyTheme() {
   const isDark = state.theme === 'dark';
   document.documentElement.classList.toggle('dark', isDark);
-  el('theme-icon').textContent = isDark ? '☀' : '☾';
+  el('theme-icon').innerHTML = isDark ? ICON_SUN : ICON_MOON;
+}
+
+/** Official Aman channels of Abu Dhabi Police (verified on aman.adpolice.gov.ae). */
+function renderAmanPanel() {
+  const tr = t();
+  const box = el('police-notice');
+  box.textContent = '';
+
+  const title = document.createElement('p');
+  title.className = 'aman-title';
+  title.textContent = tr.amanTitle;
+
+  const channels = document.createElement('p');
+  channels.className = 'aman-channels';
+  channels.dir = 'ltr';
+  const tel = document.createElement('a');
+  tel.href = 'tel:8002626';
+  tel.textContent = '800 2626';
+  const mail = document.createElement('a');
+  mail.href = 'mailto:aman@adpolice.gov.ae';
+  mail.textContent = 'aman@adpolice.gov.ae';
+  const web = document.createElement('a');
+  web.href = 'https://aman.adpolice.gov.ae';
+  web.target = '_blank';
+  web.rel = 'noopener noreferrer';
+  web.textContent = 'aman.adpolice.gov.ae';
+  channels.append(tel, ' · SMS 2828 · ', mail, ' · ', web);
+
+  const note = document.createElement('p');
+  note.className = 'aman-note';
+  note.textContent = tr.amanNote;
+
+  box.append(title, channels, note);
+}
+
+/** How much of the analysis ran, mirroring the website's wording. */
+function coverageInfo(data, tr) {
+  const aiUnavailable = data.aiAnalysis?.status === 'unavailable';
+  const level = data.coverage?.level ?? (aiUnavailable ? 'rules_only' : 'full');
+  const pageLoaded = data.coverage?.pageLoaded ?? data.technicalChecks?.domAndForms?.browserCaptured ?? true;
+  let text = tr.coverage.full;
+  if (level === 'address_only') text = tr.coverage.addressOnly;
+  else if (level === 'rules_only') text = data.verdict === 'safe' ? tr.coverage.officialNoAi : tr.coverage.rulesOnly;
+  else if (level === 'partial') text = pageLoaded ? tr.coverage.partial : tr.coverage.pageNotLoaded;
+  return { level, text, isFull: level === 'full' };
 }
 
 function applyTranslations() {
@@ -95,8 +146,8 @@ function applyTranslations() {
   el('details-btn-label').textContent = state.showDetails ? tr.hideDetails : tr.showDetails;
   el('pdf-btn-label').textContent = tr.generateReport;
   el('police-btn-label').textContent = tr.sendToPolice;
-  el('concept-badge').textContent = tr.conceptBadge;
-  el('police-notice').textContent = tr.policeNotice;
+  el('evidence-heading').textContent = tr.evidenceTitle;
+  renderAmanPanel();
 
   el('findings-heading').textContent = tr.findingsTitle;
   el('tech-heading').textContent = tr.techTitle;
@@ -159,38 +210,58 @@ function renderResult(data) {
 
   el('result-card').classList.remove('hidden');
 
-  // Gauge arc animation
-  const circumference = 2 * Math.PI * 35;
-  const offset = circumference - (score / 100) * circumference;
-  const arc = el('gauge-arc');
-  const strokeColor =
-    score >= 95
-      ? '#be123c'
-      : score >= 75
-        ? '#e11d48'
-        : score >= 45
-          ? '#ea580c'
-          : score >= 20
-            ? '#d97706'
-            : '#10b981';
+  const verdict = data.verdict || 'safe';
+  const coverage = coverageInfo(data, tr);
 
-  arc.style.stroke = strokeColor;
-  arc.style.strokeDashoffset = String(offset);
+  // A clean technical result without AI is "incomplete", never a confident verdict
+  // (unless the server itself says "safe": its verified official-domain rule).
+  const isIncomplete =
+    (coverage.level === 'rules_only' || coverage.level === 'address_only') && score <= 19 && verdict !== 'safe';
+
+  // Verdict band: tinted by verdict
+  const tone =
+    verdict === 'high_risk' || verdict === 'confirmed_scam'
+      ? 'danger'
+      : verdict === 'safe' && !isIncomplete
+        ? 'safe'
+        : 'warn';
+  el('verdict-band').className = `verdict-band tone-${tone}`;
   el('gauge-score').textContent = `${score}%`;
-  el('gauge-score').style.color = strokeColor;
-
-  // Verdict badge
-  const badge = el('verdict-badge');
-  badge.className = `verdict-badge ${data.verdict || 'safe'}`;
-  badge.textContent = tr.verdicts[data.verdict] || data.verdict;
+  el('verdict-badge').textContent = isIncomplete ? tr.incompleteLabel : tr.verdicts[verdict] || verdict;
   el('duration-pill').textContent = `${((data.durationMs || 0) / 1000).toFixed(1)}s`;
 
-  // Concise summary
+  // One sentence. The server's summary says plainly when AI was unavailable.
   const aiSummary = isAr ? data.aiAnalysis?.summaryAr : data.aiAnalysis?.summaryEn;
+  const aiUnavailable = data.aiAnalysis?.status === 'unavailable';
   el('result-summary').textContent =
-    data.aiAnalysis?.status !== 'unavailable' && aiSummary
-      ? aiSummary
-      : tr.verdicts[data.verdict] || '';
+    aiUnavailable && coverage.level !== 'address_only' && (score >= 45 || verdict === 'safe')
+      ? ''
+      : aiSummary || '';
+  el('result-summary').classList.toggle('hidden', !el('result-summary').textContent);
+
+  // Coverage chip
+  const chip = el('coverage-chip');
+  chip.textContent = coverage.text;
+  chip.className = `coverage-chip ${coverage.isFull ? 'full' : 'partial'}`;
+
+  // Evidence: the top findings, up front
+  const evidence = el('evidence-list');
+  evidence.textContent = '';
+  const topFlags = (Array.isArray(data.redFlags) ? data.redFlags : []).slice(0, 3);
+  if (topFlags.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'evidence-item none';
+    li.textContent = tr.noFindings;
+    evidence.appendChild(li);
+  } else {
+    for (const f of topFlags) {
+      const li = document.createElement('li');
+      li.className = `evidence-item sev-${String(f.severity || 'info')}`;
+      li.textContent = isAr ? f.titleAr : f.titleEn;
+      evidence.appendChild(li);
+    }
+  }
+
   el('result-url').textContent = data.finalUrl || data.inputUrl || '';
   el('result-url').title = data.finalUrl || data.inputUrl || '';
 
@@ -295,7 +366,6 @@ function renderResult(data) {
   el('details-drawer').classList.toggle('hidden', !state.showDetails);
   el('details-btn').setAttribute('aria-expanded', String(state.showDetails));
   el('details-btn-label').textContent = state.showDetails ? tr.hideDetails : tr.showDetails;
-  el('details-chevron').textContent = state.showDetails ? '▴' : '▾';
   el('police-notice').classList.toggle('hidden', !state.showPoliceNotice);
 }
 

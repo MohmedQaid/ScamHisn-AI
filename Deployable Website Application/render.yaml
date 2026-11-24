@@ -24,3 +24,20 @@ services:
       # Prompted securely in Render's Environment Variables dashboard (never committed)
       - key: GEMINI_API_KEY
         sync: false
+      # --- AI fallback chain (all optional; see docs/AI_FALLBACK_SETUP.md) ---
+      # A second team member's Gemini key, tried when the first is rate limited
+      - key: GEMINI_API_KEY_2
+        sync: false
+      # A second Gemini model, tried when the primary is overloaded (limits are per model)
+      - key: GEMINI_FALLBACK_MODEL
+        sync: false
+      # Self-hosted OpenAI-compatible model (e.g. Jais 2), tried when every Gemini option fails
+      - key: LOCAL_LLM_BASE_URL
+        sync: false
+      - key: LOCAL_LLM_MODEL
+        sync: false
+      - key: LOCAL_LLM_API_KEY
+        sync: false
+      # hybrid | gemini_first | auto (hybrid when a self-hosted model is configured)
+      - key: AI_PIPELINE
+        value: auto

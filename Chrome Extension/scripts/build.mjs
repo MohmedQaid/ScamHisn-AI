@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,7 +14,8 @@ function copyDirRecursive(src, dest, excludeRelPaths = new Set(), base = src) {
   fs.mkdirSync(dest, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     const srcPath = path.join(src, entry.name);
-    const relPath = path.relative(base, srcPath);
+    // Forward slashes on every OS, so the exclude list below also matches on Windows
+    const relPath = path.relative(base, srcPath).split(path.sep).join('/');
     if (excludeRelPaths.has(relPath)) continue;
     const destPath = path.join(dest, entry.name);
     if (entry.isDirectory()) {
@@ -64,9 +65,86 @@ export const EXTENSION_CONFIG = {
 buildTarget({ outDir: prodDir, isDev: false });
 buildTarget({ outDir: devDir, isDev: true });
 
-// Package deployable/ as Chrome Web Store ready .zip
+/**
+ * Minimal ZIP writer (deflate, forward-slash paths) so the build works on Windows, macOS and
+ * Linux without the `zip` command-line tool. Timestamps are fixed, so the same input always
+ * produces the same archive.
+ */
+function listFiles(dir, base = dir) {
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .flatMap((entry) => {
+      const full = path.join(dir, entry.name);
+      return entry.isDirectory()
+        ? listFiles(full, base)
+        : [{ full, name: path.relative(base, full).split(path.sep).join('/') }];
+    });
+}
+
+function writeZip(sourceDir, outPath) {
+  const DOS_TIME = 0; // 00:00:00
+  const DOS_DATE = ((2026 - 1980) << 9) | (1 << 5) | 1; // 2026-01-01
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+
+  for (const file of listFiles(sourceDir)) {
+    const data = fs.readFileSync(file.full);
+    const compressed = zlib.deflateRawSync(data, { level: 9 });
+    const name = Buffer.from(file.name, 'utf8');
+    const crc = zlib.crc32(data);
+
+    const local = Buffer.alloc(30);
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4); // version needed
+    local.writeUInt16LE(0x0800, 6); // UTF-8 names
+    local.writeUInt16LE(8, 8); // deflate
+    local.writeUInt16LE(DOS_TIME, 10);
+    local.writeUInt16LE(DOS_DATE, 12);
+    local.writeUInt32LE(crc, 14);
+    local.writeUInt32LE(compressed.length, 18);
+    local.writeUInt32LE(data.length, 22);
+    local.writeUInt16LE(name.length, 26);
+    localParts.push(local, name, compressed);
+
+    const central = Buffer.alloc(46);
+    central.writeUInt32LE(0x02014b50, 0);
+    central.writeUInt16LE(20, 4); // version made by
+    central.writeUInt16LE(20, 6); // version needed
+    central.writeUInt16LE(0x0800, 8);
+    central.writeUInt16LE(8, 10);
+    central.writeUInt16LE(DOS_TIME, 12);
+    central.writeUInt16LE(DOS_DATE, 14);
+    central.writeUInt32LE(crc, 16);
+    central.writeUInt32LE(compressed.length, 20);
+    central.writeUInt32LE(data.length, 24);
+    central.writeUInt16LE(name.length, 28);
+    central.writeUInt32LE(offset, 42);
+    centralParts.push(central, name);
+
+    offset += local.length + name.length + compressed.length;
+  }
+
+  const centralDir = Buffer.concat(centralParts);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(centralParts.length / 2, 8);
+  end.writeUInt16LE(centralParts.length / 2, 10);
+  end.writeUInt32LE(centralDir.length, 12);
+  end.writeUInt32LE(offset, 16);
+  fs.writeFileSync(outPath, Buffer.concat([...localParts, centralDir, end]));
+}
+
+// Package deployable/ as a Chrome Web Store ready .zip, and refresh the copy the website serves
 fs.rmSync(zipPath, { force: true });
-execSync(`cd "${prodDir}" && zip -rq "${zipPath}" .`, { stdio: 'inherit' });
+writeZip(prodDir, zipPath);
+
+const webCopy = path.resolve(rootDir, '../Deployable Website Application/apps/web/public/scamhisn-extension.zip');
+if (fs.existsSync(path.dirname(webCopy))) {
+  fs.copyFileSync(zipPath, webCopy);
+  console.log('✓ Updated website download:', webCopy);
+}
 
 console.log('✓ Built production extension:', prodDir);
 console.log('✓ Built private dev extension:', devDir);

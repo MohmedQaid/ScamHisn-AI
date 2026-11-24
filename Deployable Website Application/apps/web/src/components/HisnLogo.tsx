@@ -1,51 +1,53 @@
-import { useId } from 'react';
-
 interface HisnLogoProps {
   className?: string;
 }
 
 /**
- * Official minimal ScamHisn AI (حصن الاحتيال) logo:
- * Minimal Emirati Hisn (fortress) icon in UAE flag colors with green as the dominant main color.
+ * ScamHisn AI (حصن الاحتيال) mark: a small sketched green fort tower flying a tiny UAE flag.
+ * Ink lines follow the current text colour so the mark works on light and dark paper.
  */
 export function HisnLogo({ className = 'h-10 w-10' }: HisnLogoProps) {
-  const uid = useId().replace(/:/g, '');
-  const gradId = `hisnGreen-${uid}`;
-  const clipId = `badgeClip-${uid}`;
-
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 64 64"
+      viewBox="0 0 40 40"
       fill="none"
-      className={className}
+      className={`text-outline ${className}`}
       aria-hidden="true"
+      focusable="false"
     >
-      <defs>
-        <linearGradient id={gradId} x1="12" y1="6" x2="58" y2="60" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#059669" />
-          <stop offset="100%" stopColor="#006A38" />
-        </linearGradient>
-        <clipPath id={clipId}>
-          <rect x="4" y="4" width="56" height="56" rx="15" />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${clipId})`}>
-        {/* Dominant UAE Emerald Green field */}
-        <rect x="4" y="4" width="56" height="56" fill={`url(#${gradId})`} />
-        {/* Minimal UAE Red vertical accent band */}
-        <rect x="4" y="4" width="10" height="56" fill="#CE1126" />
-        {/* Crisp White minimal Hisn fortress silhouette with 3 battlements */}
-        <path
-          d="M21 20H26V25H31.5V20H37.5V25H43V20H48V46C48 47.6569 46.6569 49 45 49H24C22.3431 49 21 47.6569 21 46V20Z"
-          fill="#FFFFFF"
-        />
-        {/* Minimal Obsidian Black arched fortress gate */}
-        <path
-          d="M30 49V39.5C30 37.0147 32.0147 35 34.5 35C36.9853 35 39 37.0147 39 39.5V49H30Z"
-          fill="#0B1215"
-        />
-      </g>
+      {/* Tower with three merlons */}
+      <path
+        d="M9.2 36.4 10 19.6H7.4l.2-6.2 5-.2.1 2.9 3.6.1.1-3 6.3-.1.1 3 3.7-.1v-2.9l5 .1.3 6.3-2.6.1.9 16.8Z"
+        fill="var(--color-brand)"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+      {/* Arched gate */}
+      <path
+        d="M16.6 36.3v-6.2c0-2.2 1.5-3.7 3.5-3.7s3.4 1.5 3.4 3.7v6.2"
+        fill="var(--color-page)"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M13.4 22.6h3M23.8 23.4h2.8" stroke="var(--color-page)" strokeWidth="1.3" strokeLinecap="round" />
+      {/* Flag pole and UAE flag: red band at the hoist, then green, white, black */}
+      <path d="M19.6 13.2V2.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="20.3" y="2.6" width="3.2" height="7.2" fill="#C8102E" />
+      <rect x="23.5" y="2.6" width="8.3" height="2.4" fill="#00843D" />
+      <rect x="23.5" y="5" width="8.3" height="2.4" fill="#FFFFFF" />
+      <rect x="23.5" y="7.4" width="8.3" height="2.4" fill="#111111" />
+      <rect
+        x="20.3"
+        y="2.6"
+        width="11.5"
+        height="7.2"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

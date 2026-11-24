@@ -12,42 +12,36 @@ export function GroundingSources({ sources, groundingUsed }: GroundingSourcesPro
   if (sources.length === 0) return null;
 
   return (
-    <div className="mt-4 border-t border-slate-100 pt-4 dark:border-slate-800/80">
-      <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-          {t.groundingSourcesTitle}
-        </span>
-        <div className="flex items-center gap-1.5">
-          {groundingUsed.map((g) => (
-            <span
-              key={g}
-              className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"
-            >
-              {g}
-            </span>
-          ))}
-        </div>
+    <section>
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h3 className="text-base font-extrabold text-ink">{t.groundingSourcesTitle}</h3>
+        {groundingUsed.length > 0 && (
+          <p dir="ltr" className="font-mono text-xs text-muted">
+            {groundingUsed.join(' · ')}
+          </p>
+        )}
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <ul className="divide-y divide-hairline border-y border-hairline">
         {sources.map((src) => (
-          <a
-            key={src.uri}
-            href={src.uri}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            className="inline-flex max-w-xs items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700 transition-colors hover:border-emerald-500/60 hover:text-emerald-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-emerald-400/60 dark:hover:text-emerald-300"
-          >
-            {src.sourceType === 'maps' ? (
-              <MapPin className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-            ) : (
-              <Globe className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-            )}
-            <span className="truncate">{src.title}</span>
-            <ExternalLink className="h-3 w-3 shrink-0 opacity-60" />
-          </a>
+          <li key={src.uri}>
+            <a
+              href={src.uri}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="flex items-center gap-3 py-2.5 text-sm font-semibold text-ink transition-colors hover:text-brand"
+            >
+              {src.sourceType === 'maps' ? (
+                <MapPin className="h-[18px] w-[18px] shrink-0 text-brand" strokeWidth={1.75} aria-hidden="true" />
+              ) : (
+                <Globe className="h-[18px] w-[18px] shrink-0 text-brand" strokeWidth={1.75} aria-hidden="true" />
+              )}
+              <span className="min-w-0 flex-1 truncate">{src.title}</span>
+              <ExternalLink className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.75} aria-hidden="true" />
+            </a>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   );
 }
