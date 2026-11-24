@@ -39,7 +39,7 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 | 14 | Live demo on our own samples, ending on the PDF report, with a recorded backup in case the internet fails. | Proposed |
 | 15 | Feature Map mode as "the scam with no link" only if it tests reliably. | Map mode not yet tested live |
 | 16 | The deck keeps three short slides the rules require: architecture, why these models, privacy. | Done: nine slides in `docs/pitch/`, drawn in the same paper-and-ink look, fonts embedded, PDF copy alongside |
-| 17 | Pitch video. | Postponed; a new idea is coming |
+| 17 | Pitch video: 69 seconds, 1080p60, no music or voice-over, loops. Phone shots in Blender, everything else in After Effects from the real interface cut into layers. | Done: storyboard and build scripts in `docs/pitch/video/`; a sound-effects track is optional and has not been checked by ear |
 | 18 | Visual redesign to the paper-and-ink look chosen by the team, across the website and the extension. | Done |
 
 ## Contradictions we found and how we resolved them
