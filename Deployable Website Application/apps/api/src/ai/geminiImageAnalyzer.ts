@@ -99,6 +99,7 @@ TASK (be concise and decisive to conserve tokens):
 1. Determine if the screenshot/image is GENUINE or a SCAM/FORGERY:
    - Check for smishing/WhatsApp/email scams (urgent fine/delivery/account-suspended threats, fake UAE PASS/TAMM/Abu Dhabi Police/RTA/Salik/Emirates Post/UAE bank branding, advance-fee job scams, lottery/crypto lures).
    - Check visual authenticity: altered fonts, misaligned numbers, edited payment receipts/bank transfer slips, mismatched UI elements, or AI-generated forgery signs.
+   - SIMILAR-NAME RULE: Do NOT flag a legitimate organization as a scam or impersonator merely because its name/acronym resembles another entity (e.g., ADIB vs. DIB, ADCB vs. CBD). Only flag name similarity when you are certain there is no distinct legitimate organization with that name.
 2. Extract any visible URLs/domains and phone numbers.
 3. Keep findings concise (1 to 4 highest-signal items) and keep all summaries under 2 sentences in both English and clear Arabic.`;
 

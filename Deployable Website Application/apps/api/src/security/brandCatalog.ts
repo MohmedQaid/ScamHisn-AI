@@ -117,6 +117,36 @@ export const PROTECTED_BRANDS: BrandEntry[] = [
     isUaeEntity: true,
   },
   {
+    name: 'Abu Dhabi Islamic Bank (ADIB)',
+    tokens: ['adib-uae', 'abudhabiislamic'],
+    officialDomains: ['adib.ae', 'adib.com'],
+    isUaeEntity: true,
+  },
+  {
+    name: 'Sharjah Islamic Bank (SIB)',
+    tokens: ['sib-uae', 'sharjahislamic'],
+    officialDomains: ['sib.ae'],
+    isUaeEntity: true,
+  },
+  {
+    name: 'Commercial Bank of Dubai (CBD)',
+    tokens: ['cbd-uae', 'cbdbank'],
+    officialDomains: ['cbd.ae'],
+    isUaeEntity: true,
+  },
+  {
+    name: 'RAKBANK',
+    tokens: ['rakbank'],
+    officialDomains: ['rakbank.ae'],
+    isUaeEntity: true,
+  },
+  {
+    name: 'Al Hilal Bank',
+    tokens: ['alhilalbank'],
+    officialDomains: ['alhilalbank.ae'],
+    isUaeEntity: true,
+  },
+  {
     name: 'Mashreq Bank',
     tokens: ['mashreq'],
     officialDomains: ['mashreq.com', 'mashreqbank.com', 'mashreqneo.com'],
@@ -262,6 +292,16 @@ export function detectBrandImpersonation(
   const normalizedSld = normalizeLookalikes(sld);
   const urlLower = fullUrl.toLowerCase();
 
+  // Never flag a verified official domain of ANY protected brand as impersonating another similar-named brand
+  const isAnyOfficialProtectedDomain = PROTECTED_BRANDS.some((entry) =>
+    entry.officialDomains.some(
+      (official) => regLower === official || hostLower === official || hostLower.endsWith(`.${official}`),
+    ),
+  );
+  if (isAnyOfficialProtectedDomain) {
+    return null;
+  }
+
   for (const entry of PROTECTED_BRANDS) {
     const isOfficial = entry.officialDomains.some(
       (official) => regLower === official || hostLower === official || hostLower.endsWith(`.${official}`),
@@ -303,9 +343,15 @@ export function detectBrandImpersonation(
         }
       }
 
-      // 3. Official domain string embedded in subdomain/path of unrelated domain (e.g. evil.xyz/uaepass.ae/login)
+      // 3. Official domain string embedded at a boundary in subdomain/path of unrelated domain (e.g. uaepass.ae.evil.xyz or evil.xyz/uaepass.ae/login)
+      // Must check boundaries so legitimate domains like adib.ae are never substring-matched against dib.ae
       for (const official of entry.officialDomains) {
-        if (official.length >= 6 && (hostLower.includes(official) || urlLower.includes(`/${official}`))) {
+        const embeddedInSubdomain =
+          hostLower.startsWith(`${official}.`) ||
+          hostLower.includes(`.${official}.`) ||
+          hostLower.includes(`-${official}`);
+        const embeddedInPath = urlLower.includes(`/${official}`);
+        if (official.length >= 6 && (embeddedInSubdomain || embeddedInPath)) {
           return {
             brand: entry.name,
             reason: `Unofficial domain "${regLower}" embeds official domain string "${official}" in URL`,
