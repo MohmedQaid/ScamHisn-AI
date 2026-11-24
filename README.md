@@ -57,16 +57,16 @@ It supports **passive checking** (manual inspection on demand) and **proactive c
 
 ### What It Delivers
 
-**Four Inspection Modes**
+#### Four Inspection Modes
 Check **General Links**, **Job Posts**, **Map Links**, or upload **Screenshots & Images** with a live preview to verify whether an image is genuine or forged.
 
-**Decisive 0–100% Scam Score**
+#### Decisive 0–100% Scam Score
 Fatal red flags immediately score **95–100%** instead of being diluted, while legitimate lookalike organizations (such as ADIB vs. DIB) are not falsely penalized.
 
-**Simple View + Investigator Details**
+#### Simple View + Investigator Details
 Everyday users get a clear verdict at a glance; **"Show Details"** reveals technical findings for deeper investigation.
 
-**Forensic PDF & Police Escalation Concept**
+#### Forensic PDF & Police Escalation Concept
 Export an investigation-ready **PDF report** in one click, alongside a conceptual **"Send to police for investigation"** button illustrating direct eCrime reporting.
 
 ---
@@ -139,10 +139,10 @@ Bringing **ScamHisn AI** into Abu Dhabi's **TAMM** ecosystem unlocks personalize
 </tr>
 </table>
 
-**Personalized Fact-Checking**
+#### Personalized Fact-Checking
 Cross-check scam messages against a resident's real TAMM records—instantly catching fake *"unpaid fine"* claims when their account shows *"All good, no fines."*
 
-**Native TAMM App Service**
+#### Native TAMM App Service
 Embed one-tap link and screenshot verification directly inside **TAMM** with authenticated escalation to **Abu Dhabi Police**.
 
 > [!NOTE]
@@ -200,16 +200,16 @@ If you ever want to deploy your own free copy on **Render**:
 
 ### أبرز ما يقدمه التطبيق
 
-**أربعة أوضاع للفحص**
+#### أربعة أوضاع للفحص
 افحص **الروابط العامة** أو **إعلانات الوظائف** أو **روابط الخرائط** أو ارفع **الصور ولقطات الشاشة** مع معاينة فورية للتحقق من أصالتها وكشف التزوير.
 
-**نسبة احتمال احتيال حاسمة (0–100%)**
+#### نسبة احتمال احتيال حاسمة (0–100%)
 تصل النتيجة فوراً إلى **95–100%** عند وجود أدلة قاطعة دون تمييع، مع تجنّب الإنذارات الكاذبة للجهات الشرعية متشابهة الأسماء (مثل ADIB وDIB).
 
-**عرض بسيط وتفاصيل للمحققين**
+#### عرض بسيط وتفاصيل للمحققين
 يظهر ملخص واضح وسريع للمستخدم العادي، مع زر **«عرض التفاصيل التقنية»** لعرض الأدلة المعمّقة عند الحاجة.
 
-**تقرير PDF ومفهوم الإبلاغ للشرطة**
+#### تقرير PDF ومفهوم الإبلاغ للشرطة
 إمكانية تصدير **تقرير أدلة بصيغة PDF** بضغطة زر، إلى جانب زر تجريبي **«إرسال للشرطة للتحقيق»** يوضح مسار الربط المستقبلي.
 
 ---
@@ -282,10 +282,10 @@ If you ever want to deploy your own free copy on **Render**:
 </tr>
 </table>
 
-**كشف مخصّص للاحتيال عبر بيانات المستخدم**
+#### كشف مخصّص للاحتيال عبر بيانات المستخدم
 التحقق الفوري من ادعاءات الرسائل المشبوهة (مثل *"مخالفة مرورية غير مدفوعة"*) مقارنةً بحالة المستفيد الفعلية في «تم» (مثل ظهور *"لا توجد مخالفات"*).
 
-**خدمة مدمجة داخل تطبيق «تم»**
+#### خدمة مدمجة داخل تطبيق «تم»
 توفير فحص الروابط والصور بضغطة واحدة داخل التطبيق مع إمكانية رفع البلاغات الموثّقة مباشرةً إلى **شرطة أبوظبي**.
 
 > **نطاق التصميم المعماري:**
