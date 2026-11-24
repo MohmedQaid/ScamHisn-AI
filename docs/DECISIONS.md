@@ -38,7 +38,7 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 | 13 | Open with two SMS messages side by side, one real and one fake. | Proposed |
 | 14 | Live demo on our own samples, ending on the PDF report, with a recorded backup in case the internet fails. | Proposed |
 | 15 | Feature Map mode as "the scam with no link" only if it tests reliably. | Map mode not yet tested live |
-| 16 | The deck keeps three short slides the rules require: architecture, why these models, privacy. | Proposed |
+| 16 | The deck keeps three short slides the rules require: architecture, why these models, privacy. | Done: nine slides in `docs/pitch/`, drawn in the same paper-and-ink look, fonts embedded, PDF copy alongside |
 | 17 | Pitch video. | Postponed; a new idea is coming |
 | 18 | Visual redesign to the paper-and-ink look chosen by the team, across the website and the extension. | Done |
 
@@ -67,6 +67,7 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 
 | What | Where |
 |---|---|
+| Pitch deck (PowerPoint and PDF) | [`docs/pitch/`](./pitch/) |
 | Fallback chain setup | [`docs/AI_FALLBACK_SETUP.md`](./AI_FALLBACK_SETUP.md) |
 | Measured accuracy | [`docs/eval/address-layer.md`](./eval/address-layer.md) |
 | Research and sources | [`docs/research/`](./research/) |
