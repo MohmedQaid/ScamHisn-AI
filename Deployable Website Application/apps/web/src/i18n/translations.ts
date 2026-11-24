@@ -45,7 +45,21 @@ export interface Translations {
   scanBtn: string;
   scanningBtn: string;
   trySampleLabel: string;
-  samples: Array<{ label: string; url: string; mode: ScanMode }>;
+  samples: Array<{ label: string; url: string; mode: ScanMode; tone?: 'danger' }>;
+  /** Plain statement of how much of the analysis actually ran. */
+  coverage: {
+    incompleteLabel: string;
+    full: string;
+    partialBackup: string;
+    partialPageNotLoaded: string;
+    rulesOnly: string;
+    addressOnly: string;
+  };
+  nav: {
+    impact: string;
+    pitch: string;
+    back: string;
+  };
   progressTitle: string;
   progressSteps: string[];
   scamLikelihoodLabel: string;
@@ -210,8 +224,32 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     trySampleLabel: 'Quick test:',
     samples: [
       { label: 'UAE Portal (u.ae)', url: 'https://u.ae/en', mode: 'general' },
-      { label: 'Example.com', url: 'https://example.com', mode: 'general' },
+      {
+        label: 'Fake fine link',
+        url: 'https://adpolice-fines-pay.top/verify',
+        mode: 'general',
+        tone: 'danger',
+      },
+      {
+        label: 'Scam SMS',
+        url: 'Abu Dhabi Police: you have an unpaid traffic fine of AED 150. Pay within 24 hours at tamm-login.xyz/pay to avoid court.',
+        mode: 'general',
+        tone: 'danger',
+      },
     ],
+    coverage: {
+      incompleteLabel: 'Incomplete check',
+      full: 'Full check: page opened, AI analysis, live sources.',
+      partialBackup: 'Backup AI model answered. Live Google sources were not checked.',
+      partialPageNotLoaded: 'The page could not be opened. This result uses the address, registry data and AI lookups.',
+      rulesOnly: 'AI analysis was unavailable. This result uses technical checks only, so treat it as incomplete.',
+      addressOnly: 'This address is offline. The result is based on the address itself.',
+    },
+    nav: {
+      impact: 'Impact',
+      pitch: 'Watch the pitch',
+      back: 'Back to the inspector',
+    },
     progressTitle: 'Running Isolated Forensic Pipeline',
     progressSteps: [
       'Validating URL & blocking SSRF private IP ranges',
@@ -328,7 +366,7 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       apiNoteLabel: 'REST API v1 Ready',
       apiNoteDesc: 'Versioned endpoint ready for web clients and future browser extensions.',
       sandboxNote:
-        'All inspected URLs are opened inside an isolated ephemeral headless browser with downloads, cookies, and internal network ranges strictly blocked.',
+        'Links are opened for you in a throwaway headless browser on our server: downloads are blocked, nothing is kept after the scan, and internal network addresses are refused.',
       privacyNote:
         'Automated scores are decision-support forensics—never enter passwords, OTP codes, or card details on unverified links.',
       downloadExtensionBtn: 'Download Chrome Extension (.zip)',
@@ -405,8 +443,32 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     trySampleLabel: 'جرّب رابط سريع:',
     samples: [
       { label: 'حكومة الإمارات (u.ae)', url: 'https://u.ae/ar', mode: 'general' },
-      { label: 'Example.com', url: 'https://example.com', mode: 'general' },
+      {
+        label: 'رابط مخالفة مزيّف',
+        url: 'https://adpolice-fines-pay.top/verify',
+        mode: 'general',
+        tone: 'danger',
+      },
+      {
+        label: 'رسالة احتيال',
+        url: 'شرطة أبوظبي: لديك مخالفة مرورية غير مدفوعة بقيمة 150 درهماً. ادفع خلال 24 ساعة عبر tamm-login.xyz/pay لتجنب الإحالة للمحكمة.',
+        mode: 'general',
+        tone: 'danger',
+      },
     ],
+    coverage: {
+      incompleteLabel: 'فحص غير مكتمل',
+      full: 'فحص كامل: فتحنا الصفحة، وحلّلها الذكاء الاصطناعي، وتحققنا من المصادر المباشرة.',
+      partialBackup: 'أجاب النموذج الاحتياطي. لم يتم التحقق من مصادر جوجل المباشرة.',
+      partialPageNotLoaded: 'تعذّر فتح الصفحة. النتيجة مبنية على العنوان وبيانات التسجيل وبحث الذكاء الاصطناعي.',
+      rulesOnly: 'التحليل الذكي غير متاح حالياً. النتيجة مبنية على الفحوصات التقنية فقط، فاعتبرها غير مكتملة.',
+      addressOnly: 'هذا العنوان متوقف. النتيجة مبنية على العنوان نفسه فقط.',
+    },
+    nav: {
+      impact: 'الأثر',
+      pitch: 'شاهد العرض',
+      back: 'رجوع إلى الفاحص',
+    },
     progressTitle: 'جاري تشغيل منظومة الفحص المعزول',
     progressSteps: [
       'التحقق من سلامة الرابط وحظر العناوين الداخلية (SSRF)',
@@ -418,7 +480,7 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     scamLikelihoodLabel: 'نسبة الاحتيال',
     verdicts: {
       safe: {
-        label: 'الرابط آمن',
+        label: 'آمن على الأرجح',
         desc: 'ما رصدنا أي مؤشرات احتيال أو انتحال أو مخاطر تقنية واضحة على هذا الرابط.',
       },
       caution: {
@@ -523,7 +585,7 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       apiNoteLabel: 'واجهة برمجية v1 جاهزة',
       apiNoteDesc: 'نقطة فحص برمجية موحّدة وجاهزة للربط مع تطبيقات الويب وإضافات المتصفح مستقبلاً.',
       sandboxNote:
-        'يتم فتح جميع الروابط داخل متصفح معزول بالكامل مع منع التحميل والكوكيز وحظر الوصول للشبكات الداخلية.',
+        'نفتح الرابط بدلاً منك في متصفح مؤقت على خادمنا: التحميل ممنوع، ولا يُحفظ شيء بعد الفحص، وتُرفض عناوين الشبكات الداخلية.',
       privacyNote:
         'نتائج الفحص مساعدة تقنية للتحقق — لا تدخل أبداً كلمات السر أو رموز OTP أو بيانات البطاقة في صفحات غير موثّقة.',
       downloadExtensionBtn: 'تحميل إضافة كروم (.zip)',

@@ -287,7 +287,11 @@ export function ScanForm({
                     onModeChange(sample.mode);
                     onUrlChange(sample.url);
                   }}
-                  className="cursor-pointer rounded-full border border-slate-200/90 bg-slate-100/70 px-3 py-1 font-medium text-slate-700 transition-colors hover:border-emerald-500/50 hover:bg-emerald-50 hover:text-emerald-800 disabled:opacity-50 dark:border-slate-700/80 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-emerald-400/50 dark:hover:bg-emerald-950/60 dark:hover:text-emerald-300"
+                  className={
+                    sample.tone === 'danger'
+                      ? 'cursor-pointer rounded-full border border-rose-300/80 bg-rose-50/80 px-3 py-1 font-medium text-rose-800 transition-colors hover:border-rose-400 hover:bg-rose-100 disabled:opacity-50 dark:border-rose-500/35 dark:bg-rose-950/40 dark:text-rose-200 dark:hover:bg-rose-950/70'
+                      : 'cursor-pointer rounded-full border border-slate-200/90 bg-slate-100/70 px-3 py-1 font-medium text-slate-700 transition-colors hover:border-emerald-500/50 hover:bg-emerald-50 hover:text-emerald-800 disabled:opacity-50 dark:border-slate-700/80 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-emerald-400/50 dark:hover:bg-emerald-950/60 dark:hover:text-emerald-300'
+                  }
                 >
                   {sample.label}
                 </button>

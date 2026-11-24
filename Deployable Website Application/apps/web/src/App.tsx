@@ -37,6 +37,9 @@ function ScamHisnShell() {
     setIsScanning(true);
     setScanningVariant('url');
     setError(null);
+    // Clear the previous verdict so a failed scan never leaves an old result on screen
+    setResult(null);
+    setImageResult(null);
 
     try {
       const response = await scanUrl({ url: targetUrl, mode: targetMode, locale });
@@ -63,6 +66,8 @@ function ScamHisnShell() {
     setIsScanning(true);
     setScanningVariant('image');
     setError(null);
+    setResult(null);
+    setImageResult(null);
 
     try {
       const response = await scanImage({

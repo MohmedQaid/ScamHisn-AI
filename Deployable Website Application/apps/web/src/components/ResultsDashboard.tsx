@@ -54,8 +54,35 @@ export function ResultsDashboard({ result }: ResultsDashboardProps) {
 
   const verdictMeta = t.verdicts[result.verdict];
   const aiSummary = locale === 'ar' ? result.aiAnalysis.summaryAr : result.aiAnalysis.summaryEn;
+
+  // How much of the analysis ran. Older API responses have no coverage field: infer it.
+  const coverageLevel =
+    result.coverage?.level ?? (result.aiAnalysis.status === 'unavailable' ? 'rules_only' : 'full');
+  const pageLoaded = result.coverage?.pageLoaded ?? result.technicalChecks.domAndForms.browserCaptured;
+  const coverageText =
+    coverageLevel === 'address_only'
+      ? t.coverage.addressOnly
+      : coverageLevel === 'rules_only'
+        ? t.coverage.rulesOnly
+        : coverageLevel === 'partial'
+          ? pageLoaded
+            ? t.coverage.partialBackup
+            : t.coverage.partialPageNotLoaded
+          : t.coverage.full;
+  const isFullCoverage = coverageLevel === 'full';
+
+  // A clean technical result without AI is "incomplete", never a confident verdict
+  const isIncompleteCheck =
+    (coverageLevel === 'rules_only' || coverageLevel === 'address_only') && result.scamScore <= 19;
+  const verdictLabel = isIncompleteCheck ? t.coverage.incompleteLabel : verdictMeta.label;
+
+  // When the AI did not answer and the rules found real risk, lead with the verdict text;
+  // otherwise show the summary (which now says plainly when AI was unavailable).
+  const aiUnavailable = result.aiAnalysis.status === 'unavailable';
   const displayHeadlineText =
-    result.aiAnalysis.status !== 'unavailable' && aiSummary ? aiSummary : verdictMeta.desc;
+    aiUnavailable && coverageLevel !== 'address_only' && result.scamScore >= 45
+      ? verdictMeta.desc
+      : aiSummary || verdictMeta.desc;
 
   const handleGeneratePdf = async () => {
     setIsGeneratingPdf(true);
@@ -91,7 +118,7 @@ export function ResultsDashboard({ result }: ResultsDashboardProps) {
               <span
                 className={`inline-flex items-center rounded-full border px-3 py-0.5 text-xs font-extrabold ${VERDICT_BADGE[result.verdict]}`}
               >
-                {verdictMeta.label}
+                {verdictLabel}
               </span>
               <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
                 {t.scamLikelihoodLabel}
@@ -107,6 +134,22 @@ export function ResultsDashboard({ result }: ResultsDashboardProps) {
 
             <p className="mt-2 break-words text-sm leading-relaxed text-slate-700 dark:text-slate-200">
               {displayHeadlineText}
+            </p>
+
+            {/* Coverage: say plainly how much of the analysis ran */}
+            <p
+              className={`mt-2 inline-flex items-start gap-1.5 rounded-xl px-2.5 py-1.5 text-start text-[11.5px] font-medium leading-snug ${
+                isFullCoverage
+                  ? 'bg-emerald-50/80 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
+                  : 'border border-amber-300/80 bg-amber-50 text-amber-900 dark:border-amber-500/35 dark:bg-amber-950/40 dark:text-amber-200'
+              }`}
+            >
+              {isFullCoverage ? (
+                <CheckCircle2 className="mt-px h-3.5 w-3.5 shrink-0" />
+              ) : (
+                <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0" />
+              )}
+              <span>{coverageText}</span>
             </p>
 
             <p
