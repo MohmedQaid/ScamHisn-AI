@@ -67,7 +67,7 @@ Fatal red flags immediately score **95–100%** instead of being diluted, while 
 Everyday users get a clear verdict at a glance; **"Show Details"** reveals technical findings for deeper investigation.
 
 #### Forensic PDF & Police Escalation Concept
-Export an investigation-ready **PDF report** in one click, alongside a conceptual **"Send to police for investigation"** button illustrating direct eCrime reporting.
+Export an investigation-ready **PDF report** in one click. The **"Report to Abu Dhabi Police"** button lists the official **Aman** channels (800 2626, SMS 2828, aman@adpolice.gov.ae); it does not submit anything for you.
 
 ---
 
@@ -165,7 +165,9 @@ Embed one-tap link and screenshot verification directly inside **TAMM** with aut
 
 #### Measured, not claimed
 
-On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 102 unit tests (`npm test`).
+On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 104 unit tests (`npm test`).
+
+The problem figures, cost model and savings estimate are on the in-app **Impact** page (`#/impact`) and in [`docs/IMPACT.md`](./docs/IMPACT.md). All 67 references are in [`docs/research/sources.md`](./docs/research/sources.md); the UAE open-data files we used are in [`data/open-data/`](./data/open-data/).
 
 #### Privacy
 
@@ -178,7 +180,7 @@ On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), t
 #### What we left out
 
 - A police-side dashboard that groups reports into campaigns.
-- A live reporting link to the police. The "Send to police" button is a concept.
+- Direct submission to the police. The report button lists the official Aman channels; the user sends the report.
 - The TAMM claim-check. It is a concept and needs a government integration.
 - On-device text reading for screenshots, so screenshots currently leave the device.
 - Public threat feeds, user accounts, and Chrome Web Store publication.
@@ -199,7 +201,7 @@ npm install
 npm run install:browser      # headless Chromium for the scanner
 cp .env.example .env         # then set GEMINI_API_KEY
 npm run dev                  # web on :5173, API on :3001
-npm test                     # 102 API unit tests
+npm test                     # 104 API unit tests
 ```
 
 The fallback chain is configured with environment variables; see [`docs/AI_FALLBACK_SETUP.md`](./docs/AI_FALLBACK_SETUP.md).
@@ -266,7 +268,7 @@ If you ever want to deploy your own free copy on **Render**:
 يظهر ملخص واضح وسريع للمستخدم العادي، مع زر **«عرض التفاصيل التقنية»** لعرض الأدلة المعمّقة عند الحاجة.
 
 #### تقرير PDF ومفهوم الإبلاغ للشرطة
-إمكانية تصدير **تقرير أدلة بصيغة PDF** بضغطة زر، إلى جانب زر تجريبي **«إرسال للشرطة للتحقيق»** يوضح مسار الربط المستقبلي.
+إمكانية تصدير **تقرير أدلة بصيغة PDF** بضغطة زر. وزر **«بلّغ شرطة أبوظبي»** يعرض قنوات خدمة **«أمان»** الرسمية (8002626، رسالة نصية 2828، aman@adpolice.gov.ae) ولا يرسل شيئاً بالنيابة عنك.
 
 ---
 
@@ -365,7 +367,9 @@ If you ever want to deploy your own free copy on **Render**:
 
 #### قياس لا ادّعاء
 
-على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 102 اختباراً آلياً (`npm test`).
+على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 104 اختبارات آلية (`npm test`).
+
+أرقام المشكلة ونموذج التكلفة وتقدير التوفير معروضة في صفحة **الأثر** داخل التطبيق (`#/impact`) وفي [`docs/IMPACT.md`](./docs/IMPACT.md). المراجع الـ67 كلها في [`docs/research/sources.md`](./docs/research/sources.md)، وملفات البيانات المفتوحة الإماراتية المستخدمة في [`data/open-data/`](./data/open-data/).
 
 #### الخصوصية
 
@@ -378,7 +382,7 @@ If you ever want to deploy your own free copy on **Render**:
 #### ما لم ننفّذه
 
 - لوحة للشرطة تجمع البلاغات في حملات.
-- ربط مباشر للإبلاغ؛ فزر «إرسال للشرطة» تصوّر مستقبلي.
+- إرسال البلاغ مباشرةً للشرطة؛ فزر الإبلاغ يعرض قنوات «أمان» الرسمية والمستخدم هو من يرسل.
 - التحقق من الادعاء عبر «تم»؛ وهو تصوّر يحتاج تكاملاً حكومياً.
 - قراءة نص اللقطات على الجهاز نفسه، ولذلك تغادر اللقطات الجهاز حالياً.
 - قوائم التهديدات العامة، وحسابات المستخدمين، والنشر في متجر كروم.
@@ -401,7 +405,7 @@ npm install
 npm run install:browser      # headless Chromium for the scanner
 cp .env.example .env         # then set GEMINI_API_KEY
 npm run dev                  # web on :5173, API on :3001
-npm test                     # 102 API unit tests
+npm test                     # 104 API unit tests
 ```
 
 </div>

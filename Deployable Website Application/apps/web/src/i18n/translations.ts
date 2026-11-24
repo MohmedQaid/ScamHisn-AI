@@ -87,6 +87,12 @@ export interface Translations {
     sendToPolice: string;
     conceptBadge: string;
     policeConceptNotice: string;
+    amanTitle: string;
+    amanPhoneLabel: string;
+    amanSmsLabel: string;
+    amanEmailLabel: string;
+    amanWebLabel: string;
+    amanNote: string;
     reportError: string;
   };
   labels: {
@@ -240,7 +246,7 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     coverage: {
       incompleteLabel: 'Incomplete check',
       full: 'Full check: page opened, AI analysis, live sources.',
-      partialBackup: 'Backup AI model answered. Live Google sources were not checked.',
+      partialBackup: 'AI analysis ran, but live Google sources were not checked.',
       partialPageNotLoaded: 'The page could not be opened. This result uses the address, registry data and AI lookups.',
       rulesOnly: 'AI analysis was unavailable. This result uses technical checks only, so treat it as incomplete.',
       addressOnly: 'This address is offline. The result is based on the address itself.',
@@ -302,10 +308,17 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       hideDetails: 'Hide Details',
       generateReport: 'Generate Report',
       generatingReport: 'Generating PDF...',
-      sendToPolice: 'Send to police for investigation',
-      conceptBadge: 'Concept',
+      sendToPolice: 'Report to Abu Dhabi Police',
+      conceptBadge: 'Aman',
       policeConceptNotice:
-        'Concept preview: Direct law-enforcement submission is not connected to an active police API yet. You can download the full forensic PDF using "Generate Report" and attach it to your official eCrime report.',
+        'ScamHisn does not send anything for you. Download the report with "Generate Report" and share it through one of these official Aman channels.',
+      amanTitle: 'Aman service, Abu Dhabi Police (free, 24/7, confidential)',
+      amanPhoneLabel: 'Call',
+      amanSmsLabel: 'SMS',
+      amanEmailLabel: 'Email',
+      amanWebLabel: 'Website',
+      amanNote:
+        'Aman receives information. If you lost money, also file a police report and tell your bank at once.',
       reportError: 'Could not generate the PDF report. Please try again.',
     },
     labels: {
@@ -459,7 +472,7 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     coverage: {
       incompleteLabel: 'فحص غير مكتمل',
       full: 'فحص كامل: فتحنا الصفحة، وحلّلها الذكاء الاصطناعي، وتحققنا من المصادر المباشرة.',
-      partialBackup: 'أجاب النموذج الاحتياطي. لم يتم التحقق من مصادر جوجل المباشرة.',
+      partialBackup: 'تم التحليل الذكي، لكن لم يتم التحقق من مصادر جوجل المباشرة.',
       partialPageNotLoaded: 'تعذّر فتح الصفحة. النتيجة مبنية على العنوان وبيانات التسجيل وبحث الذكاء الاصطناعي.',
       rulesOnly: 'التحليل الذكي غير متاح حالياً. النتيجة مبنية على الفحوصات التقنية فقط، فاعتبرها غير مكتملة.',
       addressOnly: 'هذا العنوان متوقف. النتيجة مبنية على العنوان نفسه فقط.',
@@ -521,10 +534,17 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       hideDetails: 'إخفاء التفاصيل التقنية',
       generateReport: 'إنشاء تقرير (PDF)',
       generatingReport: 'جاري تجهيز التقرير...',
-      sendToPolice: 'إرسال للشرطة للتحقيق',
-      conceptBadge: 'نموذج تجريبي',
+      sendToPolice: 'بلّغ شرطة أبوظبي',
+      conceptBadge: 'أمان',
       policeConceptNotice:
-        'ميزة تجريبية (Concept): الربط المباشر مع أنظمة الشرطة غير مفعّل حالياً. تقدر تحمّل التقرير الجنائي الكامل بصيغة PDF من زر "إنشاء تقرير (PDF)" وتقدمه مباشرةً للجهات المختصة.',
+        'حصن الاحتيال لا يرسل أي شيء بالنيابة عنك. حمّل التقرير من زر "إنشاء تقرير (PDF)" وشاركه عبر إحدى قنوات «أمان» الرسمية.',
+      amanTitle: 'خدمة «أمان» من شرطة أبوظبي (مجانية، على مدار الساعة، بسرية تامة)',
+      amanPhoneLabel: 'اتصال',
+      amanSmsLabel: 'رسالة نصية',
+      amanEmailLabel: 'بريد إلكتروني',
+      amanWebLabel: 'الموقع',
+      amanNote:
+        '«أمان» قناة لاستقبال المعلومات. إذا خسرت مالاً فافتح بلاغاً لدى الشرطة أيضاً وأبلغ بنكك فوراً.',
       reportError: 'تعذّر إنشاء تقرير الـ PDF حالياً. حاول مرة ثانية.',
     },
     labels: {

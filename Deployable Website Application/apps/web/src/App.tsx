@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ImpactPage } from './components/ImpactPage';
 import { Download, ShieldCheck, Sparkles, Users } from 'lucide-react';
 import type { ImageScanResponse, ScanMode, ScanResponse } from '@scamhisn/shared';
 import { LocaleProvider, useLocale } from './i18n/LocaleContext';
@@ -13,8 +14,23 @@ import { ScanProgress } from './components/ScanProgress';
 import { ResultsDashboard } from './components/ResultsDashboard';
 import { ImageResultsCard } from './components/ImageResultsCard';
 
+/** Minimal hash routing: "#/impact" shows the Impact page, anything else the inspector. */
+function useHashRoute(): string {
+  const [hash, setHash] = useState(() => window.location.hash);
+  useEffect(() => {
+    const onChange = () => {
+      setHash(window.location.hash);
+      window.scrollTo({ top: 0 });
+    };
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
+  }, []);
+  return hash;
+}
+
 function ScamHisnShell() {
   const { locale, t } = useLocale();
+  const showImpact = useHashRoute().startsWith('#/impact');
   const [url, setUrl] = useState('');
   const [mode, setMode] = useState<InspectorTab>('general');
   const [selectedImage, setSelectedImage] = useState<CompressedImagePayload | null>(null);
@@ -111,7 +127,16 @@ function ScamHisnShell() {
 
       <Header />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 pt-10 sm:px-6 sm:pt-14">
+      {showImpact && (
+        <main className="flex-1">
+          <ImpactPage />
+        </main>
+      )}
+
+      <main
+        hidden={showImpact}
+        className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 pt-10 sm:px-6 sm:pt-14"
+      >
         {/* Centered Gemini / ChatGPT-Style Brand Title + Minimal Instruction + New Feature Update Pill */}
         <div className="mx-auto mb-7 max-w-2xl text-center">
           <div className="inline-flex items-center justify-center gap-3">

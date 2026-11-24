@@ -20,6 +20,12 @@ export function Header() {
 
         {/* Language Switcher + Animated Theme Toggle */}
         <div className="flex items-center gap-2.5">
+          <a
+            href="#/impact"
+            className="inline-flex h-9 items-center rounded-full px-3 text-xs font-semibold text-slate-600 transition-colors hover:text-emerald-700 dark:text-slate-300 dark:hover:text-emerald-300"
+          >
+            {t.nav.impact}
+          </a>
           <button
             type="button"
             onClick={toggleLocale}

@@ -75,16 +75,42 @@ function buildReportHtml(report: ScanResponse, locale: Locale): string {
         </section>`
       : '';
 
-  const aiSummarySection =
-    report.aiAnalysis.status !== 'unavailable'
-      ? `<section class="card">
-          <h2>${isAr ? 'ملخص التحليل الذكي والتوصية' : 'AI Forensic Summary & Recommendation'}</h2>
+  // A report must say how much of the analysis ran: an investigator reading it later cannot tell
+  // otherwise whether "no findings" means "clean" or "the AI never looked".
+  const coverageLevel =
+    report.coverage?.level ?? (report.aiAnalysis.status === 'unavailable' ? 'rules_only' : 'full');
+  const COVERAGE_TEXT: Record<string, { en: string; ar: string }> = {
+    full: {
+      en: 'Full check: page opened, AI analysis with live sources.',
+      ar: 'فحص كامل: تم فتح الصفحة والتحليل الذكي مع التحقق من المصادر المباشرة.',
+    },
+    partial: {
+      en: 'Partial check: an AI model answered, but live sources were not checked or the page could not be opened.',
+      ar: 'فحص جزئي: أجاب نموذج ذكاء اصطناعي، لكن لم يتم التحقق من المصادر المباشرة أو تعذّر فتح الصفحة.',
+    },
+    rules_only: {
+      en: 'Incomplete check: AI analysis was unavailable. Findings are from technical checks only.',
+      ar: 'فحص غير مكتمل: التحليل الذكي لم يكن متاحاً. النتائج من الفحوصات التقنية فقط.',
+    },
+    address_only: {
+      en: 'Address-only check: the domain did not resolve, so the page could not be opened.',
+      ar: 'فحص العنوان فقط: النطاق متوقف وتعذّر فتح الصفحة.',
+    },
+  };
+  const coverageText = COVERAGE_TEXT[coverageLevel] ?? COVERAGE_TEXT.full!;
+  const aiModelNote =
+    report.aiAnalysis.status !== 'unavailable' ? ` (${escapeHtml(report.aiAnalysis.model)})` : '';
+
+  const aiSummarySection = `<section class="card">
+          <h2>${isAr ? 'ملخص التحليل والتوصية' : 'Analysis Summary & Recommendation'}</h2>
+          <p><strong>${isAr ? 'نطاق الفحص:' : 'Coverage:'}</strong> ${escapeHtml(
+            isAr ? coverageText.ar : coverageText.en,
+          )}${aiModelNote}</p>
           <p>${escapeHtml(isAr ? report.aiAnalysis.summaryAr : report.aiAnalysis.summaryEn)}</p>
           <p class="rec-box"><strong>${isAr ? 'التوصية:' : 'Recommended Action:'}</strong> ${escapeHtml(
             isAr ? report.aiAnalysis.recommendationAr : report.aiAnalysis.recommendationEn,
           )}</p>
-        </section>`
-      : '';
+        </section>`;
 
   const rawJson = escapeHtml(JSON.stringify(report, null, 2));
 

@@ -4,6 +4,11 @@ import { config } from '../config.js';
 import { wrapUntrustedContent } from '../security/promptInjectionScanner.js';
 import { isTransientAiError, runAiChain, type AiChainResult, type AiProvider } from './aiChain.js';
 import { createLocalLlmProvider } from './localLlmProvider.js';
+import { RefusalMemo } from './refusalMemo.js';
+
+// Grounding tools refused by a (key, model) pair are skipped for 15 minutes, so a free-tier key
+// without Google Search grounding costs one call per scan, not two or three.
+const groundingRefusals = new RefusalMemo(15 * 60 * 1000);
 import type { AiAnalysisInput } from './types.js';
 
 /** Kept as an alias so existing imports keep working. */
@@ -558,6 +563,10 @@ export function createGeminiProvider(options: {
       let lastError: string | null = null;
 
       for (const attempt of attempts) {
+        if (attempt.tools && groundingRefusals.isRefused(options.id, attempt.label)) {
+          lastError = `${attempt.label} was refused recently for this key and model`;
+          continue;
+        }
         try {
           const requestConfig: Record<string, unknown> = {
             systemInstruction,
@@ -612,7 +621,14 @@ export function createGeminiProvider(options: {
             // Quota exhausted or model overloaded: do not spend more calls on this provider.
             throw new Error(lastError);
           }
-          // Otherwise (e.g. a grounding tool refused) continue to the next graceful attempt
+          // Otherwise (e.g. a grounding tool refused) continue to the next graceful attempt,
+          // and remember the refusal so the next scan does not repeat the failed call.
+          if (attempt.tools) {
+            groundingRefusals.remember(options.id, attempt.label);
+            console.warn(
+              `[ScamHisn AI chain] ${options.id}: ${attempt.label} refused (${lastError.slice(0, 140)}); skipping it for 15 min`,
+            );
+          }
         }
       }
 

@@ -221,9 +221,52 @@ export function ResultsDashboard({ result }: ResultsDashboardProps) {
         )}
 
         {showPoliceConcept && (
-          <div className="mt-3 flex items-start gap-2.5 rounded-2xl border border-amber-200/90 bg-amber-50/80 px-4 py-3 text-xs leading-relaxed text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/35 dark:text-amber-200">
-            <Info className="mt-0.5 h-4 w-4 shrink-0" />
-            <p>{t.actions.policeConceptNotice}</p>
+          <div className="mt-3 rounded-2xl border border-slate-200/90 bg-slate-50/80 px-4 py-3 text-xs leading-relaxed text-slate-700 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+            <p className="font-bold text-slate-900 dark:text-white">{t.actions.amanTitle}</p>
+            {/* Official Aman channels, verified on aman.adpolice.gov.ae and adpolice.gov.ae */}
+            <dl className="mt-2 grid grid-cols-1 gap-x-6 gap-y-1.5 sm:grid-cols-2">
+              <div className="flex items-baseline gap-2">
+                <dt className="text-slate-500 dark:text-slate-400">{t.actions.amanPhoneLabel}</dt>
+                <dd dir="ltr" className="font-mono font-semibold">
+                  <a className="underline-offset-2 hover:underline" href="tel:8002626">
+                    800 2626
+                  </a>
+                </dd>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <dt className="text-slate-500 dark:text-slate-400">{t.actions.amanSmsLabel}</dt>
+                <dd dir="ltr" className="font-mono font-semibold">
+                  2828
+                </dd>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <dt className="text-slate-500 dark:text-slate-400">{t.actions.amanEmailLabel}</dt>
+                <dd dir="ltr" className="font-mono font-semibold">
+                  <a className="underline-offset-2 hover:underline" href="mailto:aman@adpolice.gov.ae">
+                    aman@adpolice.gov.ae
+                  </a>
+                </dd>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <dt className="text-slate-500 dark:text-slate-400">{t.actions.amanWebLabel}</dt>
+                <dd dir="ltr" className="font-mono font-semibold">
+                  <a
+                    className="underline-offset-2 hover:underline"
+                    href="https://aman.adpolice.gov.ae"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    aman.adpolice.gov.ae
+                  </a>
+                </dd>
+              </div>
+            </dl>
+            <p className="mt-2.5 flex items-start gap-1.5 text-slate-600 dark:text-slate-300">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>
+                {t.actions.policeConceptNotice} {t.actions.amanNote}
+              </span>
+            </p>
           </div>
         )}
       </section>

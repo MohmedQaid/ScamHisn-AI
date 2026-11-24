@@ -215,7 +215,15 @@ export function ImageResultsCard({
         {showPoliceConcept && (
           <div className="mt-3 flex items-start gap-2.5 rounded-2xl border border-amber-200/90 bg-amber-50/80 px-4 py-3 text-xs leading-relaxed text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/35 dark:text-amber-200">
             <Info className="mt-0.5 h-4 w-4 shrink-0" />
-            <p className="min-w-0 break-words">{t.actions.policeConceptNotice}</p>
+            <p className="min-w-0 break-words">
+              <strong>{t.actions.amanTitle}</strong>
+              <br />
+              <span dir="ltr" className="font-mono">
+                800 2626 · SMS 2828 · aman@adpolice.gov.ae
+              </span>
+              <br />
+              {t.actions.amanNote}
+            </p>
           </div>
         )}
       </section>
