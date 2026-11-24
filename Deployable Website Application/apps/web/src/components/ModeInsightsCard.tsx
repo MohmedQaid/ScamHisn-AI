@@ -12,43 +12,30 @@ export function ModeInsightsCard({ jobAnalysis, mapAnalysis }: ModeInsightsCardP
 
   if (jobAnalysis) {
     const auth = jobAnalysis.jobAuthenticityScore;
-    const barColor =
-      auth >= 75
-        ? 'bg-emerald-500'
-        : auth >= 45
-          ? 'bg-amber-500'
-          : 'bg-rose-600';
+    const barColor = auth >= 75 ? 'bg-brand' : auth >= 45 ? 'bg-warn' : 'bg-danger';
     const redFlags = locale === 'ar' ? jobAnalysis.redFlagsAr : jobAnalysis.redFlagsEn;
 
     return (
-      <div className="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-[#0e161e] sm:p-6">
-        <div className="mb-4 flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
-            <Briefcase className="h-5 w-5" />
-          </span>
-          <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              {t.labels.jobAuthenticityTitle}
-            </h3>
+      <div className="box p-5 sm:p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <Briefcase className="h-6 w-6 shrink-0 text-brand" strokeWidth={1.6} aria-hidden="true" />
+          <div className="min-w-0">
+            <h3 className="text-base font-extrabold text-ink">{t.labels.jobAuthenticityTitle}</h3>
             {jobAnalysis.companyName && (
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                {jobAnalysis.companyName}
-              </p>
+              <p className="text-sm font-medium text-muted">{jobAnalysis.companyName}</p>
             )}
           </div>
         </div>
 
         {/* Job Authenticity Confidence Meter */}
-        <div className="mb-4 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-          <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-semibold text-slate-700 dark:text-slate-200">
-              {t.labels.jobConfidenceLabel}
-            </span>
-            <span className="font-mono text-lg font-extrabold text-slate-900 dark:text-white">
+        <div className="mb-4">
+          <div className="mb-2 flex items-baseline justify-between gap-3 text-sm">
+            <span className="font-semibold text-ink">{t.labels.jobConfidenceLabel}</span>
+            <span dir="ltr" className="text-xl font-extrabold text-ink">
               {auth}%
             </span>
           </div>
-          <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-hairline">
             <div
               className={`h-full rounded-full transition-all duration-700 ${barColor}`}
               style={{ width: `${auth}%` }}
@@ -56,7 +43,7 @@ export function ModeInsightsCard({ jobAnalysis, mapAnalysis }: ModeInsightsCardP
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
           <StatusPill
             label={t.labels.linkLegitimacyLabel}
             ok={jobAnalysis.linkLegitimate}
@@ -71,18 +58,15 @@ export function ModeInsightsCard({ jobAnalysis, mapAnalysis }: ModeInsightsCardP
           />
         </div>
 
-        <p className="mt-4 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+        <p className="mt-4 text-sm leading-relaxed text-ink/85">
           {locale === 'ar' ? jobAnalysis.verificationNotesAr : jobAnalysis.verificationNotesEn}
         </p>
 
         {redFlags.length > 0 && (
           <ul className="mt-3 space-y-1.5">
             {redFlags.map((flag, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-2 text-xs text-rose-700 dark:text-rose-300"
-              >
-                <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <li key={i} className="flex items-start gap-2 text-sm text-danger">
+                <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden="true" />
                 <span>{flag}</span>
               </li>
             ))}
@@ -94,24 +78,16 @@ export function ModeInsightsCard({ jobAnalysis, mapAnalysis }: ModeInsightsCardP
 
   if (mapAnalysis) {
     return (
-      <div className="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-[#0e161e] sm:p-6">
-        <div className="mb-4 flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
-            <MapPin className="h-5 w-5" />
-          </span>
-          <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              {t.labels.mapVerificationTitle}
-            </h3>
-            {mapAnalysis.placeName && (
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                {mapAnalysis.placeName}
-              </p>
-            )}
+      <div className="box p-5 sm:p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <MapPin className="h-6 w-6 shrink-0 text-brand" strokeWidth={1.6} aria-hidden="true" />
+          <div className="min-w-0">
+            <h3 className="text-base font-extrabold text-ink">{t.labels.mapVerificationTitle}</h3>
+            {mapAnalysis.placeName && <p className="text-sm font-medium text-muted">{mapAnalysis.placeName}</p>}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-3">
           <StatusPill
             label={t.labels.placeExistsLabel}
             ok={mapAnalysis.businessExistsOnExternalSources && mapAnalysis.placeVerified}
@@ -133,16 +109,16 @@ export function ModeInsightsCard({ jobAnalysis, mapAnalysis }: ModeInsightsCardP
         </div>
 
         {mapAnalysis.coordinates && (
-          <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-3 text-xs text-muted">
             {t.labels.coordinatesLabel}:{' '}
-            <span dir="ltr" className="font-mono font-semibold text-slate-700 dark:text-slate-200">
+            <span dir="ltr" className="font-mono font-semibold text-ink">
               {mapAnalysis.coordinates.latitude.toFixed(5)},{' '}
               {mapAnalysis.coordinates.longitude.toFixed(5)}
             </span>
           </p>
         )}
 
-        <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+        <p className="mt-3 text-sm leading-relaxed text-ink/85">
           {locale === 'ar' ? mapAnalysis.verificationNotesAr : mapAnalysis.verificationNotesEn}
         </p>
       </div>
@@ -152,6 +128,7 @@ export function ModeInsightsCard({ jobAnalysis, mapAnalysis }: ModeInsightsCardP
   return null;
 }
 
+/** One check as a plain line: label, then a coloured tick or cross with its word. */
 function StatusPill({
   label,
   ok,
@@ -164,16 +141,14 @@ function StatusPill({
   badText: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50/80 px-3.5 py-2.5 dark:border-slate-800 dark:bg-slate-900/50">
-      <span className="text-xs font-medium text-slate-600 dark:text-slate-400">{label}</span>
-      <span
-        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${
-          ok
-            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300'
-            : 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300'
-        }`}
-      >
-        {ok ? <CheckCircle2 className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />}
+    <div className="flex items-center justify-between gap-3 border-t border-hairline py-2.5 text-sm">
+      <span className="min-w-0 font-medium text-muted">{label}</span>
+      <span className={`inline-flex shrink-0 items-center gap-1 font-bold ${ok ? 'text-brand' : 'text-danger'}`}>
+        {ok ? (
+          <CheckCircle2 className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+        ) : (
+          <XCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+        )}
         <span>{ok ? okText : badText}</span>
       </span>
     </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  ArrowRight,
   Briefcase,
   ClipboardPaste,
   Image as ImageIcon,
@@ -7,9 +8,7 @@ import {
   Loader2,
   MapPin,
   RefreshCw,
-  SearchCheck,
   ShieldAlert,
-  Sparkles,
   Trash2,
   UploadCloud,
 } from 'lucide-react';
@@ -56,10 +55,14 @@ interface ScanFormProps {
   onSubmitImage: (image: CompressedImagePayload) => void;
 }
 
-const URL_MODE_META: Array<{ id: ScanMode; Icon: React.ComponentType<{ className?: string }> }> = [
+const TAB_META: Array<{
+  id: InspectorTab;
+  Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+}> = [
   { id: 'general', Icon: Link2 },
   { id: 'job', Icon: Briefcase },
   { id: 'map', Icon: MapPin },
+  { id: 'image', Icon: ImageIcon },
 ];
 
 export function ScanForm({
@@ -97,11 +100,6 @@ export function ScanForm({
         .filter(Boolean)
         .join(' ')
     : null;
-  const pausedTag = (
-    <span className="ms-1 rounded-sm bg-amber-400 px-1 py-px text-[9px] font-bold uppercase tracking-wide text-slate-950">
-      {t.availability.pausedTag}
-    </span>
-  );
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -187,334 +185,266 @@ export function ScanForm({
   const isImageMode = mode === 'image';
 
   return (
-    <section className="mx-auto w-full max-w-4xl">
-      <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 p-4 shadow-xl shadow-slate-900/[0.04] backdrop-blur-md transition-colors dark:border-slate-800/90 dark:bg-[#0e161e]/95 dark:shadow-black/40 sm:p-6">
-        {/* Mode Selector: 2x2 on phones, 4-across on desktop */}
-        <div className="mb-4">
-          <p className="mb-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-            {t.modePrompt}
-          </p>
-          <div
-            className="grid grid-cols-2 gap-2 pt-1 sm:grid-cols-4"
-            role="radiogroup"
-            aria-label={t.modePrompt}
-          >
-            {URL_MODE_META.map(({ id, Icon }) => {
-              const selected = mode === id;
-              const info = t.modes[id];
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() => onModeChange(id)}
-                  disabled={isScanning}
-                  className={`group flex min-w-0 cursor-pointer items-center gap-2 rounded-xl border px-2 py-2.5 text-start transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 sm:gap-2.5 sm:px-3 ${
-                    selected
-                      ? 'border-emerald-600/80 bg-emerald-50/75 ring-1 ring-emerald-600/20 dark:border-emerald-400/70 dark:bg-emerald-950/45 dark:ring-emerald-400/20'
-                      : 'border-slate-200/90 bg-slate-50/50 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-900/40 dark:hover:border-slate-700 dark:hover:bg-slate-900/70'
-                  }`}
-                >
-                  <span
-                    className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors sm:h-8 sm:w-8 ${
-                      selected
-                        ? 'bg-emerald-700 text-white dark:bg-emerald-500 dark:text-slate-950'
-                        : 'bg-white text-slate-600 ring-1 ring-slate-200 group-hover:text-emerald-700 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 dark:group-hover:text-emerald-300'
-                    }`}
-                  >
-                    <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  </span>
+    <section className="w-full">
+      {/* The one outlined row: link input, or the screenshot picker. The tabs sit under it and never move. */}
+      {!isImageMode ? (
+        <form onSubmit={handleFormSubmit}>
+          <label htmlFor="scamhisn-url-input" className="sr-only">
+            {t.urlLabel}
+          </label>
+          <div className="flex flex-col gap-3 sm:box sm:flex-row sm:items-center sm:gap-2 sm:p-2 sm:ps-5 sm:transition-colors sm:has-[input:focus]:border-brand">
+            <div className="flex h-14 min-w-0 flex-1 items-center gap-3 max-sm:box max-sm:pe-1.5 max-sm:ps-4 max-sm:has-[input:focus]:border-brand sm:h-12">
+              <Link2 className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.75} aria-hidden="true" />
+              <input
+                id="scamhisn-url-input"
+                type="text"
+                dir="auto"
+                value={url}
+                onChange={(e) => onUrlChange(e.target.value)}
+                placeholder={t.inputPlaceholder[mode]}
+                disabled={isScanning}
+                autoComplete="off"
+                spellCheck={false}
+                className="h-full min-w-0 flex-1 bg-transparent text-base text-ink placeholder:text-muted focus:outline-none disabled:opacity-60 sm:text-[17px] rtl:text-right"
+              />
+              <button
+                type="button"
+                onClick={handlePasteUrl}
+                disabled={isScanning}
+                title={t.pasteBtn}
+                aria-label={t.pasteBtn}
+                className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-[10px] text-muted transition-colors hover:bg-brand-tint hover:text-brand disabled:opacity-50"
+              >
+                <ClipboardPaste className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
+              </button>
+            </div>
 
-                  <div className="min-w-0 flex-1">
-                    <span className="block truncate text-xs font-bold text-slate-900 dark:text-white sm:text-sm">
-                      {info.label}
-                      {isPaused(id) && pausedTag}
-                    </span>
-                    <span className="block truncate text-[10.5px] text-slate-500 dark:text-slate-400 sm:text-[11px]">
-                      {info.shortDesc}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-
-            {/* 4th Mode: Image / Screenshot Authenticity Check */}
             <button
-              type="button"
-              role="radio"
-              aria-checked={isImageMode}
-              onClick={() => onModeChange('image')}
-              disabled={isScanning}
-              className={`group flex min-w-0 cursor-pointer items-center gap-2 rounded-xl border px-2 py-2.5 text-start transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 sm:gap-2.5 sm:px-3 ${
-                isImageMode
-                  ? 'border-emerald-600/80 bg-emerald-50/75 ring-1 ring-emerald-600/20 dark:border-emerald-400/70 dark:bg-emerald-950/45 dark:ring-emerald-400/20'
-                  : 'border-slate-200/90 bg-slate-50/50 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-900/40 dark:hover:border-slate-700 dark:hover:bg-slate-900/70'
+              type="submit"
+              disabled={isScanning || !url.trim() || modePaused}
+              className={`btn btn-primary h-14 shrink-0 px-7 text-base sm:h-12 ${
+                !isScanning && !modePaused ? 'disabled:opacity-100' : ''
               }`}
             >
-              <span
-                className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors sm:h-8 sm:w-8 ${
-                  isImageMode
-                    ? 'bg-emerald-700 text-white dark:bg-emerald-500 dark:text-slate-950'
-                    : 'bg-white text-slate-600 ring-1 ring-slate-200 group-hover:text-emerald-700 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 dark:group-hover:text-emerald-300'
-                }`}
-              >
-                <ImageIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </span>
-
-              <div className="min-w-0 flex-1">
-                <span className="block truncate text-xs font-bold text-slate-900 dark:text-white sm:text-sm">
-                  {t.imageMode.label}
-                  {isPaused('image') && pausedTag}
-                </span>
-                <span className="block truncate text-[10.5px] text-slate-500 dark:text-slate-400 sm:text-[11px]">
-                  {t.imageMode.shortDesc}
-                </span>
-              </div>
+              {isScanning ? (
+                <>
+                  <Loader2 className="h-[18px] w-[18px] animate-spin" aria-hidden="true" />
+                  <span>{t.scanningBtn}</span>
+                </>
+              ) : (
+                <>
+                  <span>{t.checkBtn}</span>
+                  <ArrowRight className="h-[18px] w-[18px] rtl:rotate-180" aria-hidden="true" />
+                </>
+              )}
             </button>
           </div>
-        </div>
+        </form>
+      ) : (
+        <form onSubmit={handleFormSubmit}>
+          <input
+            ref={fileInputRef}
+            id="scamhisn-image-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFileChange}
+            disabled={isScanning || isCompressing}
+            className="sr-only"
+          />
 
-        {pausedText && (
-          <div
-            role="status"
-            className="mb-3 flex items-start gap-2.5 rounded-2xl border border-amber-300/80 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/35 dark:bg-amber-950/40 dark:text-amber-200"
-          >
-            <ShieldAlert className="mt-0.5 h-4.5 w-4.5 shrink-0" />
-            <p className="min-w-0 leading-relaxed">{pausedText}</p>
-          </div>
-        )}
+          {!selectedImage ? (
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (!isScanning) setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => !isScanning && !isCompressing && fileInputRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && !isScanning && !isCompressing) {
+                  e.preventDefault();
+                  fileInputRef.current?.click();
+                }
+              }}
+              className={`flex min-h-[124px] cursor-pointer flex-col items-center justify-center gap-3 rounded-box border-[1.5px] border-dashed px-4 py-4 text-center transition-colors sm:min-h-[67px] sm:flex-row sm:justify-between sm:py-2 sm:pe-2 sm:ps-5 sm:text-start ${
+                isDragging ? 'border-brand bg-brand-tint' : 'border-outline bg-surface hover:border-brand'
+              }`}
+            >
+              <span className="flex min-w-0 items-center gap-3">
+                {isCompressing ? (
+                  <Loader2 className="h-5 w-5 shrink-0 animate-spin text-brand" aria-hidden="true" />
+                ) : (
+                  <UploadCloud className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.75} aria-hidden="true" />
+                )}
+                <span className="min-w-0 text-base text-muted sm:text-[17px]">{t.imageMode.uploadTitle}</span>
+              </span>
 
-        {/* Dynamic Input Body: URL Scanner vs. Image Uploader & Preview */}
-        {!isImageMode ? (
-          <form onSubmit={handleFormSubmit} className="space-y-3">
-            <label htmlFor="scamhisn-url-input" className="sr-only">
-              {t.urlLabel}
-            </label>
-            <div className="flex flex-col gap-2.5 sm:flex-row">
-              <div className="relative flex-1">
-                <input
-                  id="scamhisn-url-input"
-                  type="text"
+              <span className="btn btn-outline h-11 shrink-0 px-5 sm:h-12">
+                <ImageIcon className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
+                <span>{t.imageMode.chooseFileBtn}</span>
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 sm:box sm:flex-row sm:items-center sm:gap-2 sm:p-2 sm:ps-5">
+              <div className="flex h-14 min-w-0 flex-1 items-center gap-3 max-sm:box max-sm:pe-1.5 max-sm:ps-4 sm:h-12">
+                <ImageIcon className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.75} aria-hidden="true" />
+                <p
                   dir="ltr"
-                  value={url}
-                  onChange={(e) => onUrlChange(e.target.value)}
-                  placeholder={t.modes[mode].placeholder}
-                  disabled={isScanning}
-                  autoComplete="off"
-                  spellCheck={false}
-                  className="h-12 w-full rounded-2xl border border-slate-300/90 bg-slate-50/70 px-4 pe-22 font-mono text-sm text-slate-900 placeholder:font-sans placeholder:text-slate-400 transition-all focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/15 disabled:opacity-60 dark:border-slate-700 dark:bg-[#091017] dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-emerald-400 dark:focus:bg-[#0b131b]"
-                />
+                  className="min-w-0 flex-1 truncate text-left font-mono text-sm text-ink rtl:text-right"
+                  title={selectedImage.fileName}
+                >
+                  {selectedImage.fileName}
+                </p>
                 <button
                   type="button"
-                  onClick={handlePasteUrl}
                   disabled={isScanning}
-                  className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 cursor-pointer items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:border-emerald-500/50 hover:text-emerald-700 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:text-emerald-300"
-                  title={t.pasteBtn}
+                  onClick={() => fileInputRef.current?.click()}
+                  title={t.imageMode.changeBtn}
+                  className="inline-flex h-10 shrink-0 cursor-pointer items-center gap-1.5 rounded-[10px] px-2.5 text-sm font-bold text-muted transition-colors hover:bg-brand-tint hover:text-brand disabled:opacity-50"
                 >
-                  <ClipboardPaste className="h-3.5 w-3.5" />
-                  <span>{t.pasteBtn}</span>
+                  <RefreshCw className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+                  <span className="max-sm:sr-only">{t.imageMode.changeBtn}</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={isScanning}
+                  onClick={() => onImageSelect(null)}
+                  title={t.imageMode.removeBtn}
+                  className="inline-flex h-10 shrink-0 cursor-pointer items-center gap-1.5 rounded-[10px] px-2.5 text-sm font-bold text-muted transition-colors hover:bg-danger-tint hover:text-danger disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+                  <span className="max-sm:sr-only">{t.imageMode.removeBtn}</span>
                 </button>
               </div>
 
               <button
                 type="submit"
-                disabled={isScanning || !url.trim() || modePaused}
-                className="inline-flex h-12 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#00734B] via-[#059669] to-[#047857] px-6 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-55 dark:from-emerald-600 dark:via-emerald-500 dark:to-teal-500 dark:text-slate-950 dark:shadow-emerald-950/50"
+                disabled={isScanning}
+                className="btn btn-primary h-14 shrink-0 px-7 text-base sm:h-12"
               >
                 {isScanning ? (
                   <>
-                    <Loader2 className="h-4.5 w-4.5 animate-spin" />
-                    <span>{t.scanningBtn}</span>
+                    <Loader2 className="h-[18px] w-[18px] animate-spin" aria-hidden="true" />
+                    <span>{t.imageMode.inspectingBtn}</span>
                   </>
                 ) : (
                   <>
-                    <SearchCheck className="h-4.5 w-4.5" />
-                    <span>{t.scanBtn}</span>
+                    <span>{t.imageMode.inspectBtn}</span>
+                    <ArrowRight className="h-[18px] w-[18px] rtl:rotate-180" aria-hidden="true" />
                   </>
                 )}
               </button>
             </div>
+          )}
+        </form>
+      )}
 
-            {/* Quick Sample Links */}
-            <div className="flex flex-wrap items-center gap-2 pt-0.5 text-xs text-slate-500 dark:text-slate-400">
-              <span>{t.trySampleLabel}</span>
-              {t.samples.map((sample) => (
-                <button
-                  key={sample.url}
-                  type="button"
-                  disabled={isScanning}
-                  onClick={() => {
-                    onModeChange(sample.mode);
-                    onUrlChange(sample.url);
-                  }}
-                  className={
-                    sample.tone === 'danger'
-                      ? 'cursor-pointer rounded-full border border-rose-300/80 bg-rose-50/80 px-3 py-1 font-medium text-rose-800 transition-colors hover:border-rose-400 hover:bg-rose-100 disabled:opacity-50 dark:border-rose-500/35 dark:bg-rose-950/40 dark:text-rose-200 dark:hover:bg-rose-950/70'
-                      : 'cursor-pointer rounded-full border border-slate-200/90 bg-slate-100/70 px-3 py-1 font-medium text-slate-700 transition-colors hover:border-emerald-500/50 hover:bg-emerald-50 hover:text-emerald-800 disabled:opacity-50 dark:border-slate-700/80 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-emerald-400/50 dark:hover:bg-emerald-950/60 dark:hover:text-emerald-300'
-                  }
-                >
-                  {sample.label}
-                </button>
-              ))}
-            </div>
-          </form>
-        ) : (
-          <form onSubmit={handleFormSubmit} className="space-y-3.5">
-            <input
-              ref={fileInputRef}
-              id="scamhisn-image-input"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleFileChange}
-              disabled={isScanning || isCompressing}
-              className="sr-only"
-            />
-
-            {!selectedImage ? (
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  if (!isScanning) setIsDragging(true);
-                }}
-                onDragLeave={() => setIsDragging(false)}
-                onDrop={handleDrop}
-                onClick={() => !isScanning && !isCompressing && fileInputRef.current?.click()}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if ((e.key === 'Enter' || e.key === ' ') && !isScanning && !isCompressing) {
-                    e.preventDefault();
-                    fileInputRef.current?.click();
-                  }
-                }}
-                className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-4 py-7 text-center transition-all sm:px-6 ${
-                  isDragging
-                    ? 'border-emerald-500 bg-emerald-50/70 dark:border-emerald-400 dark:bg-emerald-950/40'
-                    : 'border-slate-300/90 bg-slate-50/65 hover:border-emerald-500/70 hover:bg-emerald-50/35 dark:border-slate-700 dark:bg-[#091017] dark:hover:border-emerald-400/60 dark:hover:bg-emerald-950/25'
+      {/* Mode tabs: one row, thin dividers, the active one in emerald with an underline */}
+      <div
+        className="mt-5 grid grid-cols-4 divide-x divide-hairline sm:mt-7"
+        role="radiogroup"
+        aria-label={t.modePrompt}
+      >
+        {TAB_META.map(({ id, Icon }) => {
+          const selected = mode === id;
+          const paused = isPaused(id);
+          return (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              onClick={() => onModeChange(id)}
+              disabled={isScanning}
+              title={id === 'image' ? t.imageMode.shortDesc : t.modes[id].shortDesc}
+              className={`group flex min-w-0 cursor-pointer flex-col items-center px-1 pb-1 pt-2 transition-colors disabled:cursor-not-allowed ${
+                selected ? 'text-brand' : 'text-muted hover:text-ink'
+              }`}
+            >
+              <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={1.6} aria-hidden="true" />
+              <span className="mt-1.5 flex max-w-full flex-col items-center gap-x-2 gap-y-1 sm:mt-2 sm:flex-row">
+                <span className="text-center text-[13px] font-bold leading-tight sm:text-base">{t.tabs[id]}</span>
+                {paused && (
+                  <span className="rounded-[5px] bg-warn-tint px-1.5 py-px text-[10px] font-extrabold uppercase leading-normal tracking-wide text-warn rtl:tracking-normal">
+                    {t.availability.pausedTag}
+                  </span>
+                )}
+              </span>
+              <span
+                aria-hidden="true"
+                className={`mt-2.5 h-[3px] w-14 rounded-full transition-colors ${
+                  selected ? 'bg-brand' : 'bg-transparent'
                 }`}
-              >
-                <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100/90 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-400">
-                  {isCompressing ? (
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                  ) : (
-                    <UploadCloud className="h-6 w-6" />
-                  )}
-                </span>
-
-                <p className="text-sm font-bold text-slate-900 dark:text-white">
-                  {t.imageMode.uploadTitle}
-                </p>
-                <p className="mt-1 max-w-md text-xs text-slate-500 dark:text-slate-400">
-                  {t.imageMode.uploadHint}
-                </p>
-
-                <span className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-white px-4 py-2 text-xs font-bold text-emerald-800 shadow-xs transition-colors hover:bg-emerald-50 dark:border-emerald-400/35 dark:bg-slate-900 dark:text-emerald-300">
-                  <ImageIcon className="h-3.5 w-3.5" />
-                  <span>{t.imageMode.chooseFileBtn}</span>
-                </span>
-              </div>
-            ) : (
-              /* Dedicated Visible Uploaded Image Preview Area */
-              <div className="rounded-2xl border border-slate-200/90 bg-slate-50/75 p-3.5 dark:border-slate-700/80 dark:bg-[#091017] sm:p-4">
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-emerald-600/15 text-emerald-700 dark:bg-emerald-400/20 dark:text-emerald-300">
-                      <ImageIcon className="h-3.5 w-3.5" />
-                    </span>
-                    <span className="text-xs font-extrabold text-slate-800 dark:text-slate-100">
-                      {t.imageMode.previewLabel}
-                    </span>
-                    <span
-                      dir="ltr"
-                      className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-50 px-2 py-0.5 font-mono text-[10.5px] font-semibold text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-950/60 dark:text-emerald-300"
-                    >
-                      <Sparkles className="h-2.5 w-2.5" />
-                      {selectedImage.compressedKb} KB · {t.imageMode.optimizedTag}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      disabled={isScanning}
-                      onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 transition-colors hover:border-emerald-500/50 hover:text-emerald-700 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                    >
-                      <RefreshCw className="h-3 w-3" />
-                      <span>{t.imageMode.changeBtn}</span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isScanning}
-                      onClick={() => onImageSelect(null)}
-                      className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-rose-200/90 bg-rose-50/70 px-2.5 py-1 text-[11px] font-semibold text-rose-700 transition-colors hover:bg-rose-100 disabled:opacity-50 dark:border-rose-500/30 dark:bg-rose-950/40 dark:text-rose-300"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                      <span>{t.imageMode.removeBtn}</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Framed Image Canvas */}
-                <div className="flex min-h-[160px] items-center justify-center overflow-hidden rounded-xl border border-slate-200/90 bg-white p-2 dark:border-slate-800 dark:bg-slate-950/80">
-                  <img
-                    src={selectedImage.previewDataUrl}
-                    alt={selectedImage.fileName}
-                    className="max-h-64 w-auto max-w-full rounded-lg object-contain"
-                  />
-                </div>
-
-                {/* Footer bar: file info + Inspect Image button */}
-                <div className="mt-3 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0 flex-1">
-                    <p
-                      dir="ltr"
-                      className="truncate font-mono text-xs font-medium text-slate-600 dark:text-slate-300"
-                      title={selectedImage.fileName}
-                    >
-                      {selectedImage.fileName}
-                    </p>
-                    <p dir="ltr" className="font-mono text-[11px] text-slate-400 dark:text-slate-500">
-                      {selectedImage.width}×{selectedImage.height}px · {selectedImage.originalKb} KB →{' '}
-                      {selectedImage.compressedKb} KB
-                    </p>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isScanning}
-                    className="inline-flex h-11 w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#00734B] via-[#059669] to-[#047857] px-6 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-55 dark:from-emerald-600 dark:via-emerald-500 dark:to-teal-500 dark:text-slate-950 dark:shadow-emerald-950/50 sm:w-auto"
-                  >
-                    {isScanning ? (
-                      <>
-                        <Loader2 className="h-4.5 w-4.5 animate-spin" />
-                        <span>{t.imageMode.inspectingBtn}</span>
-                      </>
-                    ) : (
-                      <>
-                        <SearchCheck className="h-4.5 w-4.5" />
-                        <span>{t.imageMode.inspectBtn}</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
-          </form>
-        )}
-
-        {/* Validation / SSRF / Network Error Banner */}
-        {error && (
-          <div
-            role="alert"
-            className="mt-4 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50/90 px-4 py-3 text-sm text-rose-800 dark:border-rose-500/30 dark:bg-rose-950/50 dark:text-rose-200"
-          >
-            <ShieldAlert className="mt-0.5 h-4.5 w-4.5 shrink-0 text-rose-600 dark:text-rose-400" />
-            <p className="min-w-0 break-words leading-relaxed">{error}</p>
-          </div>
-        )}
+              />
+            </button>
+          );
+        })}
       </div>
+
+      {pausedText && (
+        <div
+          role="status"
+          className="mt-5 flex items-start gap-2.5 rounded-ctl bg-warn-tint px-4 py-3 text-sm font-semibold text-ink"
+        >
+          <ShieldAlert className="mt-0.5 h-[18px] w-[18px] shrink-0 text-warn" strokeWidth={1.75} aria-hidden="true" />
+          <p className="min-w-0 leading-relaxed">{pausedText}</p>
+        </div>
+      )}
+
+      {!isImageMode ? (
+        /* Quick samples: a quiet line of text */
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-muted">
+          <span>{t.trySampleLabel}</span>
+          {t.samples.map((sample) => (
+            <button
+              key={sample.url}
+              type="button"
+              disabled={isScanning}
+              onClick={() => {
+                onModeChange(sample.mode);
+                onUrlChange(sample.url);
+              }}
+              className={`text-link ${sample.tone === 'danger' ? 'text-danger' : 'text-ink'}`}
+            >
+              {sample.label}
+            </button>
+          ))}
+        </div>
+      ) : !selectedImage ? (
+        <p className="mt-5 text-center text-sm text-muted">{t.imageMode.uploadHint}</p>
+      ) : (
+        /* Selected screenshot preview */
+        <div className="box mt-5 p-3 sm:p-4">
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <p className="text-sm font-extrabold text-ink">{t.imageMode.previewLabel}</p>
+            <p dir="ltr" className="font-mono text-xs text-muted">
+              {selectedImage.width}×{selectedImage.height}px · {selectedImage.originalKb} KB →{' '}
+              {selectedImage.compressedKb} KB · {t.imageMode.optimizedTag}
+            </p>
+          </div>
+          <div className="flex min-h-[160px] items-center justify-center overflow-hidden rounded-ctl bg-page p-2">
+            <img
+              src={selectedImage.previewDataUrl}
+              alt={selectedImage.fileName}
+              className="max-h-64 w-auto max-w-full rounded-lg object-contain"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Validation / SSRF / Network Error Banner */}
+      {error && (
+        <div
+          role="alert"
+          className="mt-5 flex items-start gap-3 rounded-ctl bg-danger-tint px-4 py-3 text-sm font-semibold text-ink"
+        >
+          <ShieldAlert className="mt-0.5 h-[18px] w-[18px] shrink-0 text-danger" strokeWidth={1.75} aria-hidden="true" />
+          <p className="min-w-0 break-words leading-relaxed">{error}</p>
+        </div>
+      )}
     </section>
   );
 }

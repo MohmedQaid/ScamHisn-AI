@@ -34,50 +34,39 @@ export function ScanProgress({ variant = 'url' }: ScanProgressProps) {
   }, [steps.length, variant]);
 
   return (
-    <div className="mx-auto mt-8 w-full max-w-2xl rounded-3xl border border-emerald-500/25 bg-white/95 p-6 shadow-xl shadow-emerald-900/5 dark:border-emerald-500/20 dark:bg-[#0e161e]/95">
-      <div className="mb-5 flex items-center gap-3">
-        <div className="animate-scan-pulse flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-400">
+    <div className="box mx-auto mt-8 w-full max-w-2xl px-5 py-5 sm:px-7 sm:py-6">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="animate-scan-pulse shrink-0 text-brand">
           {variant === 'image' ? (
-            <ImageIcon className="h-5 w-5" />
+            <ImageIcon className="h-7 w-7" strokeWidth={1.6} aria-hidden="true" />
           ) : (
-            <Shield className="h-5 w-5" />
+            <Shield className="h-7 w-7" strokeWidth={1.6} aria-hidden="true" />
           )}
-        </div>
-        <div className="min-w-0">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">
-            {variant === 'image' ? t.imageMode.inspectingBtn : t.progressTitle}
-          </h3>
-          <p className="truncate font-mono text-xs text-emerald-700 dark:text-emerald-400">
-            {variant === 'image'
-              ? 'Low-Token Vision • SHA-256 Cache • Gemini 3.5 Flash-Lite'
-              : 'Playwright Headless Shell • TLS • RDAP • Gemini 3.5 Flash-Lite'}
-          </p>
-        </div>
+        </span>
+        <h3 className="min-w-0 text-lg font-extrabold text-ink">
+          {variant === 'image' ? t.imageMode.inspectingBtn : t.progressTitle}
+        </h3>
       </div>
 
-      <ol className="space-y-3">
+      <ol className="divide-y divide-hairline">
         {steps.map((label, idx) => {
           const isDone = idx < activeStep;
           const isCurrent = idx === activeStep;
           return (
             <li
               key={label}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all ${
-                isCurrent
-                  ? 'bg-emerald-50/90 font-semibold text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200'
-                  : isDone
-                    ? 'text-slate-600 dark:text-slate-300'
-                    : 'text-slate-400 dark:text-slate-500'
+              className={`flex items-center gap-3 py-3 text-sm sm:text-[15px] ${
+                isCurrent ? 'font-bold text-ink' : isDone ? 'text-ink' : 'text-muted'
               }`}
             >
               {isDone ? (
-                <CheckCircle2 className="h-4.5 w-4.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-brand" strokeWidth={1.75} aria-hidden="true" />
               ) : isCurrent ? (
-                <Loader2 className="h-4.5 w-4.5 shrink-0 animate-spin text-emerald-600 dark:text-emerald-400" />
+                <Loader2 className="h-5 w-5 shrink-0 animate-spin text-brand" aria-hidden="true" />
               ) : (
-                <span className="h-4 w-4 shrink-0 rounded-full border border-slate-300 dark:border-slate-700" />
+                <span className="h-5 w-5 shrink-0 rounded-full border-[1.5px] border-hairline" />
               )}
-              <span>{label}</span>
+              <span className="min-w-0">{label}</span>
             </li>
           );
         })}

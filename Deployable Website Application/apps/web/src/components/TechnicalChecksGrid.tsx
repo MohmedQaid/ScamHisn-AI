@@ -66,7 +66,7 @@ export function TechnicalChecksGrid({ checks, promptInjection }: TechnicalChecks
 
   return (
     <section>
-      <h3 className="mb-3.5 text-base font-extrabold text-slate-900 dark:text-white">
+      <h3 className="mb-4 text-base font-extrabold text-ink">
         {t.technicalChecksTitle}
       </h3>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -148,12 +148,12 @@ export function TechnicalChecksGrid({ checks, promptInjection }: TechnicalChecks
             />
           </div>
           {redirects.chain.length > 1 && (
-            <div className="mt-2.5 max-h-20 space-y-1 overflow-y-auto rounded-xl bg-slate-50 p-2 dark:bg-slate-900/70">
+            <div className="mt-2.5 max-h-20 space-y-1 overflow-y-auto rounded-[10px] bg-page p-2">
               {redirects.chain.map((hop, idx) => (
                 <p
                   key={`${hop.url}-${idx}`}
                   dir="ltr"
-                  className="truncate font-mono text-[10.5px] text-slate-600 dark:text-slate-400"
+                  className="truncate text-start font-mono text-[10.5px] text-muted"
                 >
                   {idx + 1}. {hop.status ? `[${hop.status}] ` : ''}
                   {hop.url}
@@ -165,7 +165,7 @@ export function TechnicalChecksGrid({ checks, promptInjection }: TechnicalChecks
 
         {/* 4. Security Headers & DNS Auth */}
         <CheckCard title={t.cards.headersDnsTitle} icon={Cpu} status={headerStatus}>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
             <HeaderBadge name="HSTS" present={headers.hsts} />
             <HeaderBadge name="CSP" present={headers.csp} />
             <HeaderBadge name="X-Frame" present={headers.xFrameOptions} />
@@ -177,7 +177,7 @@ export function TechnicalChecksGrid({ checks, promptInjection }: TechnicalChecks
           {checks.ssrf.resolvedIps.length > 0 && (
             <p
               dir="ltr"
-              className="mt-3 truncate font-mono text-[11px] text-slate-500 dark:text-slate-400"
+              className="mt-3 truncate text-start font-mono text-[11px] text-muted"
             >
               IP: {checks.ssrf.resolvedIps.slice(0, 2).join(', ')}
             </p>
@@ -249,6 +249,12 @@ export function TechnicalChecksGrid({ checks, promptInjection }: TechnicalChecks
   );
 }
 
+const STATUS_TEXT = {
+  good: 'text-brand',
+  warn: 'text-warn',
+  bad: 'text-danger',
+} as const;
+
 function CheckCard({
   title,
   icon: Icon,
@@ -256,46 +262,17 @@ function CheckCard({
   children,
 }: {
   title: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   status: 'good' | 'warn' | 'bad';
   children: React.ReactNode;
 }) {
-  const ring =
-    status === 'good'
-      ? 'border-slate-200/90 dark:border-slate-800'
-      : status === 'warn'
-        ? 'border-amber-300/80 dark:border-amber-500/30'
-        : 'border-rose-300/90 dark:border-rose-500/40';
-
-  const iconTone =
-    status === 'good'
-      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400'
-      : status === 'warn'
-        ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400'
-        : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400';
-
   return (
-    <div
-      className={`flex flex-col rounded-3xl border bg-white p-4.5 shadow-xs transition-colors dark:bg-[#0e161e] ${ring}`}
-    >
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5">
-          <span className={`flex h-8.5 w-8.5 items-center justify-center rounded-xl ${iconTone}`}>
-            <Icon className="h-4.5 w-4.5" />
-          </span>
-          <h4 className="text-sm font-bold text-slate-900 dark:text-white">{title}</h4>
-        </div>
-        <span
-          className={`h-2.5 w-2.5 rounded-full ${
-            status === 'good'
-              ? 'bg-emerald-500'
-              : status === 'warn'
-                ? 'bg-amber-500'
-                : 'bg-rose-600'
-          }`}
-        />
+    <div className="box flex flex-col p-5">
+      <div className="mb-3.5 flex items-center gap-2.5">
+        <Icon className={`h-6 w-6 shrink-0 ${STATUS_TEXT[status]}`} strokeWidth={1.6} />
+        <h4 className="min-w-0 text-[15px] font-extrabold text-ink">{title}</h4>
       </div>
-      <div className="space-y-2 text-xs">{children}</div>
+      <div className="space-y-2 text-[13px]">{children}</div>
     </div>
   );
 }
@@ -311,18 +288,11 @@ function MetricRow({
   highlight?: 'good' | 'warn' | 'bad';
   mono?: boolean;
 }) {
-  const valColor =
-    highlight === 'bad'
-      ? 'font-bold text-rose-700 dark:text-rose-400'
-      : highlight === 'warn'
-        ? 'font-semibold text-amber-700 dark:text-amber-400'
-        : highlight === 'good'
-          ? 'font-semibold text-emerald-700 dark:text-emerald-400'
-          : 'font-medium text-slate-800 dark:text-slate-200';
+  const valColor = highlight ? `font-bold ${STATUS_TEXT[highlight]}` : 'font-semibold text-ink';
 
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="shrink-0 text-slate-500 dark:text-slate-400">{label}</span>
+      <span className="shrink-0 text-muted">{label}</span>
       <span
         dir={mono ? 'ltr' : undefined}
         className={`truncate text-end ${mono ? 'font-mono text-[11px]' : ''} ${valColor}`}
@@ -337,31 +307,18 @@ function MetricRow({
 function HeaderBadge({ name, present }: { name: string; present: boolean }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 font-mono text-[10.5px] font-semibold ${
-        present
-          ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-950/60 dark:text-emerald-300'
-          : 'border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-400'
+      className={`inline-flex items-center gap-1 font-mono text-xs font-semibold ${
+        present ? 'text-brand' : 'text-muted'
       }`}
     >
-      {present ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+      {present ? <CheckCircle2 className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />}
       <span>{name}</span>
     </span>
   );
 }
 
 function MiniChip({ text, tone }: { text: string; tone: 'good' | 'warn' | 'bad' }) {
-  const cls =
-    tone === 'good'
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-500/25'
-      : tone === 'warn'
-        ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-500/25'
-        : 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-500/30';
-
-  return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${cls}`}>
-      {text}
-    </span>
-  );
+  return <span className={`text-xs font-bold ${STATUS_TEXT[tone]}`}>{text}</span>;
 }
 
 export { ExternalLink };

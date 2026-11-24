@@ -21,26 +21,17 @@ export function PromptInjectionBanner({
   if (!hasInjection && smokingGuns.length === 0) return null;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {hasInjection && (
-        <div
-          role="alert"
-          className="rounded-3xl border-2 border-rose-500/80 bg-gradient-to-br from-rose-50 via-red-50 to-rose-100/80 p-5 shadow-lg shadow-rose-900/10 dark:border-rose-500/60 dark:from-rose-950/80 dark:via-[#200a12] dark:to-rose-950/60"
-        >
+        <div role="alert" className="rounded-box bg-danger-tint p-5 sm:p-6">
           <div className="flex items-start gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-rose-600 text-white shadow-md shadow-rose-900/30">
-              <AlertOctagon className="h-6 w-6" />
-            </div>
+            <AlertOctagon className="mt-0.5 h-7 w-7 shrink-0 text-danger" strokeWidth={1.6} aria-hidden="true" />
             <div className="min-w-0 flex-1">
-              <h3 className="text-base font-extrabold text-rose-900 dark:text-rose-100">
-                {t.promptInjectionTitle}
-              </h3>
-              <p className="mt-1 text-sm text-rose-800/90 dark:text-rose-200/90">
-                {t.promptInjectionSubtitle}
-              </p>
+              <h3 className="text-lg font-extrabold text-ink">{t.promptInjectionTitle}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-ink/85">{t.promptInjectionSubtitle}</p>
 
               {aiEvidence && (
-                <p className="mt-2.5 rounded-xl bg-white/80 px-3 py-2 font-mono text-xs text-rose-900 dark:bg-black/35 dark:text-rose-200">
+                <p className="mt-3 break-words rounded-ctl bg-surface px-3.5 py-2.5 font-mono text-xs text-ink">
                   {aiEvidence}
                 </p>
               )}
@@ -50,21 +41,18 @@ export function PromptInjectionBanner({
                   {promptInjection.findings.slice(0, 5).map((finding, idx) => (
                     <li
                       key={`${finding.patternName}-${idx}`}
-                      className="rounded-xl border border-rose-200/90 bg-white/85 px-3 py-2 text-xs dark:border-rose-500/25 dark:bg-black/35"
+                      className="rounded-ctl bg-surface px-3.5 py-2.5 text-xs"
                     >
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-md bg-rose-600 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase text-white">
-                          {finding.channel}
-                        </span>
-                        <span className="font-mono font-semibold text-rose-900 dark:text-rose-200">
-                          {finding.patternName}
-                        </span>
-                      </div>
-                      <p dir="ltr" className="mt-1 break-all font-mono text-[11px] text-slate-700 dark:text-slate-300">
+                      <p className="font-mono font-semibold text-ink">
+                        <span className="font-bold uppercase text-danger">{finding.channel}</span>
+                        <span aria-hidden="true"> · </span>
+                        {finding.patternName}
+                      </p>
+                      <p dir="ltr" className="mt-1 break-all font-mono text-[11px] text-muted">
                         {finding.matchedExcerpt}
                       </p>
                       {finding.decodedPayload && (
-                        <p dir="ltr" className="mt-1 break-all font-mono text-[11px] font-semibold text-rose-700 dark:text-rose-300">
+                        <p dir="ltr" className="mt-1 break-all font-mono text-[11px] font-semibold text-danger">
                           Decoded: {finding.decodedPayload}
                         </p>
                       )}
@@ -78,21 +66,18 @@ export function PromptInjectionBanner({
       )}
 
       {smokingGuns.length > 0 && (
-        <div className="rounded-3xl border border-rose-300/90 bg-rose-50/85 p-5 dark:border-rose-500/40 dark:bg-rose-950/35">
-          <div className="mb-3 flex items-center gap-2 text-rose-800 dark:text-rose-300">
-            <ShieldAlert className="h-5 w-5 shrink-0" />
-            <h3 className="text-sm font-extrabold">{t.smokingGunTitle}</h3>
+        <div className="rounded-box bg-danger-tint p-5 sm:p-6">
+          <div className="mb-3 flex items-center gap-2.5">
+            <ShieldAlert className="h-6 w-6 shrink-0 text-danger" strokeWidth={1.6} aria-hidden="true" />
+            <h3 className="text-base font-extrabold text-ink">{t.smokingGunTitle}</h3>
           </div>
-          <ul className="space-y-2.5">
+          <ul className="divide-y divide-danger/20">
             {smokingGuns.map((sg) => (
-              <li
-                key={sg.code}
-                className="rounded-2xl border border-rose-200/80 bg-white/90 px-4 py-3 dark:border-rose-500/25 dark:bg-[#130c10]/85"
-              >
-                <p className="text-sm font-bold text-rose-900 dark:text-rose-200">
+              <li key={sg.code} className="py-2.5 first:pt-0 last:pb-0">
+                <p className="text-sm font-bold text-ink sm:text-[15px]">
                   {locale === 'ar' ? sg.titleAr : sg.titleEn}
                 </p>
-                <p className="mt-0.5 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+                <p className="mt-0.5 break-words text-sm leading-relaxed text-ink/80">
                   {locale === 'ar' ? sg.detailAr : sg.detailEn}
                 </p>
               </li>
