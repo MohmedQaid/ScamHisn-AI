@@ -5,6 +5,13 @@ import { wrapUntrustedContent } from '../security/promptInjectionScanner.js';
 import { isTransientAiError, runAiChain, type AiChainResult, type AiProvider } from './aiChain.js';
 import { createLocalLlmProvider } from './localLlmProvider.js';
 import { RefusalMemo } from './refusalMemo.js';
+import { runHybridAnalysis } from './hybridPipeline.js';
+import {
+  geminiModels,
+  geminiProviderId,
+  isGeminiCoolingDown,
+  markGeminiExhausted,
+} from './geminiHealth.js';
 
 // Grounding tools refused by a (key, model) pair are skipped for 15 minutes, so a free-tier key
 // without Google Search grounding costs one call per scan, not two or three.
@@ -554,6 +561,10 @@ export function createGeminiProvider(options: {
     kind: options.kind,
     model: options.model,
     async run(input: AiAnalysisInput): Promise<AiForensicAnalysis> {
+      // An exhausted key is left alone until its cool-down ends: no call, no wasted quota.
+      if (isGeminiCoolingDown(options.id)) {
+        throw new Error(`${options.id} is cooling down after a quota or overload error`);
+      }
       const useVertexAi = process.env.GOOGLE_GENAI_USE_VERTEXAI?.toLowerCase() === 'true';
       const ai = new GoogleGenAI(
         useVertexAi ? { vertexai: true, apiKey: options.apiKey } : { apiKey: options.apiKey },
@@ -618,6 +629,7 @@ export function createGeminiProvider(options: {
         } catch (err) {
           lastError = err instanceof Error ? err.message : String(err);
           if (isTransientAiError(lastError)) {
+            markGeminiExhausted(options.id);
             // Quota exhausted or model overloaded: do not spend more calls on this provider.
             throw new Error(lastError);
           }
@@ -632,29 +644,25 @@ export function createGeminiProvider(options: {
         }
       }
 
+      // Whatever the reason (invalid key, every attempt refused), this pair is not usable now.
+      markGeminiExhausted(options.id);
       throw new Error(lastError ?? 'Gemini returned no usable response');
     },
   };
 }
 
 /**
- * Builds the fallback chain from configuration:
- *   1. every Gemini key with the primary model
- *   2. every Gemini key with the backup model (rate limits are counted per model)
- *   3. the self-hosted model (e.g. Jais 2), if configured
+ * Every Gemini (key, model) pair, in the order tried:
+ *   1. every key with the primary model
+ *   2. every key with the backup model (rate limits are counted per model)
  */
-export function buildAiProviders(): AiProvider[] {
+export function buildGeminiProviders(): AiProvider[] {
   const providers: AiProvider[] = [];
-  const models = [config.geminiModel];
-  if (config.geminiFallbackModel && config.geminiFallbackModel !== config.geminiModel) {
-    models.push(config.geminiFallbackModel);
-  }
-
-  models.forEach((model, modelIndex) => {
+  geminiModels().forEach((model, modelIndex) => {
     config.geminiApiKeys.forEach((apiKey, keyIndex) => {
       providers.push(
         createGeminiProvider({
-          id: `gemini:key${keyIndex + 1}:${model}`,
+          id: geminiProviderId(keyIndex, model),
           kind: modelIndex === 0 && keyIndex === 0 ? 'gemini' : 'gemini_backup',
           apiKey,
           model,
@@ -663,17 +671,33 @@ export function buildAiProviders(): AiProvider[] {
       );
     });
   });
-
-  if (config.localLlm) {
-    providers.push(createLocalLlmProvider(config.localLlm));
-  }
-
   return providers;
 }
 
-/** Runs the configured AI fallback chain for one scan. */
+/**
+ * Runs the AI stage of one scan.
+ *
+ *   hybrid mode        Gemini researches the live sources, the self-hosted model judges.
+ *                      Either one can be missing (see hybridPipeline.ts).
+ *   gemini_first mode  Gemini judges; the self-hosted model is tried only if every Gemini
+ *                      option fails.
+ */
 export async function analyzeWithAi(input: AiAnalysisInput): Promise<AiChainResult> {
-  return runAiChain(buildAiProviders(), input, {
+  const geminiProviders = buildGeminiProviders();
+  const local = config.localLlm ? createLocalLlmProvider(config.localLlm) : null;
+  const geminiOptions = { perProviderTimeoutMs: config.aiRequestTimeoutMs + 2_000 };
+
+  if (local && config.aiPipeline === 'hybrid') {
+    return runHybridAnalysis(
+      {
+        research: (researchInput) => runAiChain(geminiProviders, researchInput, geminiOptions),
+        judge: local,
+      },
+      input,
+    );
+  }
+
+  return runAiChain(local ? [...geminiProviders, local] : geminiProviders, input, {
     // Local models are slower than hosted ones, so the ceiling follows the slowest provider.
     perProviderTimeoutMs: Math.max(config.aiRequestTimeoutMs, config.localLlm?.timeoutMs ?? 0) + 2_000,
   });

@@ -56,7 +56,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
 
 /** Quota / overload / network errors where retrying the SAME provider is pointless. */
 export function isTransientAiError(message: string): boolean {
-  return /\b(429|500|502|503|504)\b|RESOURCE_EXHAUSTED|UNAVAILABLE|overloaded|high demand|quota|rate.?limit|timed out|ETIMEDOUT|ECONNRESET|ECONNREFUSED|ENOTFOUND|fetch failed/i.test(
+  return /\b(429|500|502|503|504)\b|RESOURCE_EXHAUSTED|UNAVAILABLE|overloaded|high demand|quota|rate.?limit|timed out|timeout|aborted|ETIMEDOUT|ECONNRESET|ECONNREFUSED|ENOTFOUND|fetch failed/i.test(
     message,
   );
 }

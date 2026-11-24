@@ -19,6 +19,13 @@ export class RefusalMemo {
     this.refusedUntil.set(this.key(providerId, option), this.now() + this.coolDownMs);
   }
 
+  /** Epoch milliseconds at which the refusal expires, or null when it is not refused. */
+  until(providerId: string, option: string): number | null {
+    return this.isRefused(providerId, option)
+      ? (this.refusedUntil.get(this.key(providerId, option)) ?? null)
+      : null;
+  }
+
   isRefused(providerId: string, option: string): boolean {
     const until = this.refusedUntil.get(this.key(providerId, option));
     if (until === undefined) return false;

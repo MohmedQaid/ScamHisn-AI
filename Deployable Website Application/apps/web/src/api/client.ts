@@ -1,6 +1,8 @@
 import {
   API_ENDPOINTS,
+  type AiCapabilities,
   type ApiErrorResponse,
+  type HealthResponse,
   type ImageScanRequest,
   type ImageScanResponse,
   type Locale,
@@ -21,6 +23,20 @@ export class ApiClientError extends Error {
 }
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ?? '';
+
+/** Which features can run right now (Gemini healthy, cooling down, or not configured). */
+export async function fetchCapabilities(): Promise<AiCapabilities | null> {
+  try {
+    const res = await fetch(`${API_BASE}${API_ENDPOINTS.health}`, {
+      headers: { Accept: 'application/json' },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as HealthResponse;
+    return data.capabilities ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export async function scanUrl(params: {
   url: string;

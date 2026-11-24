@@ -14,6 +14,7 @@ import { inspectDns } from '../inspectors/dnsInspector.js';
 import { runHeuristicAnalysis } from '../inspectors/heuristicAnalyzer.js';
 import { scanForPromptInjection } from '../security/promptInjectionScanner.js';
 import { analyzeWithAi } from '../ai/geminiAnalyzer.js';
+import { assertFeatureAvailable } from '../ai/geminiHealth.js';
 import { computeDecisiveScore } from '../scoring/scoringEngine.js';
 
 class ConcurrencySemaphore {
@@ -74,6 +75,12 @@ export async function runUrlScan(request: ScanRequest): Promise<ScanResponse> {
       'No link was found in that text. Paste the link itself, or the full message that contains it.',
       'ما لقينا رابط في النص. الصق الرابط نفسه أو الرسالة كاملة اللي فيها الرابط.',
     );
+  }
+
+  // Job and Map checks rest on Gemini's live Google lookups. If every Gemini key is cooling
+  // down, say so up front instead of returning a verdict without that evidence.
+  if (request.mode === 'job' || request.mode === 'map') {
+    assertFeatureAvailable(request.mode);
   }
 
   // 1. Pre-flight URL validation & SSRF protection (DNS lookup + private/loopback IP block)
@@ -190,6 +197,14 @@ export async function runUrlScan(request: ScanRequest): Promise<ScanResponse> {
       browser,
     });
     const aiAnalysis = aiResult.analysis;
+
+    // Gemini ran out during this very scan: the keys are now cooling down, so report the
+    // Job / Map check as paused rather than answer without live lookups.
+    const geminiAnswered =
+      aiResult.provider === 'gemini' || aiResult.provider === 'gemini_backup' || aiResult.provider === 'hybrid';
+    if ((request.mode === 'job' || request.mode === 'map') && !geminiAnswered) {
+      assertFeatureAvailable(request.mode);
+    }
 
     const technicalChecks: TechnicalChecks = {
       ssrf: {

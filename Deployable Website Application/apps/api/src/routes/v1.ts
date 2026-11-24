@@ -13,6 +13,24 @@ import { SsrfError } from '../security/ssrfGuard.js';
 import { runUrlScan } from '../services/scanOrchestrator.js';
 import { generateForensicPdf } from '../services/pdfReportGenerator.js';
 import { inspectUploadedImage } from '../ai/geminiImageAnalyzer.js';
+import { FeatureUnavailableError } from '../ai/availability.js';
+import { getAiCapabilities } from '../ai/geminiHealth.js';
+
+/** 503 with a Retry-After header: the feature is paused until Gemini's cool-down ends. */
+function sendFeatureUnavailable(res: import('express').Response, err: FeatureUnavailableError): void {
+  if (err.retryAt) {
+    const seconds = Math.max(1, Math.ceil((Date.parse(err.retryAt) - Date.now()) / 1000));
+    res.setHeader('Retry-After', String(seconds));
+  }
+  res.status(err.statusCode).json({
+    error: {
+      code: err.code,
+      message: err.message,
+      messageAr: err.messageAr,
+      retryAt: err.retryAt,
+    },
+  });
+}
 
 const PdfReportRequestSchema = z.object({
   report: ScanResponseSchema,
@@ -57,8 +75,9 @@ export function createV1Router(): Router {
       service: 'ScamHisn AI API',
       version: '1.0.0',
       model: config.geminiModel,
-      aiConfigured: Boolean(config.geminiApiKey),
+      aiConfigured: Boolean(config.geminiApiKey) || Boolean(config.localLlm),
       timestamp: new Date().toISOString(),
+      capabilities: getAiCapabilities(),
     };
     res.json(payload);
   });
@@ -81,6 +100,10 @@ export function createV1Router(): Router {
       const result = await runUrlScan(parsed.data);
       res.status(200).json(result);
     } catch (err) {
+      if (err instanceof FeatureUnavailableError) {
+        sendFeatureUnavailable(res, err);
+        return;
+      }
       if (err instanceof SsrfError) {
         res.status(err.statusCode).json({
           error: {
@@ -120,6 +143,10 @@ export function createV1Router(): Router {
       const result = await inspectUploadedImage(parsed.data);
       res.status(200).json(result);
     } catch (err) {
+      if (err instanceof FeatureUnavailableError) {
+        sendFeatureUnavailable(res, err);
+        return;
+      }
       const msg = err instanceof Error ? err.message : String(err);
       if (msg === 'AI_NOT_CONFIGURED') {
         res.status(503).json({

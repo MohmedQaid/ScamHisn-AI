@@ -13,11 +13,32 @@ import {
   Trash2,
   UploadCloud,
 } from 'lucide-react';
-import type { ScanMode } from '@scamhisn/shared';
+import type { AiCapabilities, ScanMode } from '@scamhisn/shared';
 import { useLocale } from '../i18n/LocaleContext';
 import { compressImageForScan, type CompressedImagePayload } from '../utils/imageCompress';
 
 export type InspectorTab = ScanMode | 'image';
+
+/** Ticks once a second while a cool-down is counting down, so "back in 1 min 20 s" stays current. */
+function useNow(active: boolean): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!active) return undefined;
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [active]);
+  return now;
+}
+
+function formatRemaining(ms: number, locale: 'en' | 'ar'): string {
+  const total = Math.max(1, Math.ceil(ms / 1000));
+  const minutes = Math.floor(total / 60);
+  const seconds = total % 60;
+  if (locale === 'ar') {
+    return minutes > 0 ? `${minutes} د ${seconds} ث` : `${seconds} ث`;
+  }
+  return minutes > 0 ? `${minutes} min ${seconds} s` : `${seconds} s`;
+}
 
 interface ScanFormProps {
   url: string;
@@ -25,6 +46,8 @@ interface ScanFormProps {
   selectedImage: CompressedImagePayload | null;
   isScanning: boolean;
   error: string | null;
+  /** Null until the first health check answers; then says which features can run right now. */
+  capabilities: AiCapabilities | null;
   onUrlChange: (value: string) => void;
   onModeChange: (mode: InspectorTab) => void;
   onImageSelect: (image: CompressedImagePayload | null) => void;
@@ -45,6 +68,7 @@ export function ScanForm({
   selectedImage,
   isScanning,
   error,
+  capabilities,
   onUrlChange,
   onModeChange,
   onImageSelect,
@@ -52,7 +76,32 @@ export function ScanForm({
   onSubmitUrl,
   onSubmitImage,
 }: ScanFormProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
+
+  // A feature that needs Gemini is paused while every Gemini key is cooling down
+  const featureState = capabilities?.features[mode] ?? null;
+  const modePaused = featureState !== null && !featureState.available;
+  const isPaused = (tab: InspectorTab) => capabilities !== null && !capabilities.features[tab].available;
+  const now = useNow(modePaused && Boolean(featureState?.retryAt));
+  const remainingMs = featureState?.retryAt ? Date.parse(featureState.retryAt) - now : null;
+  const pausedText = modePaused
+    ? [
+        featureState?.reason === 'gemini_not_configured' ? t.availability.notConfigured : t.availability.coolingDown,
+        featureState?.reason === 'gemini_cooling_down'
+          ? remainingMs !== null && remainingMs > 0
+            ? t.availability.backIn.replace('{time}', formatRemaining(remainingMs, locale))
+            : t.availability.backSoon
+          : '',
+        t.availability.generalStillWorks,
+      ]
+        .filter(Boolean)
+        .join(' ')
+    : null;
+  const pausedTag = (
+    <span className="ms-1 rounded-sm bg-amber-400 px-1 py-px text-[9px] font-bold uppercase tracking-wide text-slate-950">
+      {t.availability.pausedTag}
+    </span>
+  );
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -180,6 +229,7 @@ export function ScanForm({
                   <div className="min-w-0 flex-1">
                     <span className="block truncate text-xs font-bold text-slate-900 dark:text-white sm:text-sm">
                       {info.label}
+                      {isPaused(id) && pausedTag}
                     </span>
                     <span className="block truncate text-[10.5px] text-slate-500 dark:text-slate-400 sm:text-[11px]">
                       {info.shortDesc}
@@ -215,6 +265,7 @@ export function ScanForm({
               <div className="min-w-0 flex-1">
                 <span className="block truncate text-xs font-bold text-slate-900 dark:text-white sm:text-sm">
                   {t.imageMode.label}
+                  {isPaused('image') && pausedTag}
                 </span>
                 <span className="block truncate text-[10.5px] text-slate-500 dark:text-slate-400 sm:text-[11px]">
                   {t.imageMode.shortDesc}
@@ -223,6 +274,16 @@ export function ScanForm({
             </button>
           </div>
         </div>
+
+        {pausedText && (
+          <div
+            role="status"
+            className="mb-3 flex items-start gap-2.5 rounded-2xl border border-amber-300/80 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/35 dark:bg-amber-950/40 dark:text-amber-200"
+          >
+            <ShieldAlert className="mt-0.5 h-4.5 w-4.5 shrink-0" />
+            <p className="min-w-0 leading-relaxed">{pausedText}</p>
+          </div>
+        )}
 
         {/* Dynamic Input Body: URL Scanner vs. Image Uploader & Preview */}
         {!isImageMode ? (
@@ -258,7 +319,7 @@ export function ScanForm({
 
               <button
                 type="submit"
-                disabled={isScanning || !url.trim()}
+                disabled={isScanning || !url.trim() || modePaused}
                 className="inline-flex h-12 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#00734B] via-[#059669] to-[#047857] px-6 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-55 dark:from-emerald-600 dark:via-emerald-500 dark:to-teal-500 dark:text-slate-950 dark:shadow-emerald-950/50"
               >
                 {isScanning ? (

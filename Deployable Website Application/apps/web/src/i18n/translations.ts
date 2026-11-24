@@ -55,6 +55,15 @@ export interface Translations {
     rulesOnly: string;
     addressOnly: string;
   };
+  /** Features that need Gemini are paused while every Gemini key is cooling down. */
+  availability: {
+    pausedTag: string;
+    coolingDown: string;
+    notConfigured: string;
+    backIn: string;
+    backSoon: string;
+    generalStillWorks: string;
+  };
   nav: {
     impact: string;
     pitch: string;
@@ -250,6 +259,14 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       partialPageNotLoaded: 'The page could not be opened. This result uses the address, registry data and AI lookups.',
       rulesOnly: 'AI analysis was unavailable. This result uses technical checks only, so treat it as incomplete.',
       addressOnly: 'This address is offline. The result is based on the address itself.',
+    },
+    availability: {
+      pausedTag: 'Paused',
+      coolingDown: 'This check is paused: Gemini is over its limit or not answering.',
+      notConfigured: 'This check needs a Gemini key, and none is set on this server.',
+      backIn: 'Back in about {time}.',
+      backSoon: 'Back shortly.',
+      generalStillWorks: 'General link checks still work.',
     },
     nav: {
       impact: 'Impact',
@@ -476,6 +493,14 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
       partialPageNotLoaded: 'تعذّر فتح الصفحة. النتيجة مبنية على العنوان وبيانات التسجيل وبحث الذكاء الاصطناعي.',
       rulesOnly: 'التحليل الذكي غير متاح حالياً. النتيجة مبنية على الفحوصات التقنية فقط، فاعتبرها غير مكتملة.',
       addressOnly: 'هذا العنوان متوقف. النتيجة مبنية على العنوان نفسه فقط.',
+    },
+    availability: {
+      pausedTag: 'متوقف',
+      coolingDown: 'هذا الفحص متوقف مؤقتاً: Gemini تجاوز حدّه أو لا يستجيب.',
+      notConfigured: 'هذا الفحص يحتاج مفتاح Gemini، ولا يوجد مفتاح مفعّل على هذا الخادم.',
+      backIn: 'يرجع خلال {time} تقريباً.',
+      backSoon: 'يرجع بعد قليل.',
+      generalStillWorks: 'فحص الروابط العامة شغّال.',
     },
     nav: {
       impact: 'الأثر',

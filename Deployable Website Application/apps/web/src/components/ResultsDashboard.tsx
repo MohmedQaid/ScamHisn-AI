@@ -149,7 +149,16 @@ export function ResultsDashboard({ result }: ResultsDashboardProps) {
               ) : (
                 <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0" />
               )}
-              <span>{coverageText}</span>
+              <span>
+                {coverageText}
+                {/* Name the models when a self-hosted model judged (alone or with Gemini's research) */}
+                {(result.coverage?.aiProvider === 'hybrid' || result.coverage?.aiProvider === 'local') &&
+                  result.coverage.aiModel && (
+                    <span dir="ltr" className="ms-1 font-mono text-[10.5px] opacity-80">
+                      {result.coverage.aiModel}
+                    </span>
+                  )}
+              </span>
             </p>
 
             <p

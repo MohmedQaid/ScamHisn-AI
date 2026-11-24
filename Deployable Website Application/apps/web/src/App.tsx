@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ImpactPage } from './components/ImpactPage';
 import { Download, ShieldCheck, Sparkles, Users } from 'lucide-react';
-import type { ImageScanResponse, ScanMode, ScanResponse } from '@scamhisn/shared';
+import type { AiCapabilities, ImageScanResponse, ScanMode, ScanResponse } from '@scamhisn/shared';
 import { LocaleProvider, useLocale } from './i18n/LocaleContext';
 import { TEAM_MEMBERS } from './i18n/translations';
 import { ThemeProvider } from './theme/ThemeContext';
-import { ApiClientError, scanImage, scanUrl } from './api/client';
+import { ApiClientError, fetchCapabilities, scanImage, scanUrl } from './api/client';
 import type { CompressedImagePayload } from './utils/imageCompress';
 import { Header } from './components/Header';
 import { HisnLogo } from './components/HisnLogo';
@@ -44,6 +44,18 @@ function ScamHisnShell() {
     fileName: string;
   } | null>(null);
 
+  // Which features can run right now. Refreshed on load, every 15 s, and after each scan,
+  // so a paused feature shows as paused and comes back on its own when the cool-down ends.
+  const [capabilities, setCapabilities] = useState<AiCapabilities | null>(null);
+  const refreshCapabilities = useCallback(async () => {
+    setCapabilities(await fetchCapabilities());
+  }, []);
+  useEffect(() => {
+    void refreshCapabilities();
+    const timer = window.setInterval(() => void refreshCapabilities(), 15_000);
+    return () => window.clearInterval(timer);
+  }, [refreshCapabilities]);
+
   const handleModeChange = (nextMode: InspectorTab) => {
     setMode(nextMode);
     setError(null);
@@ -75,6 +87,7 @@ function ScamHisnShell() {
       }
     } finally {
       setIsScanning(false);
+      void refreshCapabilities();
     }
   };
 
@@ -112,6 +125,7 @@ function ScamHisnShell() {
       }
     } finally {
       setIsScanning(false);
+      void refreshCapabilities();
     }
   };
 
@@ -172,6 +186,7 @@ function ScamHisnShell() {
           selectedImage={selectedImage}
           isScanning={isScanning}
           error={error}
+          capabilities={capabilities}
           onUrlChange={setUrl}
           onModeChange={handleModeChange}
           onImageSelect={(img) => {

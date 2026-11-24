@@ -64,6 +64,22 @@ export const config = {
   geminiModel: process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL,
   /** Second Gemini model tried when the primary is overloaded or rate limited (limits are per model). */
   geminiFallbackModel: process.env.GEMINI_FALLBACK_MODEL?.trim() || null,
+  /**
+   * How long a Gemini key+model is left alone after a quota / overload error. While every key is
+   * cooling down, the features that need Gemini (Job, Map, Image) are switched off.
+   */
+  geminiCooldownMs: parsePositiveInt(process.env.GEMINI_COOLDOWN_MS, 120_000),
+  /**
+   * AI_PIPELINE:
+   *   hybrid       Gemini researches live sources, the self-hosted model makes the judgment
+   *   gemini_first Gemini judges; the self-hosted model is only a fallback
+   *   auto         (default) hybrid when a self-hosted model is configured, else gemini_first
+   */
+  aiPipeline: ((): 'hybrid' | 'gemini_first' => {
+    const raw = process.env.AI_PIPELINE?.trim().toLowerCase();
+    if (raw === 'hybrid' || raw === 'gemini_first') return raw;
+    return localLlmBaseUrl ? 'hybrid' : 'gemini_first';
+  })(),
   /** Hard ceiling for one AI provider attempt before the chain moves to the next one. */
   aiRequestTimeoutMs: parsePositiveInt(process.env.AI_REQUEST_TIMEOUT_MS, 25_000),
   /**

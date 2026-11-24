@@ -3,6 +3,14 @@ import { GoogleGenAI, Type, type Schema } from '@google/genai';
 import type { ImageScanRequest, ImageScanResponse } from '@scamhisn/shared';
 import { config } from '../config.js';
 import { scoreToVerdict } from '../scoring/scoringEngine.js';
+import { isTransientAiError } from './aiChain.js';
+import {
+  assertFeatureAvailable,
+  geminiModels,
+  geminiProviderId,
+  isGeminiCoolingDown,
+  markGeminiExhausted,
+} from './geminiHealth.js';
 
 // In-memory SHA-256 cache (30 min TTL, max 100 images) so repeat scans use ZERO Gemini tokens
 const IMAGE_CACHE_TTL_MS = 30 * 60 * 1000;
@@ -158,14 +166,18 @@ export async function inspectUploadedImage(req: ImageScanRequest): Promise<Image
   if (config.geminiApiKeys.length === 0) {
     throw new Error('AI_NOT_CONFIGURED');
   }
+  // Reading an image needs Gemini's vision. If every key is cooling down, the feature is paused.
+  assertFeatureAvailable('image');
 
   // Same fallback order as link scans: every key on the primary model, then on the backup model.
   // (Images need a vision model, so the text-only self-hosted model is not part of this chain.)
-  const models = [config.geminiModel];
-  if (config.geminiFallbackModel && config.geminiFallbackModel !== config.geminiModel) {
-    models.push(config.geminiFallbackModel);
-  }
-  const candidates = models.flatMap((model) => config.geminiApiKeys.map((apiKey) => ({ apiKey, model })));
+  const candidates = geminiModels().flatMap((model) =>
+    config.geminiApiKeys.map((apiKey, keyIndex) => ({
+      apiKey,
+      model,
+      id: geminiProviderId(keyIndex, model),
+    })),
+  );
   const useVertexAi = process.env.GOOGLE_GENAI_USE_VERTEXAI?.toLowerCase() === 'true';
 
   let parsed: RawImageAiJson | null = null;
@@ -173,6 +185,7 @@ export async function inspectUploadedImage(req: ImageScanRequest): Promise<Image
   let lastError: unknown = null;
 
   for (const candidate of candidates) {
+    if (isGeminiCoolingDown(candidate.id)) continue;
     try {
       const ai = new GoogleGenAI(
         useVertexAi ? { vertexai: true, apiKey: candidate.apiKey } : { apiKey: candidate.apiKey },
@@ -222,6 +235,9 @@ export async function inspectUploadedImage(req: ImageScanRequest): Promise<Image
       break;
     } catch (err) {
       lastError = err;
+      if (isTransientAiError(err instanceof Error ? err.message : String(err))) {
+        markGeminiExhausted(candidate.id);
+      }
       console.warn(
         `[ScamHisn AI chain] image scan on ${candidate.model} failed: ${
           err instanceof Error ? err.message.slice(0, 200) : String(err)
@@ -231,6 +247,8 @@ export async function inspectUploadedImage(req: ImageScanRequest): Promise<Image
   }
 
   if (!parsed) {
+    // If that failure left every key cooling down, report the feature as paused (with retry time)
+    assertFeatureAvailable('image');
     throw lastError instanceof Error ? lastError : new Error('IMAGE_AI_UNAVAILABLE');
   }
 
