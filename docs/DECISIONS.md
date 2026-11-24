@@ -21,10 +21,12 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 | 5 | A pasted SMS works: the link is pulled out of the text. | Done, tested |
 | 6 | Brand list fixed both ways: real brand-owned sites are not flagged, obvious UAE look-alikes are. | Done, tested |
 | 7 | One-click samples include a fake fine link and a scam SMS. | Done |
-| 8 | "Send to police" names the correct Abu Dhabi Police channel. | Waiting on verification of the channel |
+| 8 | The police button lists the official Aman channels (800 2626, SMS 2828, aman@adpolice.gov.ae). eCrime is Dubai Police. | Done, verified on adpolice.gov.ae |
 | 9 | No police dashboard. Out of scope for the time we have. | Decided |
 | 10 | Jais 2 (UAE-built, by Inception and MBZUAI) is the local model, not Falcon: its files are downloadable and fit a 12 GB card. | Decided. Quality on scam checks is untested |
 | 11 | Gemini stays the main model. Local models cannot search Google or Maps and cannot read images. | Decided |
+| 12a | In-app Impact page with cited problem figures, measured accuracy, cost and savings estimates. | Done |
+| 12b | Certificate, Map and Job scoring no longer treat "could not verify" as fraud. | Done, tested |
 
 ## Pitch decisions
 
@@ -55,7 +57,9 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 - **Deploying.** `render.yaml` auto-deploys from `main`. Merging this branch changes the live demo.
 - **Two Gemini keys from two accounts.** May conflict with Google's terms on getting around quotas. A backup model or a paid key avoids the question.
 - **Privacy slide.** Screenshots and page text go to Google's Gemini API. The README says so.
-- **Police channel.** Aman or eCrime; must be confirmed on adpolice.gov.ae.
+- **Live Google lookups.** Google lists Search grounding as not available on the free tier for `gemini-3.5-flash-lite`. Map and Job "live verification" may not be running. Check a scan's `coverage.liveSourcesChecked`. Options: a paid key, or `gemini-2.5-flash-lite`, whose free tier includes 500 lookups a day.
+- **Abu Dhabi Police already have an AI check.** The Aman portal's "Smart assessment" analyses messages and links. Pitch ScamHisn as going further, not as the first.
+- **Map mode** has still not been tested live with a working Gemini key.
 
 ## Where things are
 
@@ -64,5 +68,6 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 | Fallback chain setup | [`docs/AI_FALLBACK_SETUP.md`](./AI_FALLBACK_SETUP.md) |
 | Measured accuracy | [`docs/eval/address-layer.md`](./eval/address-layer.md) |
 | Research and sources | [`docs/research/`](./research/) |
+| Cost and savings model | [`docs/IMPACT.md`](./IMPACT.md) |
 | Open data files | [`data/open-data/`](../data/open-data/) |
 | Tests | `Deployable Website Application/apps/api/src/__tests__/` |
