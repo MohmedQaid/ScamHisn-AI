@@ -196,16 +196,12 @@ export function ScanForm({
               aria-checked={isImageMode}
               onClick={() => onModeChange('image')}
               disabled={isScanning}
-              className={`group relative flex min-w-0 cursor-pointer items-center gap-2 rounded-xl border px-2 py-2.5 text-start transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 sm:gap-2.5 sm:px-3 ${
+              className={`group flex min-w-0 cursor-pointer items-center gap-2 rounded-xl border px-2 py-2.5 text-start transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 sm:gap-2.5 sm:px-3 ${
                 isImageMode
                   ? 'border-emerald-600/80 bg-emerald-50/75 ring-1 ring-emerald-600/20 dark:border-emerald-400/70 dark:bg-emerald-950/45 dark:ring-emerald-400/20'
                   : 'border-slate-200/90 bg-slate-50/50 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-900/40 dark:hover:border-slate-700 dark:hover:bg-slate-900/70'
               }`}
             >
-              <span className="pointer-events-none absolute -top-2 end-2 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[9px] font-extrabold leading-none uppercase tracking-wide text-white shadow-xs dark:bg-emerald-400 dark:text-slate-950">
-                {t.imageMode.newBadge}
-              </span>
-
               <span
                 className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors sm:h-8 sm:w-8 ${
                   isImageMode
