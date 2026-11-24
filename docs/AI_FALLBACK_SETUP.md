@@ -1,85 +1,137 @@
-# AI fallback chain: setup
+# AI pipeline: setup
 
-Every scan tries these in order and uses the first one that answers.
+ScamHisn has two AI roles, and neither is a single point of failure.
 
-| Step | What answers | Set by | What it can do |
-|---|---|---|---|
-| 1 | Gemini, first key, primary model | `GEMINI_API_KEY`, `GEMINI_MODEL` | Everything, with live Google Search and Maps |
-| 2 | Gemini, second key, primary model | `GEMINI_API_KEY_2` (or `GEMINI_API_KEYS=a,b`) | Same |
-| 3 | Gemini, every key, backup model | `GEMINI_FALLBACK_MODEL` | Same; limits are counted per model |
-| 4 | Self-hosted model (Jais 2) | `LOCAL_LLM_BASE_URL`, `LOCAL_LLM_MODEL`, `LOCAL_LLM_API_KEY` | Judges page text and telemetry. No live lookups, no images |
-| 5 | Rules only | nothing | Technical checks, labelled "Incomplete check" |
+- **Researcher: Gemini.** Checks live Google Search and Maps, and reads images.
+- **Judge: a self-hosted model** (Jais 2 or Falcon-H1, both UAE-built). Reads our technical
+  checks, the page text and Gemini's research, and makes the judgment.
 
-A rate-limit or "high demand" reply moves straight to the next step. It does not retry the same key.
+## What happens on each scan
 
-Image checks use steps 1 to 3 only, because the self-hosted model cannot read images.
+| Situation | Link check | Job, Map and Image checks |
+|---|---|---|
+| Gemini and the local model both up | Gemini researches, local model judges | Gemini researches, local model judges (images: Gemini only) |
+| Local model down | Gemini judges alone | Gemini judges alone |
+| Gemini down on every key | Local model judges alone, marked "live sources not checked" | **Paused** for a cool-down, then switched back on automatically |
+| Both down | Rules only, shown as "Incomplete check", never "safe" | Paused |
 
-## On Render
+Job, Map and Image checks are paused rather than degraded because they depend on things only
+Gemini can do: live lookups and reading images.
 
-In the service's **Environment** tab add the variables you want. All are optional.
+## Settings
 
-```text
-GEMINI_API_KEY_2        = <second team member's key>
-GEMINI_FALLBACK_MODEL   = <a second model id, copied from Google AI Studio>
-LOCAL_LLM_BASE_URL      = https://<your-tunnel-host>/v1
-LOCAL_LLM_MODEL         = jais-2-8b-chat
-LOCAL_LLM_API_KEY       = <a long random secret>
-```
+| Variable | Purpose | Default |
+|---|---|---|
+| `GEMINI_API_KEY` | First Gemini key | none |
+| `GEMINI_API_KEY_2` (or `GEMINI_API_KEYS=a,b`) | Second key, used when the first fails | none |
+| `GEMINI_MODEL` | Primary Gemini model | `gemini-3.5-flash-lite` |
+| `GEMINI_FALLBACK_MODEL` | Second Gemini model; limits are counted per model | none |
+| `GEMINI_COOLDOWN_MS` | How long a failed key+model is left alone | `120000` (2 min) |
+| `LOCAL_LLM_BASE_URL` | The local model server, ending in `/v1` | none |
+| `LOCAL_LLM_MODEL` | Model name sent to that server | `jais-2-8b-chat` |
+| `LOCAL_LLM_API_KEY` | Secret the local server requires | none |
+| `LOCAL_LLM_TIMEOUT_MS` | Time allowed for the local model | `45000` |
+| `LOCAL_LLM_MAX_PROMPT_CHARS` | Prompt budget for small context windows | `12000` |
+| `AI_PIPELINE` | `hybrid`, `gemini_first`, or `auto` | `auto`: hybrid when a local model is set |
+| `AI_REQUEST_TIMEOUT_MS` | Time allowed for one Gemini attempt | `25000` |
+
+In `gemini_first` mode Gemini judges and the local model is only a fallback.
 
 Keys are entered in Render only. Never commit them.
 
 > Using two people's free keys to get past one account's limit may conflict with Google's API
-> terms on circumventing quotas. The legitimate routes are a backup model (step 3) or a paid key.
-> Decide as a team before turning step 2 on.
+> terms on circumventing quotas. A backup model or a paid key avoids the question.
 
-## Running Jais 2 on your own PC
+## Cool-down
 
-Needs a GPU with about 8 GB of free memory. A 12 GB RTX 3080 fits the 8B model.
+When a Gemini key+model returns an error (limit reached, overloaded, invalid key), it is left
+alone for `GEMINI_COOLDOWN_MS`. No calls are made to it during that time. When every key+model is
+cooling down:
 
-1. Install a server that speaks the OpenAI chat API: llama.cpp (`llama-server`) or Ollama.
-2. Download the model file from `inception42/Jais-2-8B-Chat-GGUF` on Hugging Face.
-   A Q4 file is about 5 GB.
-3. Start it on a local port, with a secret key:
+- `GET /api/v1/health` reports `capabilities.features.job|map|image.available = false` with the
+  time they will be retried.
+- `POST /api/v1/scan` in Job or Map mode, and `POST /api/v1/scan-image`, return
+  `503 FEATURE_UNAVAILABLE` with a `Retry-After` header.
+- The web app shows those tabs as "Paused" with a countdown, and switches them back on by itself.
+
+## Running the local model on your own PC
+
+Tested on an RTX 3080 with 12 GB. The 7B and 8B models use about 9 GB while answering.
+
+1. Install the runner (done on the team PC):
 
    ```powershell
-   llama-server -m Jais-2-8B-Chat-Q4_K_M.gguf --port 8080 -ngl 99 -c 8192 --api-key <your-secret>
+   winget install ggml.llamacpp
    ```
 
-4. Check it answers:
+2. Get a model file.
+   - **Falcon-H1 7B** (TII, Abu Dhabi): `Falcon-H1-7B-Instruct-Q4_K_M.gguf`, 4.6 GB, from
+     `tiiuae/Falcon-H1-7B-Instruct-GGUF` on Hugging Face. No login needed.
+   - **Jais 2 8B** (Inception and MBZUAI, Abu Dhabi): `Q4_K_M.gguf`, 5.1 GB, from
+     `inception42/Jais-2-8B-Chat-GGUF`. The page is gated: sign in to Hugging Face, accept the
+     terms on the model page, then download.
+
+3. Start it with a secret key:
 
    ```powershell
-   curl http://127.0.0.1:8080/v1/models -H "Authorization: Bearer <your-secret>"
+   llama-server -m C:\Users\<you>\models\falcon-h1\Falcon-H1-7B-Instruct-Q4_K_M.gguf --port 8080 -ngl 99 -c 8192 --alias falcon-h1-7b-instruct --api-key <your-secret>
    ```
 
-5. Expose it to Render with a tunnel (Cloudflare Tunnel is free), then set `LOCAL_LLM_BASE_URL`
-   to the tunnel's `https://…/v1` address and `LOCAL_LLM_API_KEY` to the same secret.
+4. Check it answers, then run the nine-case smoke test:
 
-Jais 2 8B has a short memory (about 8,000 tokens), so the app sends it a trimmed prompt.
-`LOCAL_LLM_MAX_PROMPT_CHARS` controls the budget (default 12,000 characters).
+   ```powershell
+   cd "Deployable Website Application\apps\api"
+   $env:LOCAL_LLM_BASE_URL="http://127.0.0.1:8080/v1"; $env:LOCAL_LLM_MODEL="falcon-h1-7b-instruct"; $env:LOCAL_LLM_API_KEY="<your-secret>"; npx tsx eval/localModelSmoke.ts
+   ```
 
-Your PC and home internet must stay on while judges test. If they drop, the chain falls to step 5.
+5. Let Render reach it through a tunnel (Cloudflare Tunnel is free), then set
+   `LOCAL_LLM_BASE_URL` to the tunnel's `https://…/v1` address and `LOCAL_LLM_API_KEY` to the same
+   secret.
 
-## Checking which step answered
+Your PC and home internet must stay on while judges test. If they drop, Gemini judges alone.
+
+## Checking which model answered
 
 Every scan response carries a `coverage` block:
 
 ```json
-{ "level": "partial", "pageLoaded": true, "aiProvider": "local", "aiModel": "jais-2-8b-chat", "liveSourcesChecked": false }
+{ "level": "full", "pageLoaded": true, "aiProvider": "hybrid", "aiModel": "falcon-h1-7b-instruct (judge) + gemini-3.5-flash-lite (research)", "liveSourcesChecked": true }
 ```
 
-| `level` | Meaning | What the user sees |
-|---|---|---|
-| `full` | Page opened, AI answered with live lookups | "Full check" |
-| `partial` | AI answered without live lookups, or the page did not open | Amber notice |
-| `rules_only` | No AI answered | "Incomplete check", never "safe" |
-| `address_only` | The domain does not resolve | Verdict from the address itself |
+| `aiProvider` | Meaning |
+|---|---|
+| `hybrid` | Gemini researched, the local model judged |
+| `gemini`, `gemini_backup` | Gemini judged alone |
+| `local` | The local model judged alone; live sources were not checked |
+| `none` | Rules only |
 
 Server logs print one line per failed step, for example
 `[ScamHisn AI chain] gemini:key1:gemini-3.5-flash-lite failed: 503 UNAVAILABLE`.
 
-## What was tested
+## How the two opinions are combined in hybrid mode
 
-- The chain logic, the local-model connector and the coverage rules have unit tests
-  (`apps/api/src/__tests__/aiChain.test.ts`).
-- The local-model path was run end to end against a stand-in server that speaks the same API.
-- Jais 2 itself has not been run by us yet, so its answer quality on scam checks is unmeasured.
+- The judge's score is used.
+- If the two scores differ by 40 points or more, the more cautious one wins and confidence is
+  marked low.
+- If both call the page low risk and Gemini checked live sources, the lower score stands.
+- Either model spotting a confirmed scam or a prompt-injection attempt is enough to flag it.
+- Verified facts about an employer or a map listing always come from Gemini's research.
+
+## What was tested, and what was not
+
+Tested on 24 Nov 2026 with Falcon-H1 7B (Q4_K_M) on an RTX 3080 through llama.cpp:
+
+- Nine-case smoke test (five Arabic and English scam lures, three genuine pages, one case with
+  research notes): 9 of 9 judged as expected, valid JSON every time, about 10 seconds per check
+  after a 26-second first call.
+- End to end with Gemini failing for real (an invalid key): the local model judged a real page
+  alone, Job, Map and Image paused with a countdown, and they came back after the cool-down.
+- 118 unit tests cover the chain, the hybrid merge rules, the cool-down and the availability logic.
+
+Not tested:
+
+- The Gemini half of hybrid mode. No working Gemini key was used in testing, so "Gemini researches,
+  local model judges" has run only with simulated research notes.
+- Jais 2. Its download needs a Hugging Face login that accepted the terms.
+- Falcon-H1's Arabic is understandable but rough, and once mixed in a few non-Arabic characters.
+  Nine cases is a sanity check, not an accuracy measurement.

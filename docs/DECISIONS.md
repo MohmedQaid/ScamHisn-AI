@@ -15,7 +15,8 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 | # | Decision | Status |
 |---|---|---|
 | 1 | The prompt-injection rule no longer flags ordinary text such as "Developer mode", so the app stops rating its own homepage a 98% scam. | Done, tested |
-| 2 | AI fallback chain: Gemini key → second key → backup Gemini model → self-hosted Jais 2 → rules only. | Code done, tested. Keys and Jais 2 not set up yet |
+| 2 | Hybrid AI: Gemini researches live sources, a self-hosted UAE-built model judges. Either can be missing. Two Gemini keys plus an optional backup model. | Done. Local half tested with a real model; Gemini half not tested (no working key in testing) |
+| 2a | When every Gemini key fails, Job, Map and Image checks pause for a cool-down (default 2 min) and switch back on by themselves. General link checks keep working. | Done, tested end to end |
 | 3 | An incomplete check is never shown as "safe". The result says how much of the analysis ran. | Done, tested |
 | 4 | A link whose domain is dead gets a verdict from the address itself, not an error. | Done, tested |
 | 5 | A pasted SMS works: the link is pulled out of the text. | Done, tested |
@@ -23,7 +24,7 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 | 7 | One-click samples include a fake fine link and a scam SMS. | Done |
 | 8 | The police button lists the official Aman channels (800 2626, SMS 2828, aman@adpolice.gov.ae). eCrime is Dubai Police. | Done, verified on adpolice.gov.ae |
 | 9 | No police dashboard. Out of scope for the time we have. | Decided |
-| 10 | Jais 2 (UAE-built, by Inception and MBZUAI) is the local model, not Falcon: its files are downloadable and fit a 12 GB card. | Decided. Quality on scam checks is untested |
+| 10 | Local model: Jais 2 is the target, but its download is gated behind a Hugging Face login. Falcon-H1 7B (TII) is installed and working on the team PC in the meantime. Swapping is one setting. | Falcon-H1: 9 of 9 smoke cases, about 10 s per check. Jais 2: waiting on the login |
 | 11 | Gemini stays the main model. Local models cannot search Google or Maps and cannot read images. | Decided |
 | 12a | In-app Impact page with cited problem figures, measured accuracy, cost and savings estimates. | Done |
 | 12b | Certificate, Map and Job scoring no longer treat "could not verify" as fraud. | Done, tested |

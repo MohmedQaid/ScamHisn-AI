@@ -38,3 +38,6 @@ services:
         sync: false
       - key: LOCAL_LLM_API_KEY
         sync: false
+      # hybrid | gemini_first | auto (hybrid when a self-hosted model is configured)
+      - key: AI_PIPELINE
+        value: auto
