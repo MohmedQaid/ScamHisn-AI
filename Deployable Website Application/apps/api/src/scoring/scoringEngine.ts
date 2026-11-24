@@ -15,6 +15,8 @@ export interface ScoringInput {
   heuristicFlags: BilingualFlag[];
   promptInjection: PromptInjectionReport;
   aiAnalysis: AiForensicAnalysis;
+  /** True when the final host is on our verified list of official domains (brand catalog). */
+  isOfficialDomain?: boolean;
 }
 
 export interface ScoringResult {
@@ -372,7 +374,14 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
   const aiScore = aiAnalysis.aiScamScore;
   let combinedScore: number;
 
-  if (aiScore !== null) {
+  // A verified official domain with clean technical checks is not doubted on a model's vague
+  // unease (small models hedge at 40-50 over things like missing headers). Concrete evidence
+  // still wins: any smoking gun or floor above, including a high-confidence AI "confirmed scam",
+  // bypasses this.
+  const trustOfficialDomain =
+    Boolean(input.isOfficialDomain) && smokingGuns.length === 0 && appliedFloor === null;
+
+  if (aiScore !== null && !trustOfficialDomain) {
     // Max-biased fusion: the higher risk signal leads, with modest corroboration boost
     // when both technical checks and AI detect risk.
     const dominant = Math.max(deterministicRiskPoints, aiScore);

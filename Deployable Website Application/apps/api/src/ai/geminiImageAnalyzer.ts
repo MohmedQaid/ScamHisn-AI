@@ -3,7 +3,7 @@ import { GoogleGenAI, Type, type Schema } from '@google/genai';
 import type { ImageScanRequest, ImageScanResponse } from '@scamhisn/shared';
 import { config } from '../config.js';
 import { scoreToVerdict } from '../scoring/scoringEngine.js';
-import { isTransientAiError } from './aiChain.js';
+import { isPermanentAiError, isTransientAiError } from './aiChain.js';
 import { combineImageScores, judgeImageExtraction } from './imageJudge.js';
 import {
   assertFeatureAvailable,
@@ -11,6 +11,7 @@ import {
   geminiProviderId,
   isGeminiCoolingDown,
   markGeminiExhausted,
+  markGeminiUnusable,
 } from './geminiHealth.js';
 
 // In-memory SHA-256 cache (30 min TTL, max 100 images) so repeat scans use ZERO Gemini tokens
@@ -243,7 +244,10 @@ export async function inspectUploadedImage(req: ImageScanRequest): Promise<Image
       break;
     } catch (err) {
       lastError = err;
-      if (isTransientAiError(err instanceof Error ? err.message : String(err))) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (isPermanentAiError(message)) {
+        markGeminiUnusable(candidate.id);
+      } else if (isTransientAiError(message)) {
         markGeminiExhausted(candidate.id);
       }
       console.warn(

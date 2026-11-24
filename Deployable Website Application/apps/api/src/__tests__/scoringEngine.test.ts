@@ -233,3 +233,32 @@ test('a fake job the AI rates as a scam is still escalated', () => {
   );
   assert.ok(result.scamScore >= 95, `score was ${result.scamScore}`);
 });
+
+// --- A verified official domain is not doubted on a model's vague unease -----
+
+test('an official domain with clean technical checks stays safe when the AI merely hedges', () => {
+  // Seen for real: a small local model gave adpolice.gov.ae 45% for "missing security headers"
+  const result = computeDecisiveScore(
+    input({ isOfficialDomain: true, aiAnalysis: ai({ aiScamScore: 45, confidence: 'medium' }) }),
+  );
+  assert.equal(result.verdict, 'safe');
+  assert.ok(result.scamScore <= 19, `score was ${result.scamScore}`);
+  // The model's own number is still reported for transparency
+  assert.equal(result.scoreBreakdown.aiScamScore, 45);
+});
+
+test('the same hedge on an unknown domain is not suppressed', () => {
+  const result = computeDecisiveScore(input({ aiAnalysis: ai({ aiScamScore: 45, confidence: 'medium' }) }));
+  assert.equal(result.scamScore, 45);
+});
+
+test('an official domain is still flagged when the AI is confident the page is a scam', () => {
+  // A compromised official site: concrete evidence overrides the list
+  const result = computeDecisiveScore(
+    input({
+      isOfficialDomain: true,
+      aiAnalysis: ai({ aiScamScore: 97, confidence: 'high', confirmedPhishingOrScam: true }),
+    }),
+  );
+  assert.ok(result.scamScore >= 95, `score was ${result.scamScore}`);
+});

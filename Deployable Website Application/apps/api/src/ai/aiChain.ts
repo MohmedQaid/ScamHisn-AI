@@ -61,6 +61,18 @@ export function isTransientAiError(message: string): boolean {
   );
 }
 
+/** "Quota exceeded" specifically (as opposed to the model being overloaded or unreachable). */
+export function isQuotaError(message: string): boolean {
+  return /\b429\b|RESOURCE_EXHAUSTED|exceeded your current quota/i.test(message);
+}
+
+/** Errors that will not fix themselves in minutes: wrong model for this account, bad key. */
+export function isPermanentAiError(message: string): boolean {
+  return /\b(401|403|404)\b|NOT_FOUND|no longer available|not found for API version|API key not valid|API_KEY_INVALID|PERMISSION_DENIED|UNAUTHENTICATED/i.test(
+    message,
+  );
+}
+
 function shorten(message: string, max = 300): string {
   const flat = message.replace(/\s+/g, ' ').trim();
   return flat.length > max ? `${flat.slice(0, max)}…` : flat;

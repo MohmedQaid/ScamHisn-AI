@@ -255,3 +255,90 @@ test('local provider fails loudly when the model does not return JSON', async ()
   );
   await assert.rejects(() => local.run(scanInput('x')));
 });
+
+// --- A reply cut off by the token limit still yields the verdict -------------
+
+test('a reply truncated inside keyFindings is salvaged up to the last complete field', async () => {
+  const { salvageJsonObject } = await import('../ai/localLlmProvider.js');
+  const truncated =
+    '{"aiScamScore": 12, "confidence": "high", "summaryEn": "Official site, braces } and \\"quotes\\" inside.", "summaryAr": "موقع رسمي", "keyFindings": [{"severity": "info", "titleEn": "Valid certificate", "titleAr": "شهادة صالحة"}, {"severity": "low", "titleEn": "Missing hea';
+  const obj = salvageJsonObject(truncated) as Record<string, unknown>;
+  assert.equal(obj.aiScamScore, 12);
+  assert.equal(obj.summaryAr, 'موقع رسمي');
+  assert.equal(obj.summaryEn, 'Official site, braces } and "quotes" inside.');
+  // The half-written array is dropped rather than guessed at
+  assert.equal(obj.keyFindings, undefined);
+});
+
+test('a complete reply is parsed as it is, even with prose around it', async () => {
+  const { salvageJsonObject } = await import('../ai/localLlmProvider.js');
+  const obj = salvageJsonObject('Here you go:\n```json\n{"aiScamScore": 90, "keyFindings": []}\n```') as Record<string, unknown>;
+  assert.equal(obj.aiScamScore, 90);
+  assert.deepEqual(obj.keyFindings, []);
+});
+
+test('text with no usable JSON is rejected', async () => {
+  const { salvageJsonObject } = await import('../ai/localLlmProvider.js');
+  assert.throws(() => salvageJsonObject('Sure! This site looks fine.'));
+  assert.throws(() => salvageJsonObject('{"aiScamSc'));
+});
+
+test('local provider returns a verdict when the model reply is cut off mid-array', async () => {
+  const cutOff =
+    '{"aiScamScore": 8, "confidence": "high", "aiDetectedPromptInjection": false, "promptInjectionEvidence": null, "impersonatedEntity": null, "provablyFalseOrImpersonatedClaim": false, "confirmedPhishingOrScam": false, "summaryEn": "Genuine police portal.", "summaryAr": "بوابة رسمية.", "recommendationEn": "Safe to use.", "recommendationAr": "آمن.", "keyFindings": [{"severity": "info", "titleEn": "Old dom';
+  const fakeFetch = (async () =>
+    new Response(JSON.stringify({ choices: [{ finish_reason: 'length', message: { content: cutOff } }] }), {
+      status: 200,
+    })) as typeof fetch;
+  const local = createLocalLlmProvider(
+    { baseUrl: 'http://127.0.0.1:8080/v1', model: 'falcon', apiKey: null, timeoutMs: 5000 },
+    fakeFetch,
+  );
+  const result = await local.run(scanInput('x'));
+  assert.equal(result.aiScamScore, 8);
+  assert.equal(result.summaryAr, 'بوابة رسمية.');
+  assert.deepEqual(result.keyFindings, []);
+});
+
+// --- "Live sources checked" must mean a lookup really happened --------------
+
+test('a reply with cited sources or search queries counts as a live lookup', async () => {
+  const { liveLookupHappened } = await import('../ai/geminiAnalyzer.js');
+  assert.equal(liveLookupHappened({ candidates: [{ groundingMetadata: { groundingChunks: [{ web: { uri: 'https://x' } }] } }] }), true);
+  assert.equal(liveLookupHappened({ candidates: [{ groundingMetadata: { webSearchQueries: ['adpolice official site'] } }] }), true);
+});
+
+test('a reply from a model that had search but did not use it does not count', async () => {
+  const { liveLookupHappened } = await import('../ai/geminiAnalyzer.js');
+  assert.equal(liveLookupHappened({ candidates: [{ groundingMetadata: {} }] }), false);
+  assert.equal(liveLookupHappened({ candidates: [{}] }), false);
+  assert.equal(liveLookupHappened({}), false);
+});
+
+// --- Errors that will not fix themselves are told apart from "try again soon" ---
+
+test('"model not available to this account" and bad keys are permanent', async () => {
+  const { isPermanentAiError, isTransientAiError } = await import('../ai/aiChain.js');
+  // Real message seen from Google on 24 Nov 2026
+  const gone =
+    '{"error":{"code":404,"message":"This model models/gemini-2.5-flash-lite is no longer available to new users."}}';
+  assert.equal(isPermanentAiError(gone), true);
+  assert.equal(isPermanentAiError('{"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT"}}'), true);
+  assert.equal(isPermanentAiError('403 PERMISSION_DENIED'), true);
+  assert.equal(isTransientAiError(gone), false);
+});
+
+test('quota and overload errors are temporary, not permanent', async () => {
+  const { isPermanentAiError, isTransientAiError } = await import('../ai/aiChain.js');
+  const quota = '{"error":{"code":429,"message":"You exceeded your current quota","status":"RESOURCE_EXHAUSTED"}}';
+  assert.equal(isPermanentAiError(quota), false);
+  assert.equal(isTransientAiError(quota), true);
+  assert.equal(isPermanentAiError('503 UNAVAILABLE: high demand'), false);
+});
+
+test('"quota exceeded" is told apart from "model overloaded"', async () => {
+  const { isQuotaError } = await import('../ai/aiChain.js');
+  assert.equal(isQuotaError('{"error":{"code":429,"message":"You exceeded your current quota","status":"RESOURCE_EXHAUSTED"}}'), true);
+  assert.equal(isQuotaError('{"error":{"code":503,"message":"This model is currently experiencing high demand.","status":"UNAVAILABLE"}}'), false);
+  assert.equal(isQuotaError('fetch failed'), false);
+});

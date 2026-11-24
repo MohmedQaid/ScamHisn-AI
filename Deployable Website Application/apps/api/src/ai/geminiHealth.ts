@@ -15,6 +15,13 @@ import { RefusalMemo } from './refusalMemo.js';
  */
 const geminiCooldowns = new RefusalMemo(config.geminiCooldownMs);
 
+/**
+ * A key+model that Google says can never work (model not offered to this account, invalid key,
+ * permission denied) is switched off for six hours instead of being retried every cool-down.
+ */
+const geminiDisabled = new RefusalMemo(6 * 60 * 60 * 1000);
+const DISABLED = 'disabled';
+
 export function geminiProviderId(keyIndex: number, model: string): string {
   return `gemini:key${keyIndex + 1}:${model}`;
 }
@@ -22,8 +29,8 @@ export function geminiProviderId(keyIndex: number, model: string): string {
 /** Primary model first, then the backup model if one is configured. */
 export function geminiModels(): string[] {
   const models = [config.geminiModel];
-  if (config.geminiFallbackModel && config.geminiFallbackModel !== config.geminiModel) {
-    models.push(config.geminiFallbackModel);
+  for (const model of config.geminiFallbackModels) {
+    if (!models.includes(model)) models.push(model);
   }
   return models;
 }
@@ -38,14 +45,28 @@ export function markGeminiExhausted(providerId: string): void {
   geminiCooldowns.remember(providerId, GEMINI_QUOTA);
 }
 
+/** Switches a key+model off for hours: the error says it will not start working by itself. */
+export function markGeminiUnusable(providerId: string): void {
+  geminiDisabled.remember(providerId, DISABLED);
+}
+
 export function isGeminiCoolingDown(providerId: string): boolean {
-  return geminiCooldowns.isRefused(providerId, GEMINI_QUOTA);
+  return (
+    geminiCooldowns.isRefused(providerId, GEMINI_QUOTA) || geminiDisabled.isRefused(providerId, DISABLED)
+  );
+}
+
+function unavailableUntil(providerId: string): number | null {
+  const quota = geminiCooldowns.until(providerId, GEMINI_QUOTA);
+  const disabled = geminiDisabled.until(providerId, DISABLED);
+  if (quota === null && disabled === null) return null;
+  return Math.max(quota ?? 0, disabled ?? 0);
 }
 
 export function getAiCapabilities(): AiCapabilities {
   return computeCapabilities({
     geminiProviderIds: allGeminiProviderIds(),
-    coolingUntil: (id) => geminiCooldowns.until(id, GEMINI_QUOTA),
+    coolingUntil: unavailableUntil,
     localModel: config.localLlm?.model ?? null,
     pipeline: config.aiPipeline === 'hybrid' && config.localLlm ? 'hybrid' : 'gemini_first',
     now: Date.now(),

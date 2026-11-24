@@ -63,7 +63,15 @@ export const config = {
   geminiApiKeys,
   geminiModel: process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL,
   /** Second Gemini model tried when the primary is overloaded or rate limited (limits are per model). */
-  geminiFallbackModel: process.env.GEMINI_FALLBACK_MODEL?.trim() || null,
+  geminiFallbackModel: process.env.GEMINI_FALLBACK_MODEL?.split(',')[0]?.trim() || null,
+  /**
+   * Backup Gemini models in the order they are tried, from GEMINI_FALLBACK_MODEL (comma-separated).
+   * Each model has its own allowance, so a list keeps the AI answering when the primary runs out.
+   */
+  geminiFallbackModels: (process.env.GEMINI_FALLBACK_MODEL ?? '')
+    .split(',')
+    .map((m) => m.trim())
+    .filter(Boolean),
   /**
    * How long a Gemini key+model is left alone after a quota / overload error. While every key is
    * cooling down, the features that need Gemini (Job, Map, Image) are switched off.
@@ -92,7 +100,7 @@ export const config = {
         model: process.env.LOCAL_LLM_MODEL?.trim() || 'jais-2-8b-chat',
         apiKey: process.env.LOCAL_LLM_API_KEY?.trim() || null,
         timeoutMs: parsePositiveInt(process.env.LOCAL_LLM_TIMEOUT_MS, 45_000),
-        maxPromptChars: parsePositiveInt(process.env.LOCAL_LLM_MAX_PROMPT_CHARS, 12_000),
+        maxPromptChars: parsePositiveInt(process.env.LOCAL_LLM_MAX_PROMPT_CHARS, 9_000),
       }
     : null,
   corsAllowedOrigins: parseOrigins(process.env.CORS_ALLOWED_ORIGINS),

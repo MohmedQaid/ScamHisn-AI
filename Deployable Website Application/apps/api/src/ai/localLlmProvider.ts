@@ -1,7 +1,12 @@
 import type { AiForensicAnalysis } from '@scamhisn/shared';
 import type { AiProvider } from './aiChain.js';
 import { buildAnalysisPrompt, parseGeminiJsonResponse, toAiForensicAnalysis } from './geminiAnalyzer.js';
+import { JOB_MAP_SHAPE, JSON_REPLY_SHAPE, salvageJsonObject } from './jsonReply.js';
 import { repairArabic } from './textQuality.js';
+
+export { salvageJsonObject };
+
+const LOCAL_REPLY_SHAPE = `${JSON_REPLY_SHAPE}\n${JOB_MAP_SHAPE}`;
 import type { AiAnalysisInput } from './types.js';
 
 /**
@@ -23,7 +28,7 @@ export interface LocalLlmConfig {
   maxPromptChars?: number;
 }
 
-const DEFAULT_MAX_PROMPT_CHARS = 12_000;
+const DEFAULT_MAX_PROMPT_CHARS = 9_000;
 const MIN_VISIBLE_TEXT_CHARS = 400;
 
 const NO_TOOLS_NOTICE = `
@@ -34,9 +39,6 @@ OFFLINE ANALYST NOTICE (overrides any instruction above to use Google Search or 
 - Never state that you verified a company, domain, place or phone number online.
 - For job posts and map listings, set "companyVerified", "placeVerified" and "businessExistsOnExternalSources" to false and say in the notes that live sources were not checked. Do not treat that as evidence of fraud by itself.`;
 
-const JSON_SHAPE = `Respond with ONE JSON object and nothing else (no prose, no markdown fences), using exactly these keys:
-{"aiScamScore": 0-100 integer, "confidence": "high"|"medium"|"low", "aiDetectedPromptInjection": boolean, "promptInjectionEvidence": string|null, "impersonatedEntity": string|null, "provablyFalseOrImpersonatedClaim": boolean, "confirmedPhishingOrScam": boolean, "summaryEn": string, "summaryAr": string, "recommendationEn": string, "recommendationAr": string, "keyFindings": [{"severity": "critical"|"high"|"medium"|"low"|"info", "titleEn": string, "titleAr": string, "detailEn": string, "detailAr": string}], "jobAnalysis": object|null, "mapAnalysis": object|null}
-Keep every string under 300 characters and return at most 4 keyFindings.`;
 
 const WITH_RESEARCH_NOTICE = `
 
@@ -60,24 +62,13 @@ function buildBudgetedPrompt(input: AiAnalysisInput, maxPromptChars: number) {
     notice.length +
     base.userPrompt.length +
     researchBlock.length +
-    JSON_SHAPE.length;
+    LOCAL_REPLY_SHAPE.length;
   const visibleTextChars = Math.max(MIN_VISIBLE_TEXT_CHARS, maxPromptChars - fixedChars);
   const prompt = buildAnalysisPrompt(input, { compact: true, visibleTextChars });
   return {
     system: `${prompt.systemInstruction}${notice}`,
-    user: `${prompt.userPrompt}${researchBlock}\n\n${JSON_SHAPE}`,
+    user: `${prompt.userPrompt}${researchBlock}\n\n${LOCAL_REPLY_SHAPE}`,
   };
-}
-
-/** Pulls the JSON object out of a chat reply that may be wrapped in fences or stray prose. */
-function extractJsonObject(content: string): string {
-  const trimmed = content.trim();
-  const start = trimmed.indexOf('{');
-  const end = trimmed.lastIndexOf('}');
-  if (start === -1 || end <= start) {
-    throw new Error('Local model did not return a JSON object');
-  }
-  return trimmed.slice(start, end + 1);
 }
 
 interface ChatCompletionResponse {
@@ -111,7 +102,8 @@ export function createLocalLlmProvider(
             { role: 'user', content: user },
           ],
           temperature: 0.1,
-          max_tokens: 1400,
+          // Arabic costs roughly one token per one or two characters: leave room for both languages
+          max_tokens: 2200,
           response_format: { type: 'json_object' },
           stream: false,
         }),
@@ -127,7 +119,10 @@ export function createLocalLlmProvider(
         throw new Error('Local model returned an empty reply');
       }
 
-      const parsed = parseGeminiJsonResponse(extractJsonObject(content), input.browser.coordinates);
+      const parsed = parseGeminiJsonResponse(
+        JSON.stringify(salvageJsonObject(content)),
+        input.browser.coordinates,
+      );
       if (typeof parsed.aiScamScore !== 'number' || Number.isNaN(parsed.aiScamScore)) {
         throw new Error('Local model reply has no numeric aiScamScore');
       }

@@ -15,7 +15,7 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 | # | Decision | Status |
 |---|---|---|
 | 1 | The prompt-injection rule no longer flags ordinary text such as "Developer mode", so the app stops rating its own homepage a 98% scam. | Done, tested |
-| 2 | Hybrid AI: Gemini researches live sources, a self-hosted UAE-built model judges. Either can be missing. Two Gemini keys plus an optional backup model. | Done. Local half tested with a real model; Gemini half not tested (no working key in testing) |
+| 2 | Hybrid AI: Gemini researches live sources, a self-hosted UAE-built model judges. Either can be missing. Two Gemini keys plus an optional backup model. | Done. Tested end to end with real Gemini keys and a real local model in Link, Job, Map and Screenshot modes |
 | 2a | When every Gemini key fails, Job, Map and Image checks pause for a cool-down (default 2 min) and switch back on by themselves. General link checks keep working. | Done, tested end to end |
 | 3 | An incomplete check is never shown as "safe". The result says how much of the analysis ran. | Done, tested |
 | 4 | A link whose domain is dead gets a verdict from the address itself, not an error. | Done, tested |

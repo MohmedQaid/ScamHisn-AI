@@ -25,7 +25,7 @@ Gemini can do: live lookups and reading images.
 | `GEMINI_API_KEY` | First Gemini key | none |
 | `GEMINI_API_KEY_2` (or `GEMINI_API_KEYS=a,b`) | Second key, used when the first fails | none |
 | `GEMINI_MODEL` | Primary Gemini model | `gemini-3.5-flash-lite` |
-| `GEMINI_FALLBACK_MODEL` | Second Gemini model; limits are counted per model | none |
+| `GEMINI_FALLBACK_MODEL` | Backup Gemini models, comma-separated, tried in order; limits are counted per model | none |
 | `GEMINI_COOLDOWN_MS` | How long a failed key+model is left alone | `120000` (2 min) |
 | `LOCAL_LLM_BASE_URL` | The local model server, ending in `/v1` | none |
 | `LOCAL_LLM_MODEL` | Model name sent to that server | `jais-2-8b-chat` |
@@ -130,12 +130,41 @@ Tested on 24 Nov 2026 with Falcon-H1 7B (Q4_K_M) on an RTX 3080 through llama.cp
   under 2 seconds each.
 - End to end with Gemini failing for real (an invalid key): the local model judged a real page
   alone, Job, Map and Image paused with a countdown, and they came back after the cool-down.
-- 118 unit tests cover the chain, the hybrid merge rules, the cool-down and the availability logic.
+- 139 unit tests cover the chain, the hybrid merge rules, the cool-down and the availability logic.
+
+Tested late on 24 Nov 2026 with two real free-tier Gemini keys, a list of backup models and
+Falcon-H1 as judge (a local production build):
+
+| Check | Result |
+|---|---|
+| `adpolice.gov.ae`, link mode | 0% safe, hybrid, about 13 s |
+| `tamm.abudhabi`, link mode | 0% safe, hybrid, about 19 s |
+| `github.com`, link mode | 0% safe, hybrid, about 10 s |
+| `amazon.jobs`, job mode | 0% safe, job authenticity 98, hybrid, about 11 s |
+| A Google Maps search link, map mode | 0% safe, hybrid, about 13 s |
+| Screenshot of a fake Arabic fine SMS | 100% confirmed scam, link extracted, about 8 s |
+| Screenshot of a genuine bank code SMS | 10% safe, about 5 s |
+
+What those runs taught us (all fixed in code):
+
+- **Free-tier keys get no allowance for live Google Search or Maps lookups on the newer Gemini
+  models.** Google answers such a call with "quota exceeded". The app now reads that as "this
+  lookup is not available on this key", remembers it, and continues without the lookup. Every
+  result above therefore says "live sources not checked". Real live lookups need a paid key.
+- **Some models refuse lookups together with a structured answer.** For those the app makes the
+  lookup call in text mode and parses the JSON out of the reply.
+- **A model a key may not use at all** (Google returned 404 "no longer available to new users"
+  for one key) is switched off for six hours instead of being retried.
+- **A long Arabic reply from the local model can be cut off.** The complete fields are kept and
+  the half-written one is dropped.
+- **A verified official domain is not doubted on a model's vague unease.** Before this rule the
+  local model rated `adpolice.gov.ae` 45% for missing security headers.
+- The primary model returned "high demand" (503) several times; a backup model answered instead.
 
 Not tested:
 
-- The Gemini half of hybrid mode. No working Gemini key was used in testing, so "Gemini researches,
-  local model judges" has run only with simulated research notes.
+- Live Google Search and Maps lookups actually returning sources (needs a paid key).
+- The app deployed on Render with these settings, and the tunnel from Render to the PC.
 - Falcon-H1's Arabic is understandable but rough, and it sometimes mixes in a few non-Arabic
   characters. The app strips those, and in hybrid mode shows Gemini's Arabic instead.
   Nine cases is a sanity check, not an accuracy measurement.

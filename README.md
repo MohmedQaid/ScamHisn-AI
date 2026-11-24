@@ -165,7 +165,7 @@ Embed one-tap link and screenshot verification directly inside **TAMM** with aut
 
 #### Measured, not claimed
 
-On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 127 unit tests (`npm test`).
+On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 139 unit tests (`npm test`).
 
 The problem figures, cost model and savings estimate are on the in-app **Impact** page (`#/impact`) and in [`docs/IMPACT.md`](./docs/IMPACT.md). All 67 references are in [`docs/research/sources.md`](./docs/research/sources.md); the UAE open-data files we used are in [`data/open-data/`](./data/open-data/).
 
@@ -201,7 +201,7 @@ npm install
 npm run install:browser      # headless Chromium for the scanner
 cp .env.example .env         # then set GEMINI_API_KEY
 npm run dev                  # web on :5173, API on :3001
-npm test                     # 127 API unit tests
+npm test                     # 139 API unit tests
 ```
 
 The AI pipeline (hybrid mode, fallbacks, cool-down, running the local model) is configured with environment variables; see [`docs/AI_FALLBACK_SETUP.md`](./docs/AI_FALLBACK_SETUP.md).
@@ -367,7 +367,7 @@ If you ever want to deploy your own free copy on **Render**:
 
 #### قياس لا ادّعاء
 
-على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 127 اختباراً آلياً (`npm test`).
+على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 139 اختباراً آلياً (`npm test`).
 
 أرقام المشكلة ونموذج التكلفة وتقدير التوفير معروضة في صفحة **الأثر** داخل التطبيق (`#/impact`) وفي [`docs/IMPACT.md`](./docs/IMPACT.md). المراجع الـ67 كلها في [`docs/research/sources.md`](./docs/research/sources.md)، وملفات البيانات المفتوحة الإماراتية المستخدمة في [`data/open-data/`](./data/open-data/).
 
@@ -405,7 +405,7 @@ npm install
 npm run install:browser      # headless Chromium for the scanner
 cp .env.example .env         # then set GEMINI_API_KEY
 npm run dev                  # web on :5173, API on :3001
-npm test                     # 127 API unit tests
+npm test                     # 139 API unit tests
 ```
 
 </div>

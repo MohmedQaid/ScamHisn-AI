@@ -221,7 +221,9 @@ export async function runUrlScan(request: ScanRequest): Promise<ScanResponse> {
     };
 
     // 7. Decisive hybrid 0–100% scoring engine (with fatal smoking-gun floors)
+    const scoredHost = finalUrlObj.hostname.toLowerCase();
     const scoring = computeDecisiveScore({
+      isOfficialDomain: isOfficialBrandDomain(scoredHost, parseDomain(scoredHost).domain ?? null),
       mode: request.mode,
       technicalChecks,
       heuristicFlags: heuristics.flags,
