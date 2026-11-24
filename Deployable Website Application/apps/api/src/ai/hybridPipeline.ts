@@ -1,5 +1,6 @@
 import type { AiForensicAnalysis } from '@scamhisn/shared';
 import { buildUnavailableAnalysis, type AiChainResult, type AiProvider } from './aiChain.js';
+import { arabicWasRepaired } from './textQuality.js';
 import type { AiAnalysisInput, ResearchNotes } from './types.js';
 
 /**
@@ -80,6 +81,11 @@ function merge(research: AiForensicAnalysis, judged: AiForensicAnalysis): AiFore
     provablyFalseOrImpersonatedClaim:
       judged.provablyFalseOrImpersonatedClaim || research.provablyFalseOrImpersonatedClaim,
     impersonatedEntity: judged.impersonatedEntity ?? research.impersonatedEntity,
+    // If the judge's Arabic had to be repaired (stray foreign-script characters), show the
+    // researcher's Arabic instead. The decision is still the judge's; only the wording changes.
+    ...(arabicWasRepaired(judged) && research.summaryAr
+      ? { summaryAr: research.summaryAr, recommendationAr: research.recommendationAr || judged.recommendationAr }
+      : {}),
     keyFindings: judged.keyFindings.length > 0 ? judged.keyFindings : research.keyFindings,
     // Verified facts about an employer or a map listing can only come from live lookups
     jobAnalysis: research.jobAnalysis,

@@ -1,4 +1,5 @@
 import type { LocalLlmConfig } from './localLlmProvider.js';
+import { hasForeignScript } from './textQuality.js';
 
 /**
  * Hybrid mode for screenshots: Gemini reads the image (a self-hosted text model cannot), and the
@@ -112,9 +113,10 @@ ${text.slice(0, 2000)}
     throw new Error('Local model reply is missing scamScore or summaries');
   }
 
+  // A garbled Arabic summary is dropped (empty) so the caller keeps the reader's Arabic instead
   return {
     scamScore: Math.max(0, Math.min(100, Math.round(score))),
     summaryEn: parsed.summaryEn,
-    summaryAr: parsed.summaryAr,
+    summaryAr: hasForeignScript(parsed.summaryAr) ? '' : parsed.summaryAr,
   };
 }

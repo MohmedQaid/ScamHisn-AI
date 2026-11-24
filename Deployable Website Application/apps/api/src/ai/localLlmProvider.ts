@@ -1,6 +1,7 @@
 import type { AiForensicAnalysis } from '@scamhisn/shared';
 import type { AiProvider } from './aiChain.js';
 import { buildAnalysisPrompt, parseGeminiJsonResponse, toAiForensicAnalysis } from './geminiAnalyzer.js';
+import { repairArabic } from './textQuality.js';
 import type { AiAnalysisInput } from './types.js';
 
 /**
@@ -131,15 +132,18 @@ export function createLocalLlmProvider(
         throw new Error('Local model reply has no numeric aiScamScore');
       }
 
-      return toAiForensicAnalysis(parsed, {
-        mode: input.mode,
-        status: 'degraded',
-        error: 'Backup model answered: live sources (Google Search / Maps) were not checked.',
-        model: cfg.model,
-        groundingUsed: [],
-        groundingSources: [],
-        coordinates: input.browser.coordinates,
-      });
+      // Small models sometimes leak characters from another script into Arabic: repair before use
+      return repairArabic(
+        toAiForensicAnalysis(parsed, {
+          mode: input.mode,
+          status: 'degraded',
+          error: 'Self-hosted model answered: live sources (Google Search / Maps) were not checked.',
+          model: cfg.model,
+          groundingUsed: [],
+          groundingSources: [],
+          coordinates: input.browser.coordinates,
+        }),
+      );
     },
   };
 }
