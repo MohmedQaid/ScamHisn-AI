@@ -42,32 +42,32 @@
 
 ## EN — Overview
 
-**ScamHisn AI** is both a **Web Application** and a **Chrome Extension** that detects fraudulent links and forged/scam screenshots before users fall for them.
+**ScamHisn AI** is a **Web Application** and **Chrome Extension** that protects users from fraudulent links and forged screenshots—including scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi Police**, local banks, fake jobs, and hijacked **Google Maps** listings.
 
-It supports **passive checking** (manual link & image inspection on demand) and **proactive checking** (automatic scanning of links on open web pages).
+It supports **passive checking** (manual inspection on demand) and **proactive checking** (automatic link scanning on open web pages).
 
 > [!IMPORTANT]
-> **Why only the passive version is deployed live:** Both versions are built (`Chrome Extension/deployable/` and `Chrome Extension/dev/`), but proactive scanning is locked to *"Developers only"* in production. Running unauthenticated background AI scans publicly could lead to runaway API bills.
+> **Why only the passive version is deployed live:** Both versions are built (`Chrome Extension/deployable/` and `Chrome Extension/dev/`), but proactive scanning is locked to *"Developers only"* in production to prevent runaway public API costs.
 
 > [!NOTE]
 > **Live Demo Rate Limits (`https://scamhisn-ai.onrender.com/`):** **15 req/min · 500 req/day · 50k tokens/min.**
-> Normal testing will run smoothly unless many users test at the exact same moment—please test thoughtfully. *(Free-tier cold start takes ~30–50s if idle.)*
+> Normal testing runs smoothly unless many people test simultaneously—please test thoughtfully. *(Free-tier cold start takes ~30–50s if idle.)*
 
 ---
 
-### The Problem & Our Solution
+### What It Delivers
 
-Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi Police**, local banks, fake job offers, and hijacked **Google Maps** numbers.
+**Four Inspection Modes**
+Check **General Links**, **Job Posts**, **Map Links**, or upload **Screenshots & Images** with a live preview to verify whether an image is genuine or forged.
 
-**ScamHisn AI** opens suspicious links inside an isolated sandbox and delivers a decisive **0–100% scam score**—hitting **95–100%** immediately on fatal red flags instead of diluting them.
+**Decisive 0–100% Scam Score**
+Fatal red flags immediately score **95–100%** instead of being diluted, while legitimate lookalike organizations (such as ADIB vs. DIB) are not falsely penalized.
 
-| Feature | What It Delivers |
-|---|---|
-| **4 Inspection Modes** | **General Link** (phishing & UAE brand spoofing) · **Job Post** (fake employers & visa fees) · **Map Link** (hijacked contacts & review attacks) · **Image Check** (screenshot genuineness, tampering & visual scam detection). |
-| **Live Image Preview & Low-Token AI** | Preview uploaded images right inside the app, spot forged receipts or smishing screenshots, extract hidden URLs for 1-click deep scanning, and save quota via `768px` compression + SHA-256 caching. |
-| **Simple + Deep Views** | Clean percentage verdict for everyday users; **"Show Details"** reveals SSL, RDAP/WHOIS age, IPs, redirects, hidden DOM, authenticity analysis, and raw JSON for investigators. |
-| **Police-Ready PDF** | One-click **"Generate Report"** exports a forensic A4 PDF (score, findings, WHOIS/TLS/IPs, UTC timestamp, raw JSON) for investigation or takedown. |
-| **Police Reporting Concept** | Includes a conceptual **"Send to police for investigation"** button illustrating direct escalation to Abu Dhabi Police eCrime workflows. |
+**Simple View + Investigator Details**
+Everyday users get a clear verdict at a glance; **"Show Details"** reveals technical findings for deeper investigation.
+
+**Forensic PDF & Police Escalation Concept**
+Export an investigation-ready **PDF report** in one click, alongside a conceptual **"Send to police for investigation"** button illustrating direct eCrime reporting.
 
 ---
 
@@ -80,10 +80,10 @@ Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi
 **Web App (Phone & Laptop)**
 
 1. Open **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
-2. Pick **General**, **Job**, **Map**, or **Image Check** — paste a link or upload a screenshot with live preview.
-3. Click **Inspect** → view score & genuineness verdict, **Show Details**, or **Generate Report (PDF)**.
+2. Choose **General**, **Job**, **Map**, or **Image Check**, then paste a link or upload an image.
+3. Click **Inspect** to view the verdict, details, or download a PDF report.
 
-*Phone Chrome tip:* Tap menu → **Add to Home screen** to install it like an app.
+*Phone Chrome tip:* Tap menu → **Add to Home screen** to use it like an app.
 
 </td>
 <td width="50%" valign="top">
@@ -102,7 +102,7 @@ Residents face realistic scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi
 
 ### How It Works
 
-Every scan combines **Deterministic Checks** *(SSL certificates, SSRF safety guard, domain age/WHOIS, DNS/SPF/DMARC, security headers, and isolated browser rendering)* with **Semantic AI Checks** *(suspicious similarities, scam red flags, visual image forgery, and prompt-injection defense)*.
+Every scan blends **Deterministic Checks** *(SSL certificates, domain age, safety guards, and isolated sandbox inspection)* with **Semantic AI Checks** *(suspicious similarities, scam red flags, visual forgery detection, and anti-prompt-injection defense)*.
 
 #### 1. Live Website (Links & Images)
 
@@ -116,18 +116,11 @@ Every scan combines **Deterministic Checks** *(SSL certificates, SSRF safety gua
   <img src="./assets/diagram-extension.svg" alt="Chrome Extension — How It Works" width="100%" />
 </p>
 
-| Layer | Purpose |
-|---|---|
-| **Deterministic Checks** | **SSRF Guard**, **Playwright Sandbox**, **Node `tls`**, **RDAP/WHOIS**, **DNS (SPF/DMARC)** & **Security Headers** catch unsafe certificates, disposable new domains, redirects, and hidden forms. |
-| **Semantic AI (`gemini-3.5-flash-lite`)** | Analyzes suspicious similarities, UAE brand spoofing, fake job/map claims, and **uploaded screenshots/images** (`≤768px` single tile + SHA-256 zero-token cache) while avoiding false positives on legitimate similar-named entities (e.g. ADIB vs. DIB). |
-| **Anti-Prompt-Injection Shield** | Detects hidden AI-override attacks in HTML, comments, Maps reviews, and images, isolating untrusted text in cryptographic boundaries. |
-| **Shared REST API (`/api/v1/scan` & `/scan-image`)** | Single backend powering the web app, image authenticity checker, PDF generator, and Chrome extension. |
-
 ---
 
 ### Future Vision: TAMM Ecosystem Integration
 
-Integrating **ScamHisn AI** into Abu Dhabi's **TAMM** ecosystem unlocks proactive, resident-specific protection right inside the services residents already trust.
+Bringing **ScamHisn AI** into Abu Dhabi's **TAMM** ecosystem unlocks personalized scam protection inside the services residents already trust.
 
 <p align="center">
   <img src="./assets/diagram-tamm.svg" alt="Future Vision — TAMM Ecosystem Integration How It Works" width="100%" />
@@ -146,19 +139,22 @@ Integrating **ScamHisn AI** into Abu Dhabi's **TAMM** ecosystem unlocks proactiv
 </tr>
 </table>
 
-- **Personalized Fact-Checking:** Cross-check scam claims against a resident's real TAMM records—instantly catching fake *"unpaid traffic fine"* or *"expired ID"* messages when their account shows *"All good, no fines."*
-- **Native TAMM App Service:** Embed one-tap link and screenshot verification inside **TAMM** with authenticated reporting to **Abu Dhabi Police** cybercrime units.
+**Personalized Fact-Checking**
+Cross-check scam messages against a resident's real TAMM records—instantly catching fake *"unpaid fine"* claims when their account shows *"All good, no fines."*
+
+**Native TAMM App Service**
+Embed one-tap link and screenshot verification directly inside **TAMM** with authenticated escalation to **Abu Dhabi Police**.
 
 > [!NOTE]
-> **Architecture Scope:** The exact integration design and which specific TAMM tools, APIs, or data boundaries ScamHisn AI connects to are intentionally left for **TAMM experts and system architects** to design.
+> **Architecture Scope:** The exact integration design and which specific TAMM tools or services ScamHisn AI connects to are intentionally left for **TAMM experts and system architects** to design.
 
 ---
 
 ### Hosting & Deployment (Not Required — Already Live!)
 
-**You do not need to host or deploy anything yourself** — we already deployed the live application for you at **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+**You do not need to host or deploy anything yourself** — the live app is already running at **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
 
-However, if you want to deploy your own copy for free on **Render**:
+If you ever want to deploy your own free copy on **Render**:
 
 1. Push `Deployable Website Application/` to GitHub.
 2. Create a **Blueprint** (or Docker Web Service) on Render connected to that repo.
@@ -184,13 +180,13 @@ However, if you want to deploy your own copy for free on **Render**:
 
 ## AR — نظرة عامة
 
-**حصن الاحتيال (ScamHisn AI)** هو **تطبيق ويب** و**إضافة لمتصفح كروم** تعتمد على الذكاء الاصطناعي لاكتشاف الروابط الاحتيالية وفحص الصور ولقطات الشاشة المشبوهة قبل الوقوع في فخ الاحتيال.
+**حصن الاحتيال (ScamHisn AI)** هو **تطبيق ويب** و**إضافة لمتصفح كروم** لحماية المستخدمين من الروابط الاحتيالية والصور المزوّرة، بما في ذلك عمليات الانتحال التي تستهدف **الهوية الرقمية (UAE PASS)** و**منظومة تم (TAMM)** و**شرطة أبوظبي** والبنوك المحلية وإعلانات التوظيف الوهمية و**خرائط جوجل**.
 
-يدعم النظام **الفحص اليدوي (السلبي)** للروابط والصور عند الطلب، و**الفحص الاستباقي (النشط)** لمراقبة الروابط تلقائياً في صفحات الويب المفتوحة.
+يدعم النظام **الفحص اليدوي (السلبي)** عند الطلب، و**الفحص الاستباقي (النشط)** لمراقبة الروابط تلقائياً في صفحات الويب المفتوحة.
 
 > **تنويه مهم — لماذا نُشرت النسخة اليدوية فقط؟**
 >
-> تم تطوير النسختين معاً (النسخة الرسمية ونسخة المطورين)، غير أن وضع الفحص الاستباقي مقفل بعبارة **«للمطورين فقط»** في النسخة الرسمية، لأن تشغيل الفحص التلقائي للعامة دون مصادقة قد يؤدي إلى استهلاك مرتفع لمفتاح واجهة البرمجة وتكاليف غير متوقعة.
+> تم تطوير النسختين معاً، غير أن وضع الفحص الاستباقي مقفل بعبارة **«للمطورين فقط»** في النسخة الرسمية، لأن تشغيل الفحص التلقائي للعامة دون مصادقة قد يؤدي إلى استهلاك مرتفع لمفتاح واجهة البرمجة وتكاليف غير متوقعة.
 
 <br />
 
@@ -202,19 +198,19 @@ However, if you want to deploy your own copy for free on **Render**:
 
 ---
 
-### المشكلة والحل
+### أبرز ما يقدمه التطبيق
 
-يواجه المستخدمون يومياً روابط احتيال متقنة تنتحل **الهوية الرقمية (UAE PASS)**، و**منظومة تم (TAMM)**، و**شرطة أبوظبي**، والبنوك المحلية، وإعلانات التوظيف الوهمية، وأرقام التواصل المخترقة على **خرائط جوجل**.
+**أربعة أوضاع للفحص**
+افحص **الروابط العامة** أو **إعلانات الوظائف** أو **روابط الخرائط** أو ارفع **الصور ولقطات الشاشة** مع معاينة فورية للتحقق من أصالتها وكشف التزوير.
 
-يقوم **حصن الاحتيال** بفتح الرابط داخل بيئة معزولة تماماً، ويقدم **نسبة احتمال احتيال حاسمة (0–100%)** تصل فوراً إلى **95–100%** عند رصد أدلة قاطعة دون تمييعها بالمتوسطات.
+**نسبة احتمال احتيال حاسمة (0–100%)**
+تصل النتيجة فوراً إلى **95–100%** عند وجود أدلة قاطعة دون تمييع، مع تجنّب الإنذارات الكاذبة للجهات الشرعية متشابهة الأسماء (مثل ADIB وDIB).
 
-| الميزة | الفائدة العملية |
-|---|---|
-| **4 أوضاع للفحص** | **رابط عام** (التصيّد وانتحال الجهات الإماراتية) · **إعلان وظيفة** (كشف الشركات الوهمية) · **رابط خريطة** (الأرقام المخترقة وهجمات التقييمات) · **فحص صورة** (التحقق من أصالة الصور وكشف التزوير والاحتيال البصري). |
-| **معاينة فورية واستهلاك اقتصادي للرموز** | عرض واضح للصورة المرفوعة قبل الفحص وداخل بطاقة النتيجة، مع استخراج الروابط المرصودة لفحصها بضغطة زر، وضغط تلقائي `768px` وتخزين مؤقت SHA-256 لحماية الرصيد. |
-| **عرض بسيط ومفصّل** | ملخص واضح وسريع للمستخدم العادي، مع زر **"عرض التفاصيل التقنية"** للمحقق الرقمي (شهادة SSL، عمر النطاق WHOIS/RDAP، عناوين IP، التحويلات، تحليل الأصالة، وJSON). |
-| **تقرير PDF جاهز للشرطة** | زر **"إنشاء تقرير (PDF)"** يصدر ملف أدلة جنائية منظماً (نسبة الخطر، الملاحظات، بيانات WHOIS/SSL/IP، التوقيت، وJSON الكامل) جاهزاً للتحقيق أو طلبات الإزالة. |
-| **مفهوم الإبلاغ للشرطة** | يتضمن زر **"إرسال للشرطة للتحقيق"** كنموذج أولي يوضح مسار الربط المباشر المستقبلي مع فرق مكافحة الجرائم الإلكترونية. |
+**عرض بسيط وتفاصيل للمحققين**
+يظهر ملخص واضح وسريع للمستخدم العادي، مع زر **«عرض التفاصيل التقنية»** لعرض الأدلة المعمّقة عند الحاجة.
+
+**تقرير PDF ومفهوم الإبلاغ للشرطة**
+إمكانية تصدير **تقرير أدلة بصيغة PDF** بضغطة زر، إلى جانب زر تجريبي **«إرسال للشرطة للتحقيق»** يوضح مسار الربط المستقبلي.
 
 ---
 
@@ -227,8 +223,8 @@ However, if you want to deploy your own copy for free on **Render**:
 **تطبيق الويب (الهاتف والحاسوب)**
 
 1. افتح **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
-2. اختر **رابط عام** أو **إعلان وظيفة** أو **رابط خريطة** أو **فحص صورة** — الصق رابطاً أو ارفع صورة مع معاينة فورية.
-3. اضغط **افحص** لعرض النتيجة وتقييم الأصالة أو **عرض التفاصيل** أو **إنشاء تقرير (PDF)**.
+2. اختر **رابط عام** أو **إعلان وظيفة** أو **رابط خريطة** أو **فحص صورة**، ثم الصق الرابط أو ارفع الصورة.
+3. اضغط **افحص** لعرض النتيجة أو التفاصيل أو تحميل تقرير PDF.
 
 *لمستخدمي كروم على الهاتف:* من القائمة اختر **إضافة إلى الشاشة الرئيسية** لاستخدامه كتطبيق.
 
@@ -249,7 +245,7 @@ However, if you want to deploy your own copy for free on **Render**:
 
 ### آلية العمل
 
-يجمع كل فحص بين **الفحوصات الحتمية (Deterministic)** *(شهادات SSL، درع SSRF، عمر النطاق WHOIS/RDAP، سجلات DNS/SPF/DMARC، ترويسات الأمان، والبيئة المعزولة)* وبين **الفحص الدلالي بالذكاء الاصطناعي (Semantic)** *(التشابه المشبوه، علامات الاحتيال، كشف تزوير الصور، وصد حقن الأوامر)*.
+يجمع كل فحص بين **الفحوصات الحتمية** *(شهادات SSL، عمر النطاق، ضوابط الأمان، والبيئة المعزولة)* وبين **الفحص الدلالي بالذكاء الاصطناعي** *(التشابه المشبوه، علامات الاحتيال، كشف تزوير الصور، وصد حقن الأوامر)*.
 
 #### 1. تطبيق الويب المباشر (الروابط والصور)
 
@@ -263,18 +259,11 @@ However, if you want to deploy your own copy for free on **Render**:
   <img src="./assets/diagram-extension.svg" alt="آلية عمل إضافة كروم — حصن الاحتيال" width="100%" />
 </p>
 
-| الطبقة | الدور داخل النظام |
-|---|---|
-| **الفحوصات الحتمية (Deterministic)** | **درع SSRF** و**متصفح Playwright المعزول** و**شهادات SSL** و**عمر النطاق RDAP/WHOIS** و**سجلات DNS/SPF/DMARC** لرصد النطاقات المؤقتة والتحويلات والنماذج المخفية. |
-| **الفحص الدلالي (`gemini-3.5-flash-lite`)** | يحلل التشابه المشبوه وانتحال الجهات الإماراتية وإعلانات الوظائف والخرائط، ويفحص **الصور ولقطات الشاشة المرفوعة** (`≤768px` مع تخزين مؤقت SHA-256 بصفر رموز عند التكرار) دون التباس بين الجهات الشرعية متشابهة الأسماء (مثل ADIB وDIB). |
-| **درع صد حقن الأوامر** | يرصد أوامر التلاعب المخفية في الصفحات وتقييمات الخرائط والصور، ويعزل النصوص غير الموثوقة بحدود مشفرة. |
-| **واجهة برمجية موحدة (`/api/v1/scan` و `/scan-image`)** | خادم واحد يغذي تطبيق الويب وفاحص الصور ومولّد تقارير PDF وإضافة المتصفح بسهولة وقابلية للتوسع. |
-
 ---
 
 ### الرؤية المستقبلية: التكامل مع منظومة «تم» (TAMM)
 
-يتيح دمج **حصن الاحتيال** ضمن بيئة **منظومة «تم» (TAMM)** حماية استباقية مخصّصة للمستخدم داخل الخدمات الحكومية التي يثق بها يومياً.
+يتيح دمج **حصن الاحتيال** ضمن **منظومة «تم» (TAMM)** حماية استباقية مخصّصة للمستخدم داخل الخدمات الحكومية التي يثق بها يومياً.
 
 <p align="center">
   <img src="./assets/diagram-tamm.svg" alt="الرؤية المستقبلية — آلية التكامل مع منظومة تم" width="100%" />
@@ -293,8 +282,11 @@ However, if you want to deploy your own copy for free on **Render**:
 </tr>
 </table>
 
-- **كشف مخصّص للاحتيال عبر بيانات المستخدم:** التحقق الفوري من صحة ادعاءات الرسائل المشبوهة (مثل *"مخالفة مرورية غير مدفوعة"*) مقارنةً بوضع المستفيد الفعلي في «تم» (مثل ظهور *"لا توجد مخالفات"* في سجل المركبات).
-- **خدمة مدمجة داخل تطبيق «تم»:** توفير فحص الروابط والصور بضغطة واحدة داخل التطبيق مع إمكانية رفع البلاغات الموثّقة مباشرةً إلى **شرطة أبوظبي**.
+**كشف مخصّص للاحتيال عبر بيانات المستخدم**
+التحقق الفوري من ادعاءات الرسائل المشبوهة (مثل *"مخالفة مرورية غير مدفوعة"*) مقارنةً بحالة المستفيد الفعلية في «تم» (مثل ظهور *"لا توجد مخالفات"*).
+
+**خدمة مدمجة داخل تطبيق «تم»**
+توفير فحص الروابط والصور بضغطة واحدة داخل التطبيق مع إمكانية رفع البلاغات الموثّقة مباشرةً إلى **شرطة أبوظبي**.
 
 > **نطاق التصميم المعماري:**
 >
@@ -304,7 +296,7 @@ However, if you want to deploy your own copy for free on **Render**:
 
 ### الاستضافة والنشر (غير مطلوب — التطبيق منشور وجاهز!)
 
-**لا حاجة لاستضافة التطبيق أو نشره بنفسك**؛ فقد قمنا بنشر النسخة المباشرة وجعلها جاهزة للاستخدام الفوري عبر **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+**لا حاجة لاستضافة التطبيق أو نشره بنفسك**؛ فالنسخة المباشرة جاهزة للاستخدام الفوري عبر **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
 
 ومع ذلك، إذا رغبت في نشر نسختك الخاصة مجاناً على **Render**:
 
