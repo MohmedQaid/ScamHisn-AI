@@ -45,9 +45,10 @@ export function scoreToVerdict(score: number): VerdictLevel {
  */
 export function computeDecisiveScore(input: ScoringInput): ScoringResult {
   const { mode, technicalChecks, heuristicFlags, promptInjection, aiAnalysis } = input;
-  const { tls, domainRegistration, redirects, headers, domAndForms, anomalies } = technicalChecks;
+  const { tls, domainRegistration, redirects, headers, dns, domAndForms, anomalies } = technicalChecks;
 
   const smokingGuns: BilingualFlag[] = [];
+  const compoundFlags: BilingualFlag[] = [];
   let appliedFloor: number | null = null;
   let escalationReason: string | null = null;
 
@@ -261,6 +262,40 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
     raiseFloor(85, 'Newly registered domain combined with suspicious TLD, obfuscation, or forms');
   }
 
+  // Compound Throwaway-Scam Infrastructure Pattern (High strictness, low false positives):
+  // Established legit sites are never newly registered (<30d), and legit startups usually configure
+  // either email (MX/SPF/DMARC) or basic HTTP security headers. Missing ALL THREE simultaneously
+  // is a strong disposable scam / fake-storefront fingerprint.
+  const hasNoEmailInfrastructure = Boolean(
+    domainRegistration.registrableDomain &&
+      dns.mxRecords.length === 0 &&
+      !dns.hasSpf &&
+      !dns.hasDmarc,
+  );
+  const missingAllCoreHeaders =
+    domAndForms.browserCaptured && headers.missingCriticalHeaders.length === 3;
+
+  if (domainRegistration.isNewlyRegistered && hasNoEmailInfrastructure && missingAllCoreHeaders) {
+    const isUltraFresh =
+      domainRegistration.domainAgeDays !== null && domainRegistration.domainAgeDays <= 14;
+    const floor = isUltraFresh ? 76 : 68;
+    compoundFlags.push({
+      code: 'THROWAWAY_SCAM_INFRASTRUCTURE',
+      severity: 'high',
+      category: 'domain',
+      titleEn: 'Disposable Unconfigured New Website Pattern',
+      titleAr: 'نمط موقع جديد ومؤقت بدون أي إعدادات أمان أو بريد',
+      detailEn: `Domain is only ${domainRegistration.domainAgeDays ?? '<30'} days old with zero email/SPF/DMARC records and all core HTTP security headers missing—a strong indicator of a throwaway scam or clone storefront.`,
+      detailAr: `النطاق عمره ${domainRegistration.domainAgeDays ?? 'أقل من 30'} يوم فقط ولا يملك أي سجلات بريد (MX/SPF/DMARC) ويفتقد جميع ترويسات الحماية الأساسية، وهو نمط شائع جداً في مواقع الاحتيال والمتاجر المقلّدة المؤقتة.`,
+    });
+    if (appliedFloor === null || appliedFloor < floor) {
+      raiseFloor(
+        floor,
+        'Newly registered domain with no email/DNS auth and missing all core HTTP security headers',
+      );
+    }
+  }
+
   if (mode === 'job' && aiAnalysis.jobAnalysis) {
     const auth = aiAnalysis.jobAnalysis.jobAuthenticityScore;
     if (auth <= 10) {
@@ -307,6 +342,11 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
   if (domAndForms.browserCaptured && headers.missingCriticalHeaders.length === 3) {
     techPoints += 6;
   }
+  if (domainRegistration.isNewlyRegistered && hasNoEmailInfrastructure) {
+    techPoints += 18;
+  } else if (domainRegistration.isYoungDomain && hasNoEmailInfrastructure && missingAllCoreHeaders) {
+    techPoints += 14;
+  }
 
   if (domAndForms.obfuscatedScriptIndicators.length > 0) techPoints += 18;
   if (domAndForms.hasSensitiveInputs && domainRegistration.isYoungDomain) techPoints += 15;
@@ -341,7 +381,7 @@ export function computeDecisiveScore(input: ScoringInput): ScoringResult {
   // =========================================================================
   // 5. MERGE, DEDUPLICATE & PRIORITIZE ALL RED FLAGS
   // =========================================================================
-  const allFlags: BilingualFlag[] = [...smokingGuns, ...heuristicFlags];
+  const allFlags: BilingualFlag[] = [...smokingGuns, ...compoundFlags, ...heuristicFlags];
 
   if (promptInjection.detected) {
     for (const f of promptInjection.findings.slice(0, 4)) {

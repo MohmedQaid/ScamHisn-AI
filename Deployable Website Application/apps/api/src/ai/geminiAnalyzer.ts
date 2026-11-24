@@ -195,6 +195,10 @@ SIMILAR-NAME ORGANIZATION RULE (CRITICAL — PREVENT FALSE POSITIVES):
 - Only flag name or domain similarity as impersonation/typosquatting when you are confident there is NO distinct legitimate organization with that name/domain (cross-check with Google Search grounding and technical signals such as domain age, TLD, SSL, and page context).
 - If the site belongs to a real, established organization whose name merely resembles another brand, score it as legitimate unless independent, concrete scam evidence exists.
 
+THROWAWAY & CLONE STOREFRONT STRICTNESS (HIGH PRECISION):
+- Be STRICT when multiple disposable infrastructure signals combine: a newly registered domain (<=30 days old) with NO email/MX/SPF/DMARC records and missing core HTTP security headers (HSTS/CSP/X-Frame-Options) is a classic throwaway scam footprint (typically 70-90+ unless strong external verification proves it is an authentic new launch).
+- Actively check for regional brand-clone storefronts (e.g., "<brand><country>.com" mimicking an established brand whose official domain is different, such as "dusk.com.au" vs a newly registered "duskaustralia.com" with no email config). If confirmed as an unofficial clone of a real brand, score 95-100 and set confirmedPhishingOrScam=true.
+
 ${modeGuidance[mode]}
 
 BILINGUAL OUTPUT STYLE:
