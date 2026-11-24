@@ -2,14 +2,18 @@ import crypto from 'node:crypto';
 import { parse as parseDomain } from 'tldts';
 import type { ScanRequest, ScanResponse, TechnicalChecks } from '@scamhisn/shared';
 import { config } from '../config.js';
-import { assertSafeUrl, SsrfError } from '../security/ssrfGuard.js';
+import { assertSafeUrl, normalizeUserUrl, SsrfError } from '../security/ssrfGuard.js';
+import { extractFirstUrl } from '../security/inputExtractor.js';
+import { isOfficialBrandDomain } from '../security/brandCatalog.js';
+import { buildAddressOnlyScan } from './addressOnlyScan.js';
+import { determineCoverage, guardVerdict } from './coverage.js';
 import { inspectInHeadlessBrowser } from '../inspectors/browserInspector.js';
 import { inspectTls } from '../inspectors/tlsInspector.js';
 import { inspectDomainRegistration } from '../inspectors/rdapInspector.js';
 import { inspectDns } from '../inspectors/dnsInspector.js';
 import { runHeuristicAnalysis } from '../inspectors/heuristicAnalyzer.js';
 import { scanForPromptInjection } from '../security/promptInjectionScanner.js';
-import { analyzeWithGemini } from '../ai/geminiAnalyzer.js';
+import { analyzeWithAi } from '../ai/geminiAnalyzer.js';
 import { computeDecisiveScore } from '../scoring/scoringEngine.js';
 
 class ConcurrencySemaphore {
@@ -60,8 +64,38 @@ export async function runUrlScan(request: ScanRequest): Promise<ScanResponse> {
   const startedAt = Date.now();
   const scanId = crypto.randomUUID();
 
+  // 0. People paste the whole SMS, not just the link: pull the first real link out of free text
+  const candidateUrl = extractFirstUrl(request.url);
+  if (!candidateUrl) {
+    throw new SsrfError(
+      'NO_LINK_FOUND',
+      'No link was found in that text. Paste the link itself, or the full message that contains it.',
+      'ما لقينا رابط في النص. الصق الرابط نفسه أو الرسالة كاملة اللي فيها الرابط.',
+    );
+  }
+
   // 1. Pre-flight URL validation & SSRF protection (DNS lookup + private/loopback IP block)
-  const safeInitial = await assertSafeUrl(request.url);
+  let safeInitial: Awaited<ReturnType<typeof assertSafeUrl>>;
+  try {
+    safeInitial = await assertSafeUrl(candidateUrl);
+  } catch (err) {
+    // A dead or never-registered look-alike still deserves a verdict, not an error:
+    // judge the address itself (brand impersonation, look-alike spelling, TLD, registry age).
+    if (err instanceof SsrfError && err.code === 'DNS_RESOLUTION_FAILED') {
+      const url = new URL(normalizeUserUrl(candidateUrl));
+      const host = url.hostname.toLowerCase().replace(/\.$/, '');
+      const registration = await inspectDomainRegistration(host);
+      return buildAddressOnlyScan({
+        scanId,
+        startedAt,
+        mode: request.mode,
+        url,
+        registration,
+        dnsErrorCode: /\(([A-Z_]+)\)/.exec(err.message)?.[1] ?? 'NO_DNS_RECORDS',
+      });
+    }
+    throw err;
+  }
   const initialRegDomain = parseDomain(safeInitial.hostname).domain ?? null;
 
   await scanSemaphore.acquire();
@@ -137,8 +171,9 @@ export async function runUrlScan(request: ScanRequest): Promise<ScanResponse> {
       ariaAndDataAttrs: browser.ariaAndDataAttrs,
     });
 
-    // 6. Gemini 3.5 Flash-Lite grounded & structured forensic inspection
-    const aiAnalysis = await analyzeWithGemini({
+    // 6. AI forensic inspection through the fallback chain
+    //    (Gemini keys → backup Gemini model → self-hosted model → rules only)
+    const aiResult = await analyzeWithAi({
       mode: request.mode,
       inputUrl: safeInitial.normalizedUrl,
       finalUrl: finalUrlObj.toString(),
@@ -152,6 +187,7 @@ export async function runUrlScan(request: ScanRequest): Promise<ScanResponse> {
       promptInjection,
       browser,
     });
+    const aiAnalysis = aiResult.analysis;
 
     const technicalChecks: TechnicalChecks = {
       ssrf: {
@@ -176,6 +212,22 @@ export async function runUrlScan(request: ScanRequest): Promise<ScanResponse> {
       aiAnalysis,
     });
 
+    // 8. State how much of the analysis ran; an incomplete check is never reported as "safe"
+    const coverage = determineCoverage({
+      domainResolved: true,
+      pageLoaded: browser.captured,
+      aiStatus: aiAnalysis.status,
+      aiProvider: aiResult.provider,
+      aiModel: aiResult.provider === 'none' ? null : aiAnalysis.model,
+    });
+    // An official domain of a protected brand that scored clean is safe on the registry evidence
+    // alone, so an AI outage must not make adpolice.gov.ae or tamm.abudhabi look doubtful.
+    const finalHost = finalUrlObj.hostname.toLowerCase();
+    const isCleanOfficialDomain =
+      scoring.verdict === 'safe' &&
+      browser.captured &&
+      isOfficialBrandDomain(finalHost, parseDomain(finalHost).domain ?? null);
+
     return {
       scanId,
       scannedAt: new Date().toISOString(),
@@ -184,13 +236,14 @@ export async function runUrlScan(request: ScanRequest): Promise<ScanResponse> {
       inputUrl: safeInitial.normalizedUrl,
       finalUrl: finalUrlObj.toString(),
       scamScore: scoring.scamScore,
-      verdict: scoring.verdict,
+      verdict: isCleanOfficialDomain ? scoring.verdict : guardVerdict(scoring.verdict, coverage),
       scoreBreakdown: scoring.scoreBreakdown,
       smokingGunsTriggered: scoring.smokingGunsTriggered,
       redFlags: scoring.redFlags,
       technicalChecks,
       promptInjection,
       aiAnalysis,
+      coverage,
     };
   } finally {
     scanSemaphore.release();

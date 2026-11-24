@@ -27,26 +27,30 @@ const INJECTION_PATTERNS: InjectionPattern[] = [
   {
     name: 'instruction_override_en',
     regex:
-      /\b(ignore|disregard|forget|override|bypass)\s+(all\s+)?(previous|prior|above|system|developer|earlier)\s+(instructions?|prompts?|rules?|directives?|guidelines?)\b/i,
+      /\b(ignore|disregard|forget|override|bypass)\s+(?:(?:all|any|the|your|these|those|every)\s+)?(?:of\s+)?(?:the\s+)?(previous|prior|above|system|developer|earlier|preceding)\s+(instructions?|prompts?|rules?|directives?|guidelines?)\b/i,
     baseSeverity: 'critical',
   },
   {
+    // NOTE: a bare "developer mode" is ordinary website copy (Chrome, Android, Discord docs —
+    // and our own footer), so it is only flagged when addressed to the reader as a state change.
     name: 'system_override_en',
     regex:
-      /\b(system\s+override|developer\s+mode|jailbreak\s+mode|enter\s+admin\s+mode|new\s+system\s+instructions?|override\s+security\s+policy)\b/i,
+      /\b(system\s+override|you\s+are\s+(now\s+)?in\s+developer\s+mode|jailbreak\s+mode|enter\s+admin\s+mode|new\s+system\s+instructions?|override\s+security\s+policy)\b/i,
     baseSeverity: 'critical',
   },
   {
+    // Requires an AI-like noun or an instruction verb, so marketing copy such as
+    // "You are now a member" or "From now on you will receive our newsletter" never matches.
     name: 'role_hijack_en',
     regex:
-      /\b(you\s+are\s+now\s+(a|an)\s+|from\s+now\s+on\s+you\s+(must|will|are)|act\s+as\s+a\s+helpful\s+assistant\s+that\s+ignores)\b/i,
+      /\b(you\s+are\s+now\s+(a|an|the|my)\s+(\w+\s+){0,2}(ai|assistant|chatbot|bot|model|llm|language\s+model|inspector|scanner|agent)\b|from\s+now\s+on,?\s+you\s+(must|will|should|are\s+to)\s+(ignore|disregard|forget|rate|respond|reply|answer|say|output|classify|mark|treat|act|behave|pretend|approve)\b|act\s+as\s+a\s+helpful\s+assistant\s+that\s+ignores)/i,
     baseSeverity: 'high',
   },
   // Direct scam-scanner score manipulation (English)
   {
     name: 'score_manipulation_en',
     regex:
-      /\b(rate\s+this\s+(site|url|link|page|business|listing|job)?\s*(as\s*)?(0%|0\b|safe|legit|legitimate|100%\s*safe)|scam\s*score\s*[:=]\s*0|scamScore["']?\s*[:=]\s*0|mark\s+(this\s+)?(url|link|site|page|business)\s+as\s+(safe|legitimate|verified)|classify\s+as\s+(safe|legitimate|not\s+a\s+scam)|return\s+verdict\s*[:=]?\s*["']?safe["']?|output\s+0%\s+scam|must\s+give\s+a\s+score\s+of\s+0)\b/i,
+      /\b(rate\s+this\s+(site|url|link|page|business|listing|job)?\s*(as\s*)?(0%|0\b|safe|legit|legitimate|100%\s*safe)|scam\s*score\s*[:=]\s*0|scamScore["']?\s*[:=]\s*0|(scam|risk)\s+score\s+(for\s+this\s+(page|site|website|link|url|listing)\s+)?(is|should\s+be|must\s+be)\s+0|(give|assign|award)\s+(it|this\s+\w+|the\s+\w+)\s+(a\s+)?((scam|risk)\s+)?score\s+of\s+0|mark\s+(this\s+)?(url|link|site|page|business)\s+as\s+(safe|legitimate|verified)|classify\s+as\s+(safe|legitimate|not\s+a\s+scam)|return\s+verdict\s*[:=]?\s*["']?safe["']?|output\s+0%\s+scam|must\s+give\s+a\s+score\s+of\s+0)\b/i,
     baseSeverity: 'critical',
     isScoreManipulation: true,
   },
@@ -61,13 +65,13 @@ const INJECTION_PATTERNS: InjectionPattern[] = [
   {
     name: 'instruction_override_ar',
     regex:
-      /(تجاهل\s+(كل\s+|جميع\s+)?(التعليمات|الأوامر|القواعد)\s+(السابقة|الأولى)|تجاوز\s+(النظام|التعليمات|الحماية)|انسَ\s+التعليمات\s+السابقة)/i,
+      /(تجاهل\s+(كل\s+|جميع\s+)?(التعليمات|الأوامر|القواعد)\s+(السابقة|الأولى)|تجاهل\s+(كل\s+|جميع\s+)?ما\s+(سبق|ورد\s+أعلاه)|تجاوز\s+(النظام|التعليمات|الحماية)|انسَ\s+التعليمات\s+السابقة)/i,
     baseSeverity: 'critical',
   },
   {
     name: 'score_manipulation_ar',
     regex:
-      /(اعطِ?\s+(هذا\s+)?(الرابط|الموقع)\s+(تقييم|نسبة)\s*0|قيّ?م\s+(هذا\s+)?(الرابط|الموقع)\s+(كـ?\s*)?آمن|صنّ?ف\s+(الرابط|الموقع)\s+آمن|لا\s+تصنّ?ف\s+هذا\s+الموقع\s+كاحتيال|ملاحظة\s+للذكاء\s+الاصطناعي)/i,
+      /(اعطِ?\s+(هذا\s+)?(الرابط|الموقع)\s+(تقييم|نسبة)\s*0|قيّ?م\s+(هذا\s+)?(الرابط|الموقع)\s+(كـ?\s*)?آمن|صنّ?ف\s+(الرابط|الموقع)\s+آمن|اعتبر\s+(هذا\s+)?(الرابط|الموقع)\s+آمن|لا\s+تصنّ?ف\s+هذا\s+الموقع\s+كاحتيال|ملاحظة\s+للذكاء\s+الاصطناعي)/i,
     baseSeverity: 'critical',
     isScoreManipulation: true,
   },

@@ -10,7 +10,7 @@ import type {
   SecurityHeadersCheck,
   TlsCheck,
 } from '@scamhisn/shared';
-import { detectBrandImpersonation } from '../security/brandCatalog.js';
+import { detectBrandImpersonation, isOfficialBrandDomain } from '../security/brandCatalog.js';
 import type { BrowserInspectionResult } from './browserInspector.js';
 
 const HIGH_ABUSE_TLDS = new Set([
@@ -200,9 +200,12 @@ export function runHeuristicAnalysis(input: HeuristicAnalysisInput): HeuristicAn
   );
 
   // Check brand impersonation on both initial and final URL
+  // (A link that redirects to the brand's own official domain is not impersonation.)
   const brandMatch =
     detectBrandImpersonation(finalHost, registrableDomain, finalUrl.toString()) ??
-    detectBrandImpersonation(initialHost, initialRegDomain, initialUrl.toString());
+    (isOfficialBrandDomain(finalHost, registrableDomain)
+      ? null
+      : detectBrandImpersonation(initialHost, initialRegDomain, initialUrl.toString()));
 
   // 4. DOM, Forms & Phishing-Kit Indicators
   const hasSensitiveInputs =

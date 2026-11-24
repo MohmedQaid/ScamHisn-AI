@@ -30,17 +30,55 @@ function parseOrigins(raw: string | undefined): string[] {
     .filter(Boolean);
 }
 
-const rawApiKey = process.env.GEMINI_API_KEY?.trim() ?? '';
-const isPlaceholderKey =
-  rawApiKey.length === 0 ||
-  rawApiKey.toLowerCase().includes('your_google_ai_studio') ||
-  rawApiKey.toLowerCase() === 'changeme';
+function isPlaceholderKey(key: string): boolean {
+  const k = key.trim().toLowerCase();
+  return k.length === 0 || k.includes('your_google_ai_studio') || k === 'changeme';
+}
+
+/**
+ * Gemini keys, in the order they are tried. GEMINI_API_KEY stays the primary; GEMINI_API_KEYS
+ * (comma-separated) and GEMINI_API_KEY_2 add fallbacks used when the previous key is rate limited.
+ */
+function parseGeminiKeys(): string[] {
+  const candidates = [
+    process.env.GEMINI_API_KEY ?? '',
+    ...(process.env.GEMINI_API_KEYS ?? '').split(','),
+    process.env.GEMINI_API_KEY_2 ?? '',
+  ];
+  const keys: string[] = [];
+  for (const raw of candidates) {
+    const key = raw.trim();
+    if (!isPlaceholderKey(key) && !keys.includes(key)) keys.push(key);
+  }
+  return keys;
+}
+
+const geminiApiKeys = parseGeminiKeys();
+const localLlmBaseUrl = process.env.LOCAL_LLM_BASE_URL?.trim() ?? '';
 
 export const config = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: parsePositiveInt(process.env.PORT, 3001),
-  geminiApiKey: isPlaceholderKey ? null : rawApiKey,
+  geminiApiKey: geminiApiKeys[0] ?? null,
+  geminiApiKeys,
   geminiModel: process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL,
+  /** Second Gemini model tried when the primary is overloaded or rate limited (limits are per model). */
+  geminiFallbackModel: process.env.GEMINI_FALLBACK_MODEL?.trim() || null,
+  /** Hard ceiling for one AI provider attempt before the chain moves to the next one. */
+  aiRequestTimeoutMs: parsePositiveInt(process.env.AI_REQUEST_TIMEOUT_MS, 25_000),
+  /**
+   * Optional self-hosted OpenAI-compatible model (e.g. Jais 2 on llama.cpp / Ollama), used when
+   * every Gemini option fails. Null when LOCAL_LLM_BASE_URL is not set.
+   */
+  localLlm: localLlmBaseUrl
+    ? {
+        baseUrl: localLlmBaseUrl,
+        model: process.env.LOCAL_LLM_MODEL?.trim() || 'jais-2-8b-chat',
+        apiKey: process.env.LOCAL_LLM_API_KEY?.trim() || null,
+        timeoutMs: parsePositiveInt(process.env.LOCAL_LLM_TIMEOUT_MS, 45_000),
+        maxPromptChars: parsePositiveInt(process.env.LOCAL_LLM_MAX_PROMPT_CHARS, 12_000),
+      }
+    : null,
   corsAllowedOrigins: parseOrigins(process.env.CORS_ALLOWED_ORIGINS),
   corsAllowExtensions: parseBool(process.env.CORS_ALLOW_EXTENSIONS, true),
   playwrightHeadless: parseBool(process.env.PLAYWRIGHT_HEADLESS, true),

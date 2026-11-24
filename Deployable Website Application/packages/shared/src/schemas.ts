@@ -280,6 +280,29 @@ export const TechnicalChecksSchema = z.object({
 });
 export type TechnicalChecks = z.infer<typeof TechnicalChecksSchema>;
 
+/**
+ * How much of the analysis actually ran. The UI must never present an incomplete check as "safe".
+ * - full:         page opened AND a grounded AI answered (live Google Search / Maps lookups)
+ * - partial:      an AI answered, but without live lookups (backup model) or the page could not be opened
+ * - rules_only:   no AI answered — deterministic technical checks only
+ * - address_only: the domain does not resolve — verdict is based on the address itself
+ */
+export const CoverageLevelSchema = z.enum(['full', 'partial', 'rules_only', 'address_only']);
+export type CoverageLevel = z.infer<typeof CoverageLevelSchema>;
+
+export const AiProviderKindSchema = z.enum(['gemini', 'gemini_backup', 'local', 'none']);
+export type AiProviderKind = z.infer<typeof AiProviderKindSchema>;
+
+export const AnalysisCoverageSchema = z.object({
+  level: CoverageLevelSchema,
+  domainResolved: z.boolean(),
+  pageLoaded: z.boolean(),
+  aiProvider: AiProviderKindSchema,
+  aiModel: z.string().nullable(),
+  liveSourcesChecked: z.boolean(),
+});
+export type AnalysisCoverage = z.infer<typeof AnalysisCoverageSchema>;
+
 export const ScanResponseSchema = z.object({
   scanId: z.string(),
   scannedAt: z.string(),
@@ -300,6 +323,7 @@ export const ScanResponseSchema = z.object({
   technicalChecks: TechnicalChecksSchema,
   promptInjection: PromptInjectionReportSchema,
   aiAnalysis: AiForensicAnalysisSchema,
+  coverage: AnalysisCoverageSchema.optional(),
 });
 export type ScanResponse = z.infer<typeof ScanResponseSchema>;
 

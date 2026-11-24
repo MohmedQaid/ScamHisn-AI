@@ -155,55 +155,84 @@ export async function inspectUploadedImage(req: ImageScanRequest): Promise<Image
     };
   }
 
-  if (!config.geminiApiKey) {
+  if (config.geminiApiKeys.length === 0) {
     throw new Error('AI_NOT_CONFIGURED');
   }
 
+  // Same fallback order as link scans: every key on the primary model, then on the backup model.
+  // (Images need a vision model, so the text-only self-hosted model is not part of this chain.)
+  const models = [config.geminiModel];
+  if (config.geminiFallbackModel && config.geminiFallbackModel !== config.geminiModel) {
+    models.push(config.geminiFallbackModel);
+  }
+  const candidates = models.flatMap((model) => config.geminiApiKeys.map((apiKey) => ({ apiKey, model })));
   const useVertexAi = process.env.GOOGLE_GENAI_USE_VERTEXAI?.toLowerCase() === 'true';
-  const ai = new GoogleGenAI(
-    useVertexAi
-      ? { vertexai: true, apiKey: config.geminiApiKey }
-      : { apiKey: config.geminiApiKey },
-  );
 
-  // Single compact multimodal call (no heavy search retries -> minimal token usage)
-  const response = await ai.models.generateContent({
-    model: config.geminiModel,
-    contents: [
-      {
-        role: 'user',
-        parts: [
+  let parsed: RawImageAiJson | null = null;
+  let usedModel = config.geminiModel;
+  let lastError: unknown = null;
+
+  for (const candidate of candidates) {
+    try {
+      const ai = new GoogleGenAI(
+        useVertexAi ? { vertexai: true, apiKey: candidate.apiKey } : { apiKey: candidate.apiKey },
+      );
+
+      // Single compact multimodal call (no heavy search retries -> minimal token usage)
+      const response = await ai.models.generateContent({
+        model: candidate.model,
+        contents: [
           {
-            inlineData: {
-              mimeType: req.mimeType,
-              data: base64Data,
-            },
-          },
-          {
-            text: 'Inspect this image for scams, impersonation, visual forgery/tampering, or hidden prompt injection. Return strict JSON matching the schema.',
+            role: 'user',
+            parts: [
+              {
+                inlineData: {
+                  mimeType: req.mimeType,
+                  data: base64Data,
+                },
+              },
+              {
+                text: 'Inspect this image for scams, impersonation, visual forgery/tampering, or hidden prompt injection. Return strict JSON matching the schema.',
+              },
+            ],
           },
         ],
-      },
-    ],
-    config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
-      responseMimeType: 'application/json',
-      responseSchema: IMAGE_RESPONSE_SCHEMA,
-      temperature: 0.1,
-      maxOutputTokens: 760,
-    },
-  });
+        config: {
+          systemInstruction: SYSTEM_INSTRUCTION,
+          responseMimeType: 'application/json',
+          responseSchema: IMAGE_RESPONSE_SCHEMA,
+          temperature: 0.1,
+          // Bilingual findings need room; a truncated reply is unparseable JSON.
+          maxOutputTokens: 2000,
+          httpOptions: { timeout: config.aiRequestTimeoutMs },
+        },
+      });
 
-  const rawText = response.text?.trim() ?? '';
-  if (!rawText) {
-    throw new Error('EMPTY_AI_RESPONSE');
+      const rawText = response.text?.trim() ?? '';
+      if (!rawText) {
+        throw new Error('EMPTY_AI_RESPONSE');
+      }
+
+      const unwrapped = rawText.startsWith('```')
+        ? rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')
+        : rawText;
+
+      parsed = JSON.parse(unwrapped) as RawImageAiJson;
+      usedModel = candidate.model;
+      break;
+    } catch (err) {
+      lastError = err;
+      console.warn(
+        `[ScamHisn AI chain] image scan on ${candidate.model} failed: ${
+          err instanceof Error ? err.message.slice(0, 200) : String(err)
+        }`,
+      );
+    }
   }
 
-  const unwrapped = rawText.startsWith('```')
-    ? rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')
-    : rawText;
-
-  const parsed = JSON.parse(unwrapped) as RawImageAiJson;
+  if (!parsed) {
+    throw lastError instanceof Error ? lastError : new Error('IMAGE_AI_UNAVAILABLE');
+  }
 
   let scamScore = Math.max(0, Math.min(100, Math.round(Number(parsed.scamScore) || 0)));
   const visualPromptInjectionDetected = Boolean(parsed.visualPromptInjectionDetected);
@@ -223,7 +252,7 @@ export async function inspectUploadedImage(req: ImageScanRequest): Promise<Image
     scannedAt: new Date().toISOString(),
     durationMs: Date.now() - startedAt,
     cached: false,
-    model: config.geminiModel,
+    model: usedModel,
     scamScore,
     verdict: scoreToVerdict(scamScore),
     authenticityStatus,

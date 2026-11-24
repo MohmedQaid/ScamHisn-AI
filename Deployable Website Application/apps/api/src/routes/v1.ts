@@ -151,6 +151,18 @@ export function createV1Router(): Router {
         });
         return;
       }
+      if (/\b503\b|UNAVAILABLE|high demand|overloaded|timed out|timeout/i.test(msg)) {
+        res.status(503).json({
+          error: {
+            code: 'AI_BUSY',
+            message:
+              'The image-reading AI is busy right now (all backup options were tried). Please try again in a minute.',
+            messageAr:
+              'نموذج قراءة الصور مشغول حالياً (جرّبنا كل البدائل). حاول مرة ثانية بعد دقيقة.',
+          },
+        });
+        return;
+      }
       console.error('[ScamHisn API] Image scan error:', err);
       res.status(500).json({
         error: {
