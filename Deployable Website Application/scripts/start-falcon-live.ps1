@@ -117,5 +117,25 @@ if (-not $url) { throw "The tunnel did not report an address after four attempts
   "LOCAL_LLM_API_KEY=$key"
 ), $utf8)
 
+# --- everything Render needs in one file, ready for Environment > "Add from .env"
+$renderFile = Join-Path $appDir '.env.render.local'
+$render = @(
+  '# Complete settings for Render. In the service: Environment > Add from .env > paste all of this.',
+  '# Contains secret keys: send it privately, never commit it. LOCAL_LLM_BASE_URL changes when the tunnel restarts.',
+  'NODE_ENV=production',
+  'PLAYWRIGHT_HEADLESS=true',
+  'MAX_CONCURRENT_SCANS=2',
+  'CORS_ALLOW_EXTENSIONS=true',
+  'CORS_ALLOWED_ORIGINS=*',
+  'AI_PIPELINE=auto'
+)
+foreach ($name in 'GEMINI_API_KEY', 'GEMINI_API_KEY_2', 'GEMINI_API_KEYS', 'GEMINI_MODEL', 'GEMINI_FALLBACK_MODEL') {
+  $v = Get-EnvValue $name
+  if ($v) { $render += "$name=$v" }
+}
+$render += "LOCAL_LLM_BASE_URL=$url/v1", "LOCAL_LLM_MODEL=$Alias", "LOCAL_LLM_API_KEY=$key"
+[System.IO.File]::WriteAllLines($renderFile, $render, $utf8)
+
 "Tunnel address: $url"
-"Values for Render are in: $outFile"
+"Falcon values only:        $outFile"
+"Complete file for Render:  $renderFile"
