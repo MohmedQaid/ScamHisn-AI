@@ -56,7 +56,7 @@ Last updated 24 Nov 2026. Work is on the branch `feat/pitch-ready`.
 ## Open questions
 
 - **Deadline and pitch length.** Deadline is within hours; the pitch time limit is unknown.
-- **Deploying.** Merging to `main` did not update the live demo (checked four hours after the merge on 25 Nov), so the Render service is not following this repository. The repository now has a root-level `Dockerfile` and `render.yaml`; whoever owns the Render service has to repoint it or press Manual Deploy. Steps: `Deployable Website Application/DEPLOY_TO_RENDER.md`.
+- **Deploying.** Live at `https://scamhisn-ai-v1.onrender.com` since 25 Nov 2026: a new Render service (free plan, Frankfurt) built from the root `Dockerfile` on `main`. It was created from the public repository address, so it does not redeploy by itself; press Manual Deploy after changes. The self-hosted judge reaches it through a tunnel from a team PC (`scripts/start-falcon-live.ps1`), whose address changes when the tunnel restarts. The earlier service at `scamhisn-ai.onrender.com` still runs the old version.
 - **Two Gemini keys from two accounts.** May conflict with Google's terms on getting around quotas. A backup model or a paid key avoids the question.
 - **Privacy slide.** Screenshots and page text go to Google's Gemini API. The README says so.
 - **Live Google lookups.** Google lists Search grounding as not available on the free tier for `gemini-3.5-flash-lite`. Map and Job "live verification" may not be running. Check a scan's `coverage.liveSourcesChecked`. Options: a paid key, or `gemini-2.5-flash-lite`, whose free tier includes 500 lookups a day.

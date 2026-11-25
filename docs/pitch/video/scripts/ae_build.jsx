@@ -461,7 +461,7 @@
     var logo = image(c, "logo_1024.png", { x: 1640, y: 372, scale: 13.5, name: "Logo mark" });
     var name = text(c, "ScamHisn AI", { font: "Nunito-Black", size: 74, color: C.ink, x: 1640, y: 500 });
     var tag = text(c, "Check before you click.", { font: "Nunito-SemiBold", size: 34, color: C.ink, x: 1640, y: 568 });
-    var url = text(c, "scamhisn-ai.onrender.com", { font: "Nunito-ExtraBold", size: 27, color: C.brand, x: 1640, y: 634 });
+    var url = text(c, "scamhisn-ai-v1.onrender.com", { font: "Nunito-ExtraBold", size: 27, color: C.brand, x: 1640, y: 634 });
     var all = [logo, name, tag, url];
     for (var i = 0; i < all.length; i++) {
       enter(all[i], 1.9 + i * 0.1, { dy: 26, d: 0.55, blur: 16 });
