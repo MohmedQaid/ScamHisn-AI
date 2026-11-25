@@ -12,13 +12,13 @@
 
 <br />
 
-<a href="https://scamhisn-ai.onrender.com/">
-  <img src="./assets/badge-live.svg" alt="Live Demo: scamhisn-ai.onrender.com" />
+<a href="https://scamhisn-ai-v1.onrender.com/">
+  <img src="./assets/badge-live.svg" alt="Live Demo: scamhisn-ai-v1.onrender.com" />
 </a>
 
 <br />
 
-<a href="https://scamhisn-ai.onrender.com/scamhisn-extension.zip">
+<a href="https://scamhisn-ai-v1.onrender.com/scamhisn-extension.zip">
   <img src="./assets/badge-extension.svg" alt="Download Chrome Extension (.zip)" />
 </a>
 
@@ -54,7 +54,7 @@ It supports **passive checking** (manual inspection on demand) and **proactive c
 > **Why only the passive version is deployed live:** Both versions are built (`Chrome Extension/deployable/` and `Chrome Extension/dev/`), but proactive scanning is locked to *"Developers only"* in production to prevent runaway public API costs.
 
 > [!NOTE]
-> **Live Demo Rate Limits (`https://scamhisn-ai.onrender.com/`):** **15 req/min · 500 req/day · 50k tokens/min.**
+> **Live Demo Rate Limits (`https://scamhisn-ai-v1.onrender.com/`):** **15 req/min · 500 req/day · 50k tokens/min.**
 > Normal testing runs smoothly unless many people test simultaneously—please test thoughtfully. *(Free-tier cold start takes ~30–50s if idle.)*
 
 ---
@@ -100,7 +100,7 @@ Export an investigation-ready **PDF report** in one click. The **"Report to Abu 
 
 **Web App (Phone & Laptop)**
 
-1. Open **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+1. Open **[scamhisn-ai-v1.onrender.com](https://scamhisn-ai-v1.onrender.com/)**.
 2. Choose **Link**, **Job post**, **Map listing** or **Screenshot**, then paste a link (or the whole message) or upload an image.
 3. Click **Check** to see the verdict and the evidence, or download a PDF report.
 
@@ -111,7 +111,7 @@ Export an investigation-ready **PDF report** in one click. The **"Report to Abu 
 
 **Chrome Extension (Desktop Browsers Only)**
 
-1. **[Download Chrome Extension (.zip)](https://scamhisn-ai.onrender.com/scamhisn-extension.zip)** *(also linked at the very bottom of the web app)* and unzip it.
+1. **[Download Chrome Extension (.zip)](https://scamhisn-ai-v1.onrender.com/scamhisn-extension.zip)** *(also linked at the very bottom of the web app)* and unzip it.
 2. Open `chrome://extensions` → enable **Developer mode** → click **Load unpacked**.
 3. Click the toolbar icon or right-click any link → **Inspect link with ScamHisn AI**.
 
@@ -231,7 +231,7 @@ The AI pipeline (hybrid mode, fallbacks, cool-down, running the local model) is 
 
 ### Hosting & Deployment (Not Required — Already Live!)
 
-**You do not need to host or deploy anything yourself** — the live app is already running at **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+**You do not need to host or deploy anything yourself** — the live app is already running at **[scamhisn-ai-v1.onrender.com](https://scamhisn-ai-v1.onrender.com/)**.
 
 If you ever want to deploy your own free copy on **Render**:
 
@@ -271,7 +271,7 @@ The full guide, including what to check when the live site does not update, is i
 
 <br />
 
-> **حدود الاستخدام للنسخة المباشرة (`scamhisn-ai.onrender.com`):**
+> **حدود الاستخدام للنسخة المباشرة (`scamhisn-ai-v1.onrender.com`):**
 >
 > **15 طلباً/دقيقة · 500 طلب/يوم · 50 ألف رمز/دقيقة.**
 >
@@ -320,7 +320,7 @@ The full guide, including what to check when the live site does not update, is i
 
 **تطبيق الويب (الهاتف والحاسوب)**
 
-1. افتح **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+1. افتح **[scamhisn-ai-v1.onrender.com](https://scamhisn-ai-v1.onrender.com/)**.
 2. اختر **رابط** أو **إعلان وظيفة** أو **رابط خريطة** أو **لقطة شاشة**، ثم الصق الرابط (أو الرسالة كاملة) أو ارفع الصورة.
 3. اضغط **افحص** لعرض النتيجة أو التفاصيل أو تحميل تقرير PDF.
 
@@ -331,7 +331,7 @@ The full guide, including what to check when the live site does not update, is i
 
 **إضافة كروم (لمتصفحات الحاسوب فقط)**
 
-1. **[تحميل إضافة كروم (.zip)](https://scamhisn-ai.onrender.com/scamhisn-extension.zip)** *(كما يتوفر رابط التحميل في نهاية صفحة تطبيق الويب)* ثم فك الضغط عن الملف.
+1. **[تحميل إضافة كروم (.zip)](https://scamhisn-ai-v1.onrender.com/scamhisn-extension.zip)** *(كما يتوفر رابط التحميل في نهاية صفحة تطبيق الويب)* ثم فك الضغط عن الملف.
 2. افتح `chrome://extensions` ← فعّل **وضع مطوّر البرامج** ← اضغط **Load unpacked** واختر المجلد.
 3. اضغط أيقونة الإضافة أو انقر بزر الفأرة الأيمن على أي رابط لفحصه فوراً.
 
@@ -456,7 +456,7 @@ npm test                     # 144 API unit tests
 
 ### الاستضافة والنشر (غير مطلوب — التطبيق منشور وجاهز!)
 
-**لا حاجة لاستضافة التطبيق أو نشره بنفسك**؛ فالنسخة المباشرة جاهزة للاستخدام الفوري عبر **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
+**لا حاجة لاستضافة التطبيق أو نشره بنفسك**؛ فالنسخة المباشرة جاهزة للاستخدام الفوري عبر **[scamhisn-ai-v1.onrender.com](https://scamhisn-ai-v1.onrender.com/)**.
 
 ومع ذلك، إذا رغبت في نشر نسختك الخاصة مجاناً على **Render**:
 

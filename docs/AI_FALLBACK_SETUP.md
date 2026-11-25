@@ -90,7 +90,17 @@ Tested on an RTX 3080 with 12 GB. Falcon-H1 7B uses about 9 GB while answering.
    `LOCAL_LLM_BASE_URL` to the tunnel's `https://…/v1` address and `LOCAL_LLM_API_KEY` to the same
    secret.
 
-Your PC and home internet must stay on while judges test. If they drop, Gemini judges alone.
+Steps 3 to 5 in one command (Windows, with `cloudflared` installed, e.g. `winget install Cloudflare.cloudflared`):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "Deployable Website Application\scripts\start-falcon-live.ps1"
+```
+
+It starts the model server locked with a key (made once and kept in `.env`), opens a Cloudflare quick tunnel, and writes the three values for Render to `Deployable Website Application/.env.render-falcon` (not in git). Paste them into Render's Environment page. Add `-Stop` to shut both down.
+
+The quick tunnel needs no account, and its address is new every time it starts: after a restart, copy `LOCAL_LLM_BASE_URL` into Render again. Cloudflare gives quick tunnels no uptime guarantee. For an address that never changes, use a named tunnel on a Cloudflare account with your own domain.
+
+Your PC and home internet must stay on, and the PC awake, while judges test. If they drop, Gemini judges alone.
 
 ## Checking which model answered
 
@@ -164,7 +174,10 @@ What those runs taught us (all fixed in code):
 Not tested:
 
 - Live Google Search and Maps lookups actually returning sources (needs a paid key).
-- The app deployed on Render with these settings, and the tunnel from Render to the PC.
+- The app deployed on Render with these settings. The tunnel itself was tested on 25 Nov 2026 from the
+  PC: the public address answered 401 without the key and 200 with it, and the production build,
+  pointed at that address, returned a hybrid verdict for `adpolice.gov.ae` (0%, 16 s). Render calling
+  the tunnel has not been tried.
 - Falcon-H1's Arabic is understandable but rough, and it sometimes mixes in a few non-Arabic
   characters. The app strips those, and in hybrid mode shows Gemini's Arabic instead.
   Nine cases is a sanity check, not an accuracy measurement.

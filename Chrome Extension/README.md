@@ -24,7 +24,7 @@ ScamHisn AI [extension]/
 3. Click **Load unpacked**:
    - Select **`deployable/`** to test the **Production** experience (*Check Everything* locked as *"Developers only"*, only *Check Manually* available).
    - Select **`dev/`** to test your **Private Developer** experience (*Check Everything* unlocked for auto-monitoring open web pages).
-4. Pin **ScamHisn AI** to your Chrome toolbar, click the icon, click **⚙**, and enter your Render backend URL (e.g. `https://scamhisn-ai.onrender.com` — or `http://localhost:3001` for local testing).
+4. Pin **ScamHisn AI** to your Chrome toolbar, click the icon, click **⚙**, and enter your Render backend URL (e.g. `https://scamhisn-ai-v1.onrender.com` — or `http://localhost:3001` for local testing).
 
 ---
 
