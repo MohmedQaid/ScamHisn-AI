@@ -11,7 +11,7 @@
     var names = it.outputModule(1).templates, pick = null;
     for (i = 0; i < names.length; i++) if (/^H\.264 - Match Render Settings -\s+5 Mbps$/.test(names[i])) pick = names[i];
     it.outputModule(1).applyTemplate(pick);
-    it.outputModule(1).file = new File("C:/Users/iV1R3S/Desktop/ScamHisn-AI/docs/pitch/ScamHisn-AI-Pitch-Video.mp4");
+    it.outputModule(1).file = new File("C:/Users/iV1R3S/Desktop/ScamHisn-AI/docs/pitch/ScamHisn-AI-Pitch-Video" + (LANG_AR ? "-AR" : "") + ".mp4");
     var t0 = new Date().getTime();
     rq.render();
     out.push("template '" + pick + "' rendered in " + Math.round((new Date().getTime() - t0) / 1000) + "s, status " + rq.item(1).status + " (done=" + RQItemStatus.DONE + ")");
