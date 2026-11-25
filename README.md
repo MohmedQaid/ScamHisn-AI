@@ -46,16 +46,25 @@
 
 ## EN — Overview
 
+> **Welcome, and thank you for taking the time to look at our work.** Everything here is meant to be tried, read and questioned. If you have five minutes, start with one of these.
+
+| Start here | |
+|---|---|
+| **Watch** | [The one-minute video](./docs/pitch/ScamHisn-AI-Pitch-Video.mp4) · [Arabic version](./docs/pitch/ScamHisn-AI-Pitch-Video-AR.mp4) |
+| **Try** | [scamhisn-ai-v1.onrender.com](https://scamhisn-ai-v1.onrender.com/): paste `https://adpolice-fines-pay.top/verify` and press **Check** |
+| **Read** | [The pitch deck (PDF)](./docs/pitch/ScamHisn-AI-Pitch.pdf) |
+| **Explore** | [What's in this repository](#whats-in-this-repository) |
+
 **ScamHisn AI** is a **Web Application** and **Chrome Extension** that protects users from fraudulent links and forged screenshots—including scams impersonating **UAE PASS**, **TAMM**, **Abu Dhabi Police**, local banks, fake jobs, and hijacked **Google Maps** listings.
 
 It supports **passive checking** (manual inspection on demand) and **proactive checking** (automatic link scanning on open web pages).
 
 > [!IMPORTANT]
-> **Why only the passive version is deployed live:** Both versions are built (`Chrome Extension/deployable/` and `Chrome Extension/dev/`), but proactive scanning is locked to *"Developers only"* in production to prevent runaway public API costs.
+> **Why only the passive version is deployed live:** Both versions are built (the public one is in `Chrome Extension/deployable/`; the proactive one is built from `Chrome Extension/source/`), but proactive scanning is locked to *"Developers only"* in production to prevent runaway public API costs.
 
 > [!NOTE]
 > **Live Demo Rate Limits (`https://scamhisn-ai-v1.onrender.com/`):** **15 req/min · 500 req/day · 50k tokens/min.**
-> Normal testing runs smoothly unless many people test simultaneously—please test thoughtfully. *(Free-tier cold start takes ~30–50s if idle.)*
+> That is plenty for trying it out. If the site has been idle, the first visit takes 30 to 50 seconds to wake up; after that it is quick.
 
 ---
 
@@ -239,7 +248,23 @@ If you ever want to deploy your own free copy on **Render**:
 2. Add `GEMINI_API_KEY` (see `.env.example`) in Render's Environment Variables and deploy.
 3. Open `/api/v1/health` on the new address: `"status": "ok"` with a `capabilities` block means the current version is running.
 
-The full guide, including what to check when the live site does not update, is in [`Deployable Website Application/DEPLOY_TO_RENDER.md`](<./Deployable Website Application/DEPLOY_TO_RENDER.md>).
+The full guide, including what to check when the live site does not update, is in [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md).
+
+---
+
+### What's in this repository
+
+| Where | What you will find |
+|---|---|
+| [`Deployable Website Application/`](<./Deployable Website Application/>) | The product: the bilingual website and the API behind it, with 144 automated tests. |
+| [`Chrome Extension/`](<./Chrome Extension/>) | The browser extension, ready to load, and its source. |
+| [`docs/`](./docs/) | The evidence behind this page: measured accuracy, the AI setup, impact and cost, research with 67 sources, and how to deploy. |
+| [`docs/pitch/`](./docs/pitch/) | The pitch deck and the one-minute video, in English and Arabic. |
+| [`data/open-data/`](./data/open-data/) | The UAE government open-data files our figures draw on. |
+| [`assets/`](./assets/) | The images used on this page. |
+| `Dockerfile`, `render.yaml` | One-step deployment of the whole app. |
+
+Each folder opens with a short guide of its own.
 
 ---
 
@@ -260,6 +285,15 @@ The full guide, including what to check when the live site does not update, is i
 <div dir="rtl">
 
 ## AR — نظرة عامة
+
+> **أهلاً بك، وشكراً لوقتك في الاطلاع على عملنا.** كل ما هنا متاح للتجربة والقراءة والنقاش. إن كان لديك خمس دقائق فابدأ بأحد هذه الخيارات.
+
+| ابدأ من هنا | |
+|---|---|
+| **شاهد** | [الفيديو في دقيقة واحدة](./docs/pitch/ScamHisn-AI-Pitch-Video-AR.mp4) · [النسخة الإنجليزية](./docs/pitch/ScamHisn-AI-Pitch-Video.mp4) |
+| **جرّب** | [scamhisn-ai-v1.onrender.com](https://scamhisn-ai-v1.onrender.com/): الصق `https://adpolice-fines-pay.top/verify` واضغط **افحص** |
+| **اقرأ** | [عرض التقديم (PDF)](./docs/pitch/ScamHisn-AI-Pitch.pdf) |
+| **تصفّح** | [محتويات المستودع](#محتويات-المستودع) |
 
 **حصن الاحتيال (ScamHisn AI)** هو **تطبيق ويب** و**إضافة لمتصفح كروم** لحماية المستخدمين من الروابط الاحتيالية والصور المزوّرة، بما في ذلك عمليات الانتحال التي تستهدف **الهوية الرقمية (UAE PASS)** و**منظومة تم (TAMM)** و**شرطة أبوظبي** والبنوك المحلية وإعلانات التوظيف الوهمية و**خرائط جوجل**.
 
@@ -464,7 +498,23 @@ npm test                     # 144 API unit tests
 2. أضف `GEMINI_API_KEY` (انظر `.env.example`) في متغيرات البيئة ثم ابدأ النشر.
 3. افتح `/api/v1/health` على العنوان الجديد: ظهور `"status": "ok"` مع قسم `capabilities` يعني أن النسخة الحالية تعمل.
 
-الدليل الكامل، ومنه ما يجب فحصه إذا لم يتحدّث الموقع المباشر، في [`Deployable Website Application/DEPLOY_TO_RENDER.md`](<./Deployable Website Application/DEPLOY_TO_RENDER.md>).
+الدليل الكامل، ومنه ما يجب فحصه إذا لم يتحدّث الموقع المباشر، في [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md).
+
+---
+
+### محتويات المستودع
+
+| المكان | ما ستجده |
+|---|---|
+| [`Deployable Website Application/`](<./Deployable Website Application/>) | المنتج نفسه: الموقع بالعربية والإنجليزية والواجهة البرمجية خلفه، مع 144 اختباراً آلياً. |
+| [`Chrome Extension/`](<./Chrome Extension/>) | إضافة المتصفح جاهزة للتحميل مع شيفرتها المصدرية. |
+| [`docs/`](./docs/) | الأدلة وراء هذه الصفحة: الدقة المقيسة، إعداد نماذج الذكاء الاصطناعي، الأثر والتكلفة، البحث مع 67 مرجعاً، وطريقة النشر. |
+| [`docs/pitch/`](./docs/pitch/) | عرض التقديم والفيديو في دقيقة واحدة، بالعربية والإنجليزية. |
+| [`data/open-data/`](./data/open-data/) | ملفات البيانات المفتوحة الحكومية الإماراتية التي تستند إليها أرقامنا. |
+| [`assets/`](./assets/) | الصور المستخدمة في هذه الصفحة. |
+| `Dockerfile` و `render.yaml` | نشر التطبيق كاملاً بخطوة واحدة. |
+
+في بداية كل مجلد دليل قصير خاص به.
 
 ---
 

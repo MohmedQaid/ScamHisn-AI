@@ -1,0 +1,3 @@
+# Made by scripts/build.mjs; only source/ and the ready-to-load deployable/ are kept in git
+dev/
+*.zip

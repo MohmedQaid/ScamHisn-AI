@@ -18,9 +18,10 @@ build/
 *.tsbuildinfo
 coverage/
 
-# Documents / Reference PDFs (strictly excluded)
+# Stray PDFs (generated evidence reports and the like); the pitch deck is the one PDF we keep
 *.pdf
 *.PDF
+!docs/pitch/*.pdf
 
 # Logs & OS files
 *.log

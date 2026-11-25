@@ -13,7 +13,6 @@ Merging to `main` only redeploys if the Render service is connected to this repo
 1. Open the service in the [Render dashboard](https://dashboard.render.com) and look at **Events**. A failed build shows there with its log.
 2. In **Settings → Build & Deploy**, check that **Repository** is this repository and **Branch** is `main`.
 3. Leave **Root Directory** empty and set **Dockerfile Path** to `./Dockerfile` (the one at the repository root).
-   If you prefer the older setup, Root Directory `Deployable Website Application` with Dockerfile Path `./Dockerfile` also works.
 4. Turn **Auto-Deploy** on, then press **Manual Deploy → Deploy latest commit**.
 5. When it says **Live**, check it as described under [Verify](#verify) below.
 
@@ -49,7 +48,7 @@ Without any Gemini key the app still runs: link checks use the rule engine alone
 
 ### The self-hosted judge (Falcon-H1)
 
-Render's free plan cannot run a 7B model, so the judge runs elsewhere and Render calls it over the internet. `LOCAL_LLM_BASE_URL` must therefore be a public HTTPS address: a tunnel to the PC that runs the model, or a hosted GPU machine. Protect it with a key and put the same key in `LOCAL_LLM_API_KEY`. Setup is in [`docs/AI_FALLBACK_SETUP.md`](../docs/AI_FALLBACK_SETUP.md). If the address is empty or unreachable, the app carries on with Gemini and the rules.
+Render's free plan cannot run a 7B model, so the judge runs elsewhere and Render calls it over the internet. `LOCAL_LLM_BASE_URL` must therefore be a public HTTPS address: a tunnel to the PC that runs the model, or a hosted GPU machine. Protect it with a key and put the same key in `LOCAL_LLM_API_KEY`. Setup is in [`AI_FALLBACK_SETUP.md`](./AI_FALLBACK_SETUP.md). If the address is empty or unreachable, the app carries on with Gemini and the rules.
 
 ---
 
@@ -65,13 +64,8 @@ On the free plan the service sleeps when idle; the first request after a pause t
 
 ---
 
-## Deploying only this folder
-
-This folder also carries its own `Dockerfile`, `.dockerignore` and `render.yaml`, for anyone who pushes "Deployable Website Application" as a repository of its own. The root-level files and these build the same image; keep them in step.
-
----
-
 ## What was and was not tested
 
-- Tested on 25 November 2026: every step of the Dockerfile replayed by hand on a clean copy of `main` (install, build, production-only install, start), the server answering `/api/v1/health`, serving the page and the extension download, and returning a verdict.
-- Not tested: the image built by Docker itself (no Docker on the build machine), and the deployment on Render.
+- **Tested on 25 November 2026:** Render built the image from the root `Dockerfile` in 1 minute 19 seconds, and the app has run at `https://scamhisn-ai-v1.onrender.com` since. On the live service the page loads, all four kinds of check are switched on, a fake fine link scores 84%, and the real Abu Dhabi Police site scores 0% with the self-hosted model judging through a tunnel.
+- **Not tested:** Job, Map and Screenshot checks with real scans on the live service, and other hosts than Render.
+- A service created from a public repository address does not redeploy by itself. After a change, press **Manual Deploy**.
