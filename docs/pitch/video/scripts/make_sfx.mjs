@@ -1,10 +1,11 @@
 // Synthesises a restrained sound-effects track for the pitch video (no samples, no music) and
 // writes it as one 48 kHz stereo WAV aligned to the MASTER timeline, plus a cue sheet.
-// Usage: node make_sfx.mjs <out.wav> <cues.md>
+// Usage: node make_sfx.mjs <out.wav> <cues.md> [time scale, e.g. 0.8526 for the 59-second cut]
 import fs from 'node:fs';
 
 const SR = 48000;
-const DUR = 69.2;
+const K = Number(process.argv[4] ?? 1); // time scale: 59 / 69.2 for the one-minute cut
+const DUR = 69.2 * K;
 const N = Math.ceil(DUR * SR);
 const L = new Float32Array(N);
 const R = new Float32Array(N);
@@ -13,7 +14,7 @@ let seed = 20261125;
 const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) * 2 - 1;
 
 function add(t, samples, gain, pan = 0) {
-  const start = Math.round(t * SR);
+  const start = Math.round(t * K * SR);
   const gl = gain * Math.cos(((pan + 1) * Math.PI) / 4);
   const gr = gain * Math.sin(((pan + 1) * Math.PI) / 4);
   for (let i = 0; i < samples.length; i++) {
@@ -73,7 +74,7 @@ function whoosh(t, dur, gain = 0.12, up = true, pan0 = -0.3, pan1 = 0.3, note) {
     sl[i] = band * a * Math.cos(((p + 1) * Math.PI) / 4);
     sr[i] = band * a * Math.sin(((p + 1) * Math.PI) / 4);
   }
-  const start = Math.round(t * SR);
+  const start = Math.round(t * K * SR);
   for (let i = 0; i < n; i++) {
     const k = start + i;
     if (k < 0 || k >= N) continue;
@@ -225,7 +226,10 @@ for (let i = 0; i < N; i++) {
 fs.writeFileSync(process.argv[2], buf);
 
 cues.sort((a, b) => a[0] - b[0]);
-const fmt = (t) => `${Math.floor(t / 60)}:${(t % 60).toFixed(2).padStart(5, '0')}`;
+const fmt = (t0) => {
+  const t = t0 * K;
+  return `${Math.floor(t / 60)}:${(t % 60).toFixed(2).padStart(5, '0')}`;
+};
 fs.writeFileSync(
   process.argv[3],
   `# Sound-effect cues\n\nNo music and no voice-over. These are the moments that take a sound, with the kind of sound each one wants.\nThe track in \`assets/sfx/scamhisn_sfx_synth.wav\` was synthesised by script (no samples) and has not been checked by ear;\nreplace any cue with a sound from a professional library at the same time.\n\n| Time | Sound | Moment |\n|---|---|---|\n${cues.map(([t, kind, note]) => `| ${fmt(t)} | ${kind} | ${note} |`).join('\n')}\n\nKinds: **buzz** phone vibration on a table · **thump** soft low hit · **whoosh** short airy swish · **tick** light UI tick · **tap** pointer press · **ping** clean two-note tone · **fall** short falling tone.\n`,

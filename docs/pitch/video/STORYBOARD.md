@@ -1,7 +1,9 @@
 # ScamHisn AI pitch video: storyboard and creative direction
 
 Team Cybersound · 42 Abu Dhabi × Abu Dhabi Police ScamShield AI hackathon.
-1920 × 1080, 60 fps, 69.2 seconds, no music, no voice-over. The last frame equals the first, so the file loops.
+1920 × 1080, 60 fps, no music. The last frame equals the first, so the file loops.
+
+The published film is the **one-minute cut**: the 69.2-second edit described below, sped up evenly to 59 seconds, with the sound effects as a quiet bed at -25 dB and room for a voice-over on top (see [`VOICE_OVER_SCRIPT.md`](./VOICE_OVER_SCRIPT.md)). Times in the table below are for the full-length edit; multiply by 0.853 for the one-minute cut.
 
 ## Creative direction
 

@@ -7,3 +7,4 @@ scripts/*.log
 scripts/preview_times.txt
 scripts/_patch*.js
 scripts/ae_probe*.jsx
+voice-over/

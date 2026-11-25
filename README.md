@@ -188,7 +188,7 @@ Embed one-tap link and screenshot verification directly inside **TAMM** with aut
 
 On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 144 unit tests (`npm test`).
 
-The problem figures, cost model and savings estimate are on the in-app **Impact** page (`#/impact`) and in [`docs/IMPACT.md`](./docs/IMPACT.md). All 67 references are in [`docs/research/sources.md`](./docs/research/sources.md); the UAE open-data files we used are in [`data/open-data/`](./data/open-data/). The pitch deck and the 69-second pitch video, with its storyboard, are in [`docs/pitch/`](./docs/pitch/).
+The problem figures, cost model and savings estimate are on the in-app **Impact** page (`#/impact`) and in [`docs/IMPACT.md`](./docs/IMPACT.md). All 67 references are in [`docs/research/sources.md`](./docs/research/sources.md); the UAE open-data files we used are in [`data/open-data/`](./data/open-data/). The pitch deck and the one-minute pitch video, with its storyboard, are in [`docs/pitch/`](./docs/pitch/).
 
 #### Privacy
 
@@ -409,7 +409,7 @@ The full guide, including what to check when the live site does not update, is i
 
 على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 144 اختباراً آلياً (`npm test`).
 
-أرقام المشكلة ونموذج التكلفة وتقدير التوفير معروضة في صفحة **الأثر** داخل التطبيق (`#/impact`) وفي [`docs/IMPACT.md`](./docs/IMPACT.md). المراجع الـ67 كلها في [`docs/research/sources.md`](./docs/research/sources.md)، وملفات البيانات المفتوحة الإماراتية المستخدمة في [`data/open-data/`](./data/open-data/). عرض التقديم وفيديو العرض (69 ثانية) مع لوحة القصة في [`docs/pitch/`](./docs/pitch/).
+أرقام المشكلة ونموذج التكلفة وتقدير التوفير معروضة في صفحة **الأثر** داخل التطبيق (`#/impact`) وفي [`docs/IMPACT.md`](./docs/IMPACT.md). المراجع الـ67 كلها في [`docs/research/sources.md`](./docs/research/sources.md)، وملفات البيانات المفتوحة الإماراتية المستخدمة في [`data/open-data/`](./data/open-data/). عرض التقديم وفيديو العرض (دقيقة واحدة) مع لوحة القصة في [`docs/pitch/`](./docs/pitch/).
 
 #### الخصوصية
 
