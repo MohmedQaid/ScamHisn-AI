@@ -1,43 +1,36 @@
-# ScamHisn AI — Chromium Browser Extension (Manifest V3)
+# ScamHisn AI for Chrome
 
-Completely isolated from `ScamHisn AI [website]/`. Works on **Google Chrome, Microsoft Edge, Brave, Arc, and Opera**, calling your exact same ScamHisn AI `/api/v1/scan` & `/api/v1/report/pdf` backend.
+Check a link without leaving the page you are on. The extension uses the same scanner as the website, so the verdict, the evidence and the Aman reporting channels are identical.
 
----
+Works in Chrome, Edge, Brave, Arc and Opera (any Chromium browser, Manifest V3).
 
-## Folder Structure
+## Install it in two minutes
 
-```text
-ScamHisn AI [extension]/
-├── source/                     ← Editable extension source code
-├── scripts/build.mjs           ← Generates both dev/ and deployable/ + .zip
-├── dev/                        ← PRIVATE developer build ("Check Everything" UNLOCKED)
-├── deployable/                 ← PRODUCTION build ("Check Everything" LOCKED — "Developers only")
-└── scamhisn-extension-prod.zip ← Ready to upload directly to Chrome Web Store
-```
+1. [Download the extension (.zip)](https://scamhisn-ai-v1.onrender.com/scamhisn-extension.zip) and unzip it. If you cloned this repository, you can use the `deployable/` folder instead.
+2. Open `chrome://extensions`, switch on **Developer mode**, click **Load unpacked** and choose the folder.
+3. Click the ScamHisn AI icon in the toolbar, or right-click any link and choose **Inspect link with ScamHisn AI**.
 
----
+The ⚙ button in the popup sets which server the extension talks to. It starts on `https://scamhisn-ai-v1.onrender.com`; use `http://localhost:3001` when you run the app yourself.
 
-## How to Load Locally in Chrome / Edge / Brave
+## What is in this folder
 
-1. Open `chrome://extensions` (or `edge://extensions`).
-2. Turn ON **Developer mode** (top-right toggle).
-3. Click **Load unpacked**:
-   - Select **`deployable/`** to test the **Production** experience (*Check Everything* locked as *"Developers only"*, only *Check Manually* available).
-   - Select **`dev/`** to test your **Private Developer** experience (*Check Everything* unlocked for auto-monitoring open web pages).
-4. Pin **ScamHisn AI** to your Chrome toolbar, click the icon, click **⚙**, and enter your Render backend URL (e.g. `https://scamhisn-ai-v1.onrender.com` — or `http://localhost:3001` for local testing).
+| Path | What it is |
+|---|---|
+| `deployable/` | The public build, ready to load. This is what the download above contains. |
+| `source/` | The code to edit. It also holds the automatic page scanning that the public build leaves out. |
+| `scripts/build.mjs` | Builds everything from `source/`. |
 
----
+## Two builds, on purpose
 
-## How to Deploy to the Chrome Web Store
+- **Public (`deployable/`)** checks a link only when you ask. Automatic scanning of every page is shown as "Developers only", so a public install cannot run up API costs for the team.
+- **Developer (`dev/`)** has automatic scanning unlocked and talks to a local server. It is created by the build script and is not kept in git.
 
-1. Go to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole).
-2. Click **New Item** and upload **`scamhisn-extension-prod.zip`**.
-3. Fill in store description & screenshots (minimal permissions: `activeTab`, `storage`, `contextMenus` only — no broad `<all_urls>` content script in production!).
-4. Submit for review.
+The public build asks for three permissions only: the active tab, storage for your settings, and the right-click menu.
 
-## Rebuilding After Edits
-If you edit anything inside `source/`, run:
+## Rebuild after a change
+
 ```bash
-node "ScamHisn AI [extension]/scripts/build.mjs"
+node "Chrome Extension/scripts/build.mjs"
 ```
-This regenerates `dev/`, `deployable/`, and `scamhisn-extension-prod.zip` automatically.
+
+This rewrites `deployable/`, creates `dev/`, and updates the download the website serves.

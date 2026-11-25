@@ -3,8 +3,7 @@
 #
 # Render (or any Docker host) can point at this repository as it is: no "root
 # directory" setting is needed. It builds the app in "Deployable Website
-# Application/" exactly as the Dockerfile inside that folder does. Keep the two
-# files in step when you change either.
+# Application/" and serves the website and its API from one container.
 # =============================================================================
 
 FROM node:22-bookworm-slim AS builder

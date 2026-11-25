@@ -2,7 +2,7 @@
 #
 # Render dashboard > New > Blueprint > choose this repository. Render builds the
 # Dockerfile next to this file and asks for the secret values marked "sync: false".
-# Step-by-step notes: "Deployable Website Application/DEPLOY_TO_RENDER.md".
+# Step-by-step notes: docs/DEPLOYMENT.md.
 services:
   - type: web
     name: scamhisn-ai
