@@ -1,0 +1,14 @@
+# The image only needs the web application. Everything else in the repository
+# (documents, the pitch video, the Chrome extension, data files) stays out of the build.
+*
+!Deployable Website Application
+
+Deployable Website Application/node_modules
+Deployable Website Application/apps/*/node_modules
+Deployable Website Application/packages/*/node_modules
+Deployable Website Application/apps/*/dist
+Deployable Website Application/packages/*/dist
+Deployable Website Application/.env
+Deployable Website Application/.env.*
+!Deployable Website Application/.env.example
+Deployable Website Application/**/*.log

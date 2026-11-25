@@ -1,0 +1,49 @@
+# Render Blueprint for ScamHisn AI (حصن الاحتيال), read from the repository root.
+#
+# Render dashboard > New > Blueprint > choose this repository. Render builds the
+# Dockerfile next to this file and asks for the secret values marked "sync: false".
+# Step-by-step notes: "Deployable Website Application/DEPLOY_TO_RENDER.md".
+services:
+  - type: web
+    name: scamhisn-ai
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PLAYWRIGHT_HEADLESS
+        value: "true"
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: MAX_CONCURRENT_SCANS
+        value: "2"
+      - key: CORS_ALLOW_EXTENSIONS
+        value: "true"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "*"
+      # Secrets: typed into Render when the Blueprint is applied, never committed
+      - key: GEMINI_API_KEY
+        sync: false
+      # --- AI fallback chain (all optional; see docs/AI_FALLBACK_SETUP.md) ---
+      # A second Gemini key, tried when the first is rate limited
+      - key: GEMINI_API_KEY_2
+        sync: false
+      # Backup Gemini models, comma-separated, tried when the main model is overloaded
+      - key: GEMINI_FALLBACK_MODEL
+        value: gemini-3.1-flash-lite,gemini-3.6-flash
+      # Self-hosted OpenAI-compatible model (Falcon-H1). It must be reachable from the
+      # internet (a tunnel or a hosted machine); leave empty to run on Gemini and the rules.
+      - key: LOCAL_LLM_BASE_URL
+        sync: false
+      - key: LOCAL_LLM_MODEL
+        sync: false
+      - key: LOCAL_LLM_API_KEY
+        sync: false
+      # hybrid | gemini_first | auto (hybrid when a self-hosted model is configured)
+      - key: AI_PIPELINE
+        value: auto
