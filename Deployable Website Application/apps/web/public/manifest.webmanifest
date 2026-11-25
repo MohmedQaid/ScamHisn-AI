@@ -1,11 +1,11 @@
 {
   "name": "ScamHisn AI | حصن الاحتيال",
   "short_name": "ScamHisn AI",
-  "description": "Inspect suspicious URLs, job posts, and map links before you click.",
+  "description": "Check suspicious links, job posts, map listings and screenshots before you click.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#070c10",
-  "theme_color": "#00734B",
+  "background_color": "#FBF8F1",
+  "theme_color": "#0E6B47",
   "icons": [
     {
       "src": "/favicon.svg",

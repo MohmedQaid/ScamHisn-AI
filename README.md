@@ -34,6 +34,10 @@
 
 <img src="./assets/divider.svg" alt="" width="480" />
 
+<br /><br />
+
+<img src="./assets/screenshot-home.png" alt="The ScamHisn AI home screen: Check before you click, one box to paste a link or a whole message, and four kinds of check" width="860" />
+
 </div>
 
 <br />
@@ -71,6 +75,23 @@ Export an investigation-ready **PDF report** in one click. The **"Report to Abu 
 
 ---
 
+### What It Looks Like
+
+<table align="center">
+<tr>
+<td align="center" width="68%">
+<strong>A scam verdict, with the evidence</strong><br /><br />
+<img src="./assets/screenshot-verdict.png" alt="A fake fine link rated 84% High Scam Risk, with three pieces of evidence and buttons to download a report or report to Abu Dhabi Police" width="100%" />
+</td>
+<td align="center" width="32%">
+<strong>The same verdict in Arabic, on a phone</strong><br /><br />
+<img src="./assets/screenshot-arabic-phone.png" alt="The same verdict shown in Arabic on a phone" width="230" />
+</td>
+</tr>
+</table>
+
+---
+
 ### How to Use It
 
 <table>
@@ -80,8 +101,8 @@ Export an investigation-ready **PDF report** in one click. The **"Report to Abu 
 **Web App (Phone & Laptop)**
 
 1. Open **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
-2. Choose **General**, **Job**, **Map**, or **Image Check**, then paste a link or upload an image.
-3. Click **Inspect** to view the verdict, details, or download a PDF report.
+2. Choose **Link**, **Job post**, **Map listing** or **Screenshot**, then paste a link (or the whole message) or upload an image.
+3. Click **Check** to see the verdict and the evidence, or download a PDF report.
 
 *Phone Chrome tip:* Tap menu → **Add to Home screen** to use it like an app.
 
@@ -165,7 +186,7 @@ Embed one-tap link and screenshot verification directly inside **TAMM** with aut
 
 #### Measured, not claimed
 
-On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 139 unit tests (`npm test`).
+On a blind holdout of 141 addresses (76 real sites, 65 synthetic look-alikes), the address-analysis layer alone scored **91.5% accuracy** with **0 false alarms** on real sites and caught **53 of 65** look-alikes. The 12 misses and the limits are listed in [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). The API has 144 unit tests (`npm test`).
 
 The problem figures, cost model and savings estimate are on the in-app **Impact** page (`#/impact`) and in [`docs/IMPACT.md`](./docs/IMPACT.md). All 67 references are in [`docs/research/sources.md`](./docs/research/sources.md); the UAE open-data files we used are in [`data/open-data/`](./data/open-data/). The pitch deck and the 69-second pitch video, with its storyboard, are in [`docs/pitch/`](./docs/pitch/).
 
@@ -201,7 +222,7 @@ npm install
 npm run install:browser      # headless Chromium for the scanner
 cp .env.example .env         # then set GEMINI_API_KEY
 npm run dev                  # web on :5173, API on :3001
-npm test                     # 139 API unit tests
+npm test                     # 144 API unit tests
 ```
 
 The AI pipeline (hybrid mode, fallbacks, cool-down, running the local model) is configured with environment variables; see [`docs/AI_FALLBACK_SETUP.md`](./docs/AI_FALLBACK_SETUP.md).
@@ -214,9 +235,11 @@ The AI pipeline (hybrid mode, fallbacks, cool-down, running the local model) is 
 
 If you ever want to deploy your own free copy on **Render**:
 
-1. Push `Deployable Website Application/` to GitHub.
-2. Create a **Blueprint** (or Docker Web Service) on Render connected to that repo.
-3. Add `GEMINI_API_KEY` (see `.env.example`) in Render's Environment Variables and deploy.
+1. On Render choose **New → Blueprint** (or a Docker Web Service) and connect this repository. The `render.yaml` and `Dockerfile` at the repository root are all it needs; no root directory setting.
+2. Add `GEMINI_API_KEY` (see `.env.example`) in Render's Environment Variables and deploy.
+3. Open `/api/v1/health` on the new address: `"status": "ok"` with a `capabilities` block means the current version is running.
+
+The full guide, including what to check when the live site does not update, is in [`Deployable Website Application/DEPLOY_TO_RENDER.md`](<./Deployable Website Application/DEPLOY_TO_RENDER.md>).
 
 ---
 
@@ -272,6 +295,23 @@ If you ever want to deploy your own free copy on **Render**:
 
 ---
 
+### شكل التطبيق
+
+<table align="center">
+<tr>
+<td align="center" width="68%">
+<strong>نتيجة فحص رابط احتيالي مع الأدلة</strong><br /><br />
+<img src="./assets/screenshot-verdict.png" alt="رابط مخالفة مزيّف بنتيجة 84% احتمال احتيال عالي مع ثلاثة أدلة وزرّي تحميل التقرير وإبلاغ شرطة أبوظبي" width="100%" />
+</td>
+<td align="center" width="32%">
+<strong>النتيجة نفسها بالعربية على الهاتف</strong><br /><br />
+<img src="./assets/screenshot-arabic-phone.png" alt="النتيجة نفسها معروضة بالعربية على الهاتف" width="230" />
+</td>
+</tr>
+</table>
+
+---
+
 ### طريقة الاستخدام
 
 <table>
@@ -281,7 +321,7 @@ If you ever want to deploy your own free copy on **Render**:
 **تطبيق الويب (الهاتف والحاسوب)**
 
 1. افتح **[scamhisn-ai.onrender.com](https://scamhisn-ai.onrender.com/)**.
-2. اختر **رابط عام** أو **إعلان وظيفة** أو **رابط خريطة** أو **فحص صورة**، ثم الصق الرابط أو ارفع الصورة.
+2. اختر **رابط** أو **إعلان وظيفة** أو **رابط خريطة** أو **لقطة شاشة**، ثم الصق الرابط (أو الرسالة كاملة) أو ارفع الصورة.
 3. اضغط **افحص** لعرض النتيجة أو التفاصيل أو تحميل تقرير PDF.
 
 *لمستخدمي كروم على الهاتف:* من القائمة اختر **إضافة إلى الشاشة الرئيسية** لاستخدامه كتطبيق.
@@ -367,7 +407,7 @@ If you ever want to deploy your own free copy on **Render**:
 
 #### قياس لا ادّعاء
 
-على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 139 اختباراً آلياً (`npm test`).
+على مجموعة اختبار محجوبة من 141 عنواناً (76 موقعاً حقيقياً و65 عنواناً مقلّداً مصطنعاً) حققت طبقة تحليل العنوان وحدها **دقة 91.5%** مع **صفر إنذارات كاذبة** على المواقع الحقيقية، وكشفت **53 من 65** عنواناً مقلّداً. الحالات الـ12 التي لم تُكشف وحدود القياس موثّقة في [`docs/eval/address-layer.md`](./docs/eval/address-layer.md). وللواجهة البرمجية 144 اختباراً آلياً (`npm test`).
 
 أرقام المشكلة ونموذج التكلفة وتقدير التوفير معروضة في صفحة **الأثر** داخل التطبيق (`#/impact`) وفي [`docs/IMPACT.md`](./docs/IMPACT.md). المراجع الـ67 كلها في [`docs/research/sources.md`](./docs/research/sources.md)، وملفات البيانات المفتوحة الإماراتية المستخدمة في [`data/open-data/`](./data/open-data/). عرض التقديم وفيديو العرض (69 ثانية) مع لوحة القصة في [`docs/pitch/`](./docs/pitch/).
 
@@ -405,7 +445,7 @@ npm install
 npm run install:browser      # headless Chromium for the scanner
 cp .env.example .env         # then set GEMINI_API_KEY
 npm run dev                  # web on :5173, API on :3001
-npm test                     # 139 API unit tests
+npm test                     # 144 API unit tests
 ```
 
 </div>
@@ -420,9 +460,11 @@ npm test                     # 139 API unit tests
 
 ومع ذلك، إذا رغبت في نشر نسختك الخاصة مجاناً على **Render**:
 
-1. ارفع مجلد `Deployable Website Application/` إلى مستودع GitHub.
-2. أنشئ **Blueprint** (أو Docker Web Service) على Render واربطه بالمستودع.
-3. أضف `GEMINI_API_KEY` (انظر `.env.example`) في متغيرات البيئة ثم ابدأ النشر.
+1. في Render اختر **New ← Blueprint** (أو Docker Web Service) واربطه بهذا المستودع. يكفي ملفا `render.yaml` و`Dockerfile` الموجودان في جذر المستودع، ولا حاجة لتحديد مجلد جذر.
+2. أضف `GEMINI_API_KEY` (انظر `.env.example`) في متغيرات البيئة ثم ابدأ النشر.
+3. افتح `/api/v1/health` على العنوان الجديد: ظهور `"status": "ok"` مع قسم `capabilities` يعني أن النسخة الحالية تعمل.
+
+الدليل الكامل، ومنه ما يجب فحصه إذا لم يتحدّث الموقع المباشر، في [`Deployable Website Application/DEPLOY_TO_RENDER.md`](<./Deployable Website Application/DEPLOY_TO_RENDER.md>).
 
 ---
 

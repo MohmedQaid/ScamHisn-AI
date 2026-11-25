@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import { API_V1_PREFIX } from '@scamhisn/shared';
 import { config } from './config.js';
 import { createV1Router } from './routes/v1.js';
+import { isSameOriginRequest } from './security/sameOrigin.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -53,17 +54,23 @@ export function createApp(): express.Express {
   );
 
   app.use(
-    cors({
-      origin(origin, callback) {
-        if (isAllowedCorsOrigin(origin)) {
-          callback(null, true);
-        } else {
-          callback(new Error(`CORS origin "${origin}" is not allowed`));
-        }
-      },
-      methods: ['GET', 'POST', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-ScamHisn-Client'],
-      maxAge: 86400,
+    cors((req, callback) => {
+      const origin = req.headers.origin;
+      const forwardedHost = req.headers['x-forwarded-host'];
+      // The site's own pages and files are always allowed, wherever it is deployed
+      const allowed =
+        isSameOriginRequest(origin, req.headers.host, Array.isArray(forwardedHost) ? forwardedHost.join(',') : forwardedHost) ||
+        isAllowedCorsOrigin(origin);
+      if (!allowed) {
+        callback(new Error(`CORS origin "${origin}" is not allowed`));
+        return;
+      }
+      callback(null, {
+        origin: true,
+        methods: ['GET', 'POST', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-ScamHisn-Client'],
+        maxAge: 86400,
+      });
     }),
   );
 

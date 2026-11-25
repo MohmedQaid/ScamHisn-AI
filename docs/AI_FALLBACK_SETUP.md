@@ -130,7 +130,7 @@ Tested on 24 Nov 2026 with Falcon-H1 7B (Q4_K_M) on an RTX 3080 through llama.cp
   under 2 seconds each.
 - End to end with Gemini failing for real (an invalid key): the local model judged a real page
   alone, Job, Map and Image paused with a countdown, and they came back after the cool-down.
-- 139 unit tests cover the chain, the hybrid merge rules, the cool-down and the availability logic.
+- 144 unit tests cover the chain, the hybrid merge rules, the cool-down and the availability logic.
 
 Tested late on 24 Nov 2026 with two real free-tier Gemini keys, a list of backup models and
 Falcon-H1 as judge (a local production build):

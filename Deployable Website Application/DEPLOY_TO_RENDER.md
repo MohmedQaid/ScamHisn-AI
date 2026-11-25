@@ -1,55 +1,77 @@
 # Deploying ScamHisn AI (حصن الاحتيال) to Render
 
-This `deployable/` folder contains everything Render needs to build and host the full-stack ScamHisn AI web app and `/api/v1/scan` REST API in a single Docker container (including Playwright Chromium headless shell).
+One Docker container serves the bilingual web app and the `/api/v1` REST API, with a Chromium headless shell inside for opening suspicious pages safely.
+
+The repository is ready to deploy as it is: there is a `Dockerfile`, a `.dockerignore` and a `render.yaml` at the repository root, so Render needs no "root directory" setting.
 
 ---
 
-## Option A — One-Click Blueprint Deploy (Recommended)
+## The live site is not updating
 
-Render deploys directly from GitHub/GitLab/Bitbucket using the included `render.yaml` and `Dockerfile`.
+Merging to `main` only redeploys if the Render service is connected to this repository with auto-deploy on. If the site still shows the old version:
 
-### 1. Push this `deployable/` folder to GitHub
-Create a new empty repository on GitHub (e.g., `scamhisn-ai`), then run inside this `deployable/` folder:
-
-```bash
-git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/scamhisn-ai.git
-git push -u origin main
-```
-
-### 2. Create a Blueprint on Render
-1. Log in to [dashboard.render.com](https://dashboard.render.com).
-2. Click **New +** → **Blueprint**.
-3. Connect your GitHub account and select your `scamhisn-ai` repository.
-4. Render automatically detects `render.yaml` and `Dockerfile`.
-5. When prompted for **`GEMINI_API_KEY`**, paste your Gemini API key.
-6. Click **Apply** to start the build & deploy!
+1. Open the service in the [Render dashboard](https://dashboard.render.com) and look at **Events**. A failed build shows there with its log.
+2. In **Settings → Build & Deploy**, check that **Repository** is this repository and **Branch** is `main`.
+3. Leave **Root Directory** empty and set **Dockerfile Path** to `./Dockerfile` (the one at the repository root).
+   If you prefer the older setup, Root Directory `Deployable Website Application` with Dockerfile Path `./Dockerfile` also works.
+4. Turn **Auto-Deploy** on, then press **Manual Deploy → Deploy latest commit**.
+5. When it says **Live**, check it as described under [Verify](#verify) below.
 
 ---
 
-## Option B — Manual Web Service (Docker)
+## A new service from this repository
 
-If you prefer setting up a Web Service manually instead of using Blueprint:
+**Blueprint (recommended).** Dashboard → **New +** → **Blueprint** → choose this repository. Render reads `render.yaml` from the repository root, asks for the secret values, and builds. If the name `scamhisn-ai` is taken, Render adds a suffix and the address changes with it.
 
-1. Push `deployable/` to GitHub (Step 1 above).
-2. In Render Dashboard, click **New +** → **Web Service**.
-3. Select your GitHub repository.
-4. Configure:
-   - **Language / Runtime:** `Docker` (Render automatically detects `./Dockerfile`)
-   - **Instance Type:** `Free` (for demos/testing) or `Starter` (recommended for faster cold-starts & heavier traffic)
-   - **Health Check Path:** `/api/v1/health`
-5. Under **Environment Variables**, add:
-   - `GEMINI_API_KEY` = *(your Gemini API key)*
-   - `GEMINI_MODEL` = `gemini-3.5-flash-lite`
-   - `NODE_ENV` = `production`
-   - `PLAYWRIGHT_HEADLESS` = `true`
-   - `MAX_CONCURRENT_SCANS` = `2`
-   - `CORS_ALLOW_EXTENSIONS` = `true`
-   - `CORS_ALLOWED_ORIGINS` = `*` *(or set to your Render URL `https://scamhisn-ai.onrender.com`)*
-6. Click **Deploy Web Service**.
+**By hand.** Dashboard → **New +** → **Web Service** → choose this repository → Runtime **Docker**, branch `main`, health check path `/api/v1/health`, then add the environment variables below.
 
 ---
 
-## Verify After Deploy
-Once Render reports **Live** (first Docker build takes ~3–5 minutes because Chromium headless shell is installed inside the container):
-- Visit `https://<your-service>.onrender.com/` for the bilingual web app.
-- Visit `https://<your-service>.onrender.com/api/v1/health` to confirm `"status": "ok"` and `"aiConfigured": true`.
+## Environment variables
+
+| Name | Value | Needed |
+|---|---|---|
+| `GEMINI_API_KEY` | your Gemini API key | yes, for any AI analysis |
+| `GEMINI_API_KEY_2` | a second key, tried when the first is rate limited | optional |
+| `GEMINI_FALLBACK_MODEL` | `gemini-3.1-flash-lite,gemini-3.6-flash` | recommended |
+| `GEMINI_MODEL` | `gemini-3.5-flash-lite` | yes |
+| `NODE_ENV` | `production` | yes |
+| `PLAYWRIGHT_HEADLESS` | `true` | yes |
+| `MAX_CONCURRENT_SCANS` | `2` | yes on the free plan |
+| `CORS_ALLOW_EXTENSIONS` | `true` | yes, for the Chrome extension |
+| `CORS_ALLOWED_ORIGINS` | `*`, or a comma-separated list of other sites allowed to call the API | optional |
+| `LOCAL_LLM_BASE_URL`, `LOCAL_LLM_MODEL`, `LOCAL_LLM_API_KEY` | the self-hosted judge model (Falcon-H1) | optional, see below |
+| `AI_PIPELINE` | `auto` | optional |
+
+The site can always load its own pages whatever `CORS_ALLOWED_ORIGINS` says; that setting only governs other websites.
+
+Without any Gemini key the app still runs: link checks use the rule engine alone and say so, and the Job, Map and Screenshot checks show as paused.
+
+### The self-hosted judge (Falcon-H1)
+
+Render's free plan cannot run a 7B model, so the judge runs elsewhere and Render calls it over the internet. `LOCAL_LLM_BASE_URL` must therefore be a public HTTPS address: a tunnel to the PC that runs the model, or a hosted GPU machine. Protect it with a key and put the same key in `LOCAL_LLM_API_KEY`. Setup is in [`docs/AI_FALLBACK_SETUP.md`](../docs/AI_FALLBACK_SETUP.md). If the address is empty or unreachable, the app carries on with Gemini and the rules.
+
+---
+
+## Verify
+
+The first build takes several minutes because Chromium is installed into the image.
+
+- `https://<your-service>.onrender.com/api/v1/health` returns `"status": "ok"` **and a `capabilities` block**. No `capabilities` block means the old version is still running.
+- `https://<your-service>.onrender.com/` shows the paper-coloured page with "Check before you click."
+- Check `https://adpolice-fines-pay.top/verify`: it should come back around 84%, High Scam Risk, with "This address is offline."
+
+On the free plan the service sleeps when idle; the first request after a pause takes 30 to 50 seconds.
+
+---
+
+## Deploying only this folder
+
+This folder also carries its own `Dockerfile`, `.dockerignore` and `render.yaml`, for anyone who pushes "Deployable Website Application" as a repository of its own. The root-level files and these build the same image; keep them in step.
+
+---
+
+## What was and was not tested
+
+- Tested on 25 November 2026: every step of the Dockerfile replayed by hand on a clean copy of `main` (install, build, production-only install, start), the server answering `/api/v1/health`, serving the page and the extension download, and returning a verdict.
+- Not tested: the image built by Docker itself (no Docker on the build machine), and the deployment on Render.
