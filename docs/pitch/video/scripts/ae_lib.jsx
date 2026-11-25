@@ -1,4 +1,4 @@
-// Helpers shared by the ScamHisn AI video build (ExtendScript, ES3).
+﻿// Helpers shared by the ScamHisn AI video build (ExtendScript, ES3).
 var ROOT = "C:/Users/iV1R3S/Desktop/ScamHisn-AI/docs/pitch/video";
 var W = 1920, H = 1080, FPS = 60;
 var S = 1.5; // one CSS pixel of the app = 1.5 video pixels
@@ -12,6 +12,10 @@ var C = {
   hair: rgb("E6E0D2"), brand: rgb("0E6B47"), brandTint: rgb("E4F1E8"), danger: rgb("C8322B"), dangerTint: rgb("FBE6E2"),
   warn: rgb("A66A12"), warnTint: rgb("FBF0D9")
 };
+// Language of the on-screen text. A wrapper script sets SCAMHISN_LANG = "ar" before including the build.
+var LANG_AR = (typeof SCAMHISN_LANG !== "undefined" && SCAMHISN_LANG === "ar");
+var AR_FONT = { "Nunito-Black": "Dubai-Bold", "Nunito-ExtraBold": "Dubai-Bold", "Nunito-Bold": "Dubai-Bold", "Nunito-SemiBold": "Dubai-Medium", "Nunito-Regular": "Dubai-Regular" };
+function hasArabic(s) { return /[\u0600-\u06FF]/.test(s); }
 var LOG = [];
 function log(s) {
   LOG.push(s);
@@ -205,24 +209,38 @@ function text(comp, str, o) {
   var tp = L.property("ADBE Text Properties").property("ADBE Text Document");
   var d = tp.value;
   d.resetCharStyle();
-  d.font = o.font || "Nunito-ExtraBold";
-  d.fontSize = o.size || 64;
+  var arabic = hasArabic(str);
+  d.font = arabic ? (AR_FONT[o.font || "Nunito-ExtraBold"] || "Dubai-Bold") : (o.font || "Nunito-ExtraBold");
+  d.fontSize = (o.size || 64) * (arabic ? 1.06 : 1);
   d.fillColor = o.color || C.ink;
   d.applyFill = true;
   d.applyStroke = false;
-  d.tracking = o.track || 0;
+  d.tracking = arabic ? 0 : (o.track || 0); // letter-spacing would break Arabic joins
+  if (arabic) {
+    try { d.direction = ParagraphDirection.DIRECTION_RIGHT_TO_LEFT; } catch (eDir) {}
+  }
   d.justification = ParagraphJustification.CENTER_JUSTIFY;
   if (o.leading) {
-    try { d.autoLeading = false; d.leading = o.leading; } catch (e) {}
+    try { d.autoLeading = false; d.leading = o.leading * (arabic ? 1.3 : 1); } catch (e) {}
   }
   tp.setValue(d);
   var r = L.sourceRectAtTime(0, false);
+  if (o.maxW && r.width > o.maxW) { // shrink a line that would not fit
+    d = tp.value;
+    d.fontSize = d.fontSize * o.maxW / r.width;
+    tp.setValue(d);
+    r = L.sourceRectAtTime(0, false);
+  }
   P(L, "anchor").setValue([r.left + r.width / 2, r.top + r.height / 2]);
   if (o.threeD) L.threeDLayer = true;
   var half = r.width * 0.5;
-  var px = o.x;
-  if (o.just === "left") px = o.x + half;
-  if (o.just === "right") px = o.x - half;
+  var just = o.just, px = o.x;
+  if (LANG_AR && o.arX !== undefined) { // mirrored placement for the Arabic cut
+    px = o.arX;
+    just = o.arJust;
+  }
+  if (just === "left") px = px + half;
+  if (just === "right") px = px - half;
   P(L, "pos").setValue(o.threeD ? [px, o.y, o.z || 0] : [px, o.y]);
   L.motionBlur = true;
   L.name = o.name || str.replace(/\r/g, " ").substr(0, 40);

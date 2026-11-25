@@ -63,6 +63,7 @@ No music and no voice-over, by the brief. Sound effects are optional and listed 
 | What | Where |
 |---|---|
 | The film, small copy kept in git (1080p60, about 5 Mbps, silent) | `../ScamHisn-AI-Pitch-Video.mp4` |
+| The same film with Arabic on-screen text | `../ScamHisn-AI-Pitch-Video-AR.mp4` |
 | Presentation copy (15 Mbps, silent) | `renders/final/ScamHisn-AI_pitch_1080p60.mp4` |
 | Master (40 Mbps, silent) | `renders/final/ScamHisn-AI_pitch_1080p60_master.mp4` |
 | Copy with the optional synthesised sound effects | `renders/final/ScamHisn-AI_pitch_1080p60_with_sfx.mp4` |
@@ -73,6 +74,10 @@ No music and no voice-over, by the brief. Sound effects are optional and listed 
 | Scripts that rebuild every asset and both projects | `scripts/` |
 
 Only the small copy, this storyboard, the cue sheet and the scripts are in git. The projects, assets and larger renders stay on the machine that made them (`.gitignore` in this folder).
+
+## The Arabic cut
+
+Same pictures and timing; every headline, caption and label is Arabic, set in the Dubai typeface and laid out right to left (the fallback chain and the model cards are mirrored). The interface shots stay in English apart from the scene that shows the Arabic interface, and the opening SMS is unchanged. Build it with `scripts/ae_build_ar.jsx`, render with `scripts/ae_render_ar.jsx`.
 
 ## Limits
 

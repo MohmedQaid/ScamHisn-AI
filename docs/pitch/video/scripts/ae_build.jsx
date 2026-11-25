@@ -1,9 +1,11 @@
-// Builds the whole ScamHisn AI pitch video project from scratch: eleven scene comps and a MASTER.
+﻿// Builds the whole ScamHisn AI pitch video project from scratch: eleven scene comps and a MASTER.
 // Safe to re-run: it starts a new project each time and saves to ae/scamhisn_pitch_video.aep.
 #include "ae_lib.jsx"
 
 (function () {
-  var OUT = new File(ROOT + "/ae/scamhisn_pitch_video.aep");
+  var AR = LANG_AR;
+  function tr(en, ar) { return AR ? ar : en; }
+  var OUT = new File(ROOT + "/ae/scamhisn_pitch_video" + (AR ? "_ar" : "") + ".aep");
   // Never discard someone else's open work: park an unsaved foreign project in a file first.
   if (app.project.file === null && app.project.numItems > 0 && !(new File(ROOT + "/ae/_previously_open_untitled_project.aep")).exists) {
     app.project.save(new File(ROOT + "/ae/_previously_open_untitled_project.aep"));
@@ -46,8 +48,8 @@
   scene("01 Hook - a message arrives", 5.0, function (c) {
     var ph = c.layers.add(sequence(PHONE, FPS, "Blender renders"));
     ph.name = "Phone shot (Blender, frames 1-300)";
-    var a = text(c, "Real", { font: "Nunito-Black", size: 112, color: C.ink, x: 1440, y: 300, just: "left" });
-    var b = text(c, "or fake?", { font: "Nunito-Black", size: 112, color: C.danger, x: 1440, y: 420, just: "left" });
+    var a = text(c, tr("Real", "حقيقية"), { font: "Nunito-Black", size: 112, color: C.ink, x: 1440, y: 300, just: "left", arJust: "right", arX: 1860 });
+    var b = text(c, tr("or fake?", "أم مزيّفة؟"), { font: "Nunito-Black", size: 112, color: C.danger, x: 1440, y: 420, just: "left", arJust: "right", arX: 1860 });
     enter(a, 0.98, { dy: 30, d: 0.5, blur: 24 });
     enter(b, 1.16, { dy: 30, d: 0.5, blur: 24 });
     leave(a, 2.9, { d: 0.32, dx: 160, blur: 30 });
@@ -58,7 +60,7 @@
   scene("02 Problem - three numbers", 7.0, function (c) {
     paperBg(c);
     function beat(t0, t1, num, line, src) {
-      var n = text(c, num, { font: "Nunito-Black", size: 310, color: C.danger, x: 960, y: 450 });
+      var n = text(c, num, { font: "Nunito-Black", size: 310, color: C.danger, x: 960, y: 450, maxW: 1500 });
       var sc = P(n, "scale");
       K(sc, [[t0, [128, 128]], [t0 + 0.42, [100, 100]]], "out");
       K(sc, [[t0 + 0.43, [100, 100]], [t1 - 0.3, [105, 105]]], "lin");
@@ -76,9 +78,9 @@
       enter(s, t0 + 0.5, { dy: 0, d: 0.4 });
       leave(s, t1 - 0.32, { d: 0.2 });
     }
-    beat(0.0, 2.5, "7 in 10", "people in the UAE have met a scam", "GASA and Trend Micro, State of Scams in the UAE, 2026");
-    beat(2.5, 4.7, "1 in 3", "lost money to one in a year", "GASA and Trend Micro, State of Scams in the UAE, 2026");
-    beat(4.7, 7.0, "Dh140M", "returned to victims by Abu Dhabi Police", "Abu Dhabi Police, October 2025, over two years");
+    beat(0.0, 2.5, tr("7 in 10", "7 من 10"), tr("people in the UAE have met a scam", "من سكان الإمارات واجهوا محاولة احتيال"), tr("GASA and Trend Micro, State of Scams in the UAE, 2026", "المصدر: GASA و Trend Micro، تقرير حالة الاحتيال في الإمارات 2026"));
+    beat(2.5, 4.7, tr("1 in 3", "1 من 3"), tr("lost money to one in a year", "خسروا أموالاً بسببه خلال سنة"), tr("GASA and Trend Micro, State of Scams in the UAE, 2026", "المصدر: GASA و Trend Micro، تقرير حالة الاحتيال في الإمارات 2026"));
+    beat(4.7, 7.0, tr("Dh140M", "140 مليون درهم"), tr("returned to victims by Abu Dhabi Police", "أعادتها شرطة أبوظبي إلى الضحايا"), tr("Abu Dhabi Police, October 2025, over two years", "المصدر: شرطة أبوظبي، أكتوبر 2025، خلال عامين"));
   });
 
   // ====================================================================== 03 SOLUTION
@@ -87,14 +89,14 @@
     var logo = image(c, "logo_1024.png", { x: 960, y: 300, scale: 21, name: "Logo mark" });
     K(P(logo, "scale"), [[0.1, [0, 0]], [0.42, [23.5, 23.5]], [0.6, [21, 21]]], "soft");
     logo.inPoint = 0.1;
-    var name = text(c, "ScamHisn AI", { font: "Nunito-Black", size: 168, color: C.ink, x: 960, y: 560 });
+    var name = text(c, tr("ScamHisn AI", "حصن الاحتيال"), { font: "Nunito-Black", size: 168, color: C.ink, x: 960, y: 560 });
     enter(name, 0.35, { dy: 40, d: 0.6, blur: 30 });
-    var ar = image(c, "brand_ar.png", { x: 960, y: 706, scale: 26, name: "Arabic name" });
+    var ar = AR ? text(c, "ScamHisn" + " AI", { font: "Nunito-ExtraBold", size: 62, color: C.brand, x: 960, y: 706 }) : image(c, "brand_ar.png", { x: 960, y: 706, scale: 26, name: "Arabic name" });
     enter(ar, 0.6, { dy: 24, d: 0.5 });
-    var tag = text(c, "Check before you click.", { font: "Nunito-ExtraBold", size: 66, color: C.ink, x: 960, y: 860 });
+    var tag = text(c, tr("Check before you click.", "افحص قبل ما تضغط."), { font: "Nunito-ExtraBold", size: 66, color: C.ink, x: 960, y: 860 });
     enter(tag, 1.05, { dy: 26, d: 0.5, blur: 18 });
     var r = tag.sourceRectAtTime(1.6, false);
-    scribble(c, 960 + r.width / 2 - 178, 905, 174, C.brand, 1.5, 0.5);
+    scribble(c, AR ? 960 - r.width / 2 + 4 : 960 + r.width / 2 - 178, AR ? 918 : 905, 174, C.brand, 1.5, 0.5);
     for (var i = 1; i <= c.numLayers; i++) {
       var L = c.layer(i);
       if (L.name === "Paper") continue;
@@ -237,7 +239,7 @@
       K(sh.property("ADBE Drop Shadow-0002"), [[t1, 46], [t1 + 0.5, 0]], "soft");
     }
     function callout(label, line, t0, t1) {
-      var a = text(c, label, { font: "Nunito-ExtraBold", size: 26, color: C.brand, x: 960, y: 196, track: 220 });
+      var a = text(c, label, { font: "Nunito-ExtraBold", size: AR ? 38 : 26, color: C.brand, x: 960, y: AR ? 188 : 196, track: 220 });
       var b = text(c, line, { font: "Nunito-Black", size: 80, color: C.ink, x: 960, y: 290 });
       enter(a, t0, { dy: 18, d: 0.45 });
       enter(b, t0 + 0.1, { dy: 30, d: 0.55, blur: 22 });
@@ -253,9 +255,9 @@
     recede(notice, 5.2, 8.7);
     recede(rows[0], 8.8, 12.05);
     lift(rows[0], 5.3, 8.15);
-    callout("THE EVIDENCE", "It names who is being faked.", 5.75, 7.95);
+    callout(tr("THE EVIDENCE", "الأدلة"), tr("It names who is being faked.", "يكشف الجهة التي ينتحلها المحتال."), 5.75, 7.95);
     lift(notice, 8.75, 11.5);
-    callout("EVEN WHEN THE SITE IS GONE", "Dead link? Still caught.", 9.2, 11.3);
+    callout(tr("EVEN WHEN THE SITE IS GONE", "حتى لو اختفى الموقع"), tr("Dead link? Still caught.", "الرابط متوقف؟ نكشفه أيضاً."), 9.2, 11.3);
 
     var cam = camera(c);
     camKeys(cam, [[0, 960, 540, 2560, 0, 0], [0.9, 960, 660, 2440, 0, 0]], "io");
@@ -274,22 +276,24 @@
     var chip = rrect(c, "Verdict chip", 380, 112, 56, C.dangerTint, null, 0, 960, 860, false);
     K(rectSize(chip), [[0, [2300, 1400]], [0.75, [380, 112]]], "io");
     K(P(chip, "pos"), [[0, [960, 540]], [0.75, [960, 860]]], "io");
-    var chipText = text(c, "84%  scam", { font: "Nunito-Black", size: 50, color: C.danger, x: 960, y: 860 });
+    var chipText = text(c, AR ? "84%" : "84%  scam", { font: "Nunito-Black", size: 50, color: C.danger, x: AR ? 884 : 960, y: 860 });
     enter(chipText, 0.6, { dy: 0, d: 0.35, s: 0.8 });
+    var chipWord = AR ? text(c, "احتيال", { font: "Nunito-Black", size: 50, color: C.danger, x: 1026, y: 856 }) : null;
+    if (chipWord) enter(chipWord, 0.6, { dy: 0, d: 0.35, s: 0.8 });
 
-    var h1 = headline(c, "Two AI agents. One verdict.", 150, 0.55);
+    var h1 = headline(c, tr("Two AI agents. One verdict.", "وكيلان ذكيان. حكم واحد."), 150, 0.55);
 
     function card(x, fill, fg, sub, label, name, line, t, fromX) {
       var bg = rrect(c, label + " card", 640, 300, 33, fill, C.outline, 2.25, x, 470, false);
-      var a = text(c, label, { font: "Nunito-ExtraBold", size: 24, color: sub, x: x - 268, y: 378, just: "left", track: 200 });
-      var b = text(c, name, { font: "Nunito-Black", size: 76, color: fg, x: x - 270, y: 462, just: "left" });
-      var d = text(c, line, { font: "Nunito-SemiBold", size: 31, color: fg, x: x - 268, y: 552, just: "left" });
+      var a = text(c, label, { font: "Nunito-ExtraBold", size: AR ? 34 : 24, color: sub, x: x - 268, y: 378, just: "left", track: 200, arJust: "right", arX: x + 268 });
+      var b = text(c, name, { font: "Nunito-Black", size: 76, color: fg, x: x - 270, y: 462, just: "left", arJust: "right", arX: x + 270 });
+      var d = text(c, line, { font: "Nunito-SemiBold", size: 31, color: fg, x: x - 268, y: 552, just: "left", arJust: "right", arX: x + 268 });
       var all = [bg, a, b, d];
       for (var i = 0; i < all.length; i++) enter(all[i], t + i * 0.05, { dx: fromX, dy: 0, d: 0.65 });
       return all;
     }
-    var left = card(505, C.surface, C.ink, C.muted, "THE RESEARCHER", "Gemini", "reads the page and its images", 0.95, -160);
-    var right = card(1415, C.brand, C.paper, C.brandTint, "THE JUDGE", "Falcon-H1", "built in Abu Dhabi, runs on our GPU", 1.1, 160);
+    var left = card(AR ? 1415 : 505, C.surface, C.ink, C.muted, tr("THE RESEARCHER", "الباحث"), "Gemini", tr("reads the page and its images", "يقرأ الصفحة وصورها"), 0.95, AR ? 160 : -160);
+    var right = card(AR ? 505 : 1415, C.brand, C.paper, C.brandTint, tr("THE JUDGE", "القاضي"), "Falcon-H1", tr("built in Abu Dhabi, runs on our GPU", "طُوِّر في أبوظبي ويعمل على أجهزتنا"), 1.1, AR ? -160 : 160);
 
     var l1 = stroke(c, "Researcher to verdict", [[505, 626], [880, 800]], [[0, 0], [0, -120]], [[0, 120], [0, 0]], C.outline, 3, 0, 0);
     var l2 = stroke(c, "Judge to verdict", [[1415, 626], [1040, 800]], [[0, 0], [0, -120]], [[0, 120], [0, 0]], C.outline, 3, 0, 0);
@@ -298,21 +302,23 @@
     l1.inPoint = 1.7;
     l2.inPoint = 1.82;
     K(P(chip, "scale"), [[2.42, [100, 100]], [2.56, [109, 109]], [2.85, [100, 100]]], "soft");
-    var rule = caption(c, "Our own rules can overrule both.", 978, 2.9, { font: "Nunito-SemiBold", size: 32, color: C.muted });
+    var rule = caption(c, tr("Our own rules can overrule both.", "وقواعدنا تستطيع نقض قرارهما."), 978, 2.9, { font: "Nunito-SemiBold", size: 32, color: C.muted });
 
     // out, then the fallback chain
     var out = left.concat(right, [l1, l2, chip, chipText, rule, h1]);
+    if (chipWord) out.push(chipWord);
     for (var i = 0; i < out.length; i++) leave(out[i], 5.0 + (i % 4) * 0.03, { d: 0.3, dy: -40, blur: 18 });
 
-    headline(c, "No single point of failure.", 250, 5.35, { size: 100 });
-    var labels = ["Gemini, key 1", "Gemini, key 2", "Backup models", "Falcon-H1 alone", "Rules only"];
-    var xs = [232, 596, 960, 1324, 1688];
+    headline(c, tr("No single point of failure.", "بلا نقطة فشل واحدة."), 250, 5.35, { size: 100 });
+    var labels = AR ? ["مفتاح Gemini الأول", "مفتاح Gemini الثاني", "نماذج احتياطية", "Falcon-H1 وحده", "القواعد فقط"] : ["Gemini, key 1", "Gemini, key 2", "Backup models", "Falcon-H1 alone", "Rules only"];
+    var xs = AR ? [1688, 1324, 960, 596, 232] : [232, 596, 960, 1324, 1688]; // the chain reads right to left in Arabic
+    var step = AR ? -168 : 168;
     var y = 560, k;
     for (k = 0; k < 5; k++) {
       var pill = rrect(c, "Step " + (k + 1), 322, 112, 56, C.surface, C.outline, 2.25, xs[k], y, false);
       enter(pill, 5.6 + k * 0.09, { dy: 40, d: 0.5 });
       if (k < 4) {
-        var link = stroke(c, "Link " + (k + 1), [[xs[k] + 168, y], [xs[k + 1] - 168, y]], [[0, 0], [0, 0]], [[0, 0], [0, 0]], C.outline, 3, 0, 0);
+        var link = stroke(c, "Link " + (k + 1), [[xs[k] + step, y], [xs[k + 1] - step, y]], [[0, 0], [0, 0]], [[0, 0], [0, 0]], C.outline, 3, 0, 0);
         K(trimEnd(link), [[6.0 + k * 0.09, 0], [6.25 + k * 0.09, 100]], "io");
         link.inPoint = 6.0 + k * 0.09;
       }
@@ -331,8 +337,8 @@
         cut.inPoint = hop[k] - 0.05;
       }
     }
-    caption(c, "One fails. The next takes over.", 770, 6.5, { size: 56 });
-    caption(c, "Results always say what was checked.", 866, 9.3, { font: "Nunito-SemiBold", size: 32, color: C.muted });
+    caption(c, tr("One fails. The next takes over.", "إذا تعطّل واحد، تولّى التالي."), 770, 6.5, { size: 56 });
+    caption(c, tr("Results always say what was checked.", "والنتيجة تبيّن دائماً ما تم فحصه."), 866, 9.3, { font: "Nunito-SemiBold", size: 32, color: C.muted });
     for (var j = 1; j <= c.numLayers; j++) {
       var Lj = c.layer(j);
       if (Lj.name !== "Paper" && Lj.outPoint >= 10.9) leave(Lj, 10.66, { d: 0.3, s: 1.5, blur: 40 });
@@ -360,12 +366,12 @@
       enter(ra, 1.42 + i * 0.08, { dx: 90, dy: 0, d: 0.5 });
       both.push(ra);
     }
-    var h1 = headline(c, "Arabic and English.", 150, 0.35);
+    var h1 = headline(c, tr("Arabic and English.", "بالعربية والإنجليزية."), 150, 0.35);
     leave(h1, 2.72, { d: 0.26, blur: 24 });
     for (i = 1; i < both.length; i++) leave(both[i], 2.72 + i * 0.03, { d: 0.3, dz: 500, dy: -30 });
 
-    headline(c, "Links. Jobs. Maps. Screenshots.", 250, 3.0);
-    var xs = [285, 735, 1185, 1635];
+    headline(c, tr("Links. Jobs. Maps. Screenshots.", "روابط. وظائف. خرائط. لقطات شاشة."), 250, 3.0);
+    var xs = AR ? [1635, 1185, 735, 285] : [285, 735, 1185, 1635];
     for (i = 0; i < 4; i++) {
       var tab = ui(c, "home_tab_" + i, { x: xs[i], y: 578, k: 1.5 });
       enter(tab, 3.2 + i * 0.12, { dy: 40, dz: 700, d: 0.7 });
@@ -373,7 +379,7 @@
       P(cardBg, "pos").setValue([xs[i], 570, -1]);
       enter(cardBg, 3.2 + i * 0.12, { dy: 40, dz: 700, d: 0.7 });
     }
-    caption(c, "One box. Paste whatever looks wrong.", 800, 3.9, { font: "Nunito-SemiBold", size: 34, color: C.muted });
+    caption(c, tr("One box. Paste whatever looks wrong.", "خانة واحدة. الصق أي شيء يثير شكّك."), 800, 3.9, { font: "Nunito-SemiBold", size: 34, color: C.muted });
     var cam = camera(c);
     camKeys(cam, [[0, 960, 540, 2667, 0, 0], [5.6, 960, 540, 2540, 0, 0]], "lin");
     for (var j = 1; j <= c.numLayers; j++) {
@@ -390,7 +396,7 @@
     var aman = ui(c, "res_aman", { x: 960, y: 610 });
     enter(pdf, 0.15, { dy: 40, dz: 300, d: 0.55 });
     enter(pol, 0.25, { dy: 40, dz: 300, d: 0.55 });
-    headline(c, "Ready to report.", 150, 0.3);
+    headline(c, tr("Ready to report.", "جاهز للإبلاغ."), 150, 0.3);
     var ptr = pointer(c, false);
     K(P(ptr, "pos"), [[0.8, [1560, 800]], [1.4, [1354, 350]]], "io");
     K(P(ptr, "op"), [[0.8, 0], [1.0, 82]], "soft");
@@ -401,7 +407,7 @@
     var ps = P(pol, "scale"), pv = ps.value;
     K(ps, [[1.48, pv], [1.56, mul(pv, 0.975)], [1.72, pv]], "soft");
     enter(aman, 1.66, { dy: -70, d: 0.6, s: 0.96 });
-    caption(c, "An evidence file, and the official Aman channels.", 880, 2.4);
+    caption(c, tr("An evidence file, and the official Aman channels.", "ملف أدلة، وقنوات «أمان» الرسمية."), 880, 2.4);
     var cam = camera(c);
     camKeys(cam, [[0, 960, 540, 2667, 0, 0], [5.0, 960, 540, 2560, 0, 0]], "lin");
     for (var j = 1; j <= c.numLayers; j++) {
@@ -413,11 +419,11 @@
   // ====================================================================== 09 PROOF
   scene("09 Measured, not claimed", 5.6, function (c) {
     paperBg(c);
-    headline(c, "Measured, not claimed.", 170, 0.2);
+    headline(c, tr("Measured, not claimed.", "قياسٌ لا ادّعاء."), 170, 0.2);
     var cols = [
-      [400, "91.5%", 0, 91.5, 1, "%", "accuracy on 141 addresses\rit had never seen"],
-      [960, "0", 12, 0, 0, "", "false alarms\ron 76 real sites"],
-      [1520, "139", 0, 139, 0, "", "automated tests,\rall passing"]
+      [400, "91.5%", 0, 91.5, 1, "%", tr("accuracy on 141 addresses\rit had never seen", "دقة على 141 عنواناً\rلم يرها من قبل")],
+      [960, "0", 12, 0, 0, "", tr("false alarms\ron 76 real sites", "إنذارات كاذبة\rعلى 76 موقعاً حقيقياً")],
+      [1520, "139", 0, 139, 0, "", tr("automated tests,\rall passing", "اختباراً آلياً\rكلها ناجحة")]
     ];
     for (var i = 0; i < 3; i++) {
       var q = cols[i], t = 0.6 + i * 0.22;
@@ -426,7 +432,7 @@
       var l = text(c, q[6], { font: "Nunito-SemiBold", size: 34, color: C.ink, x: q[0], y: 690, leading: 44 });
       enter(l, t + 0.25, { dy: 24, d: 0.5 });
     }
-    var f = text(c, "Accuracy is for the address-check layer, on synthetic look-alikes. The full pipeline is not yet measured.", { font: "Nunito-Regular", size: 24, color: C.muted, x: 960, y: 1000, name: "[fixed] footnote" });
+    var f = text(c, tr("Accuracy is for the address-check layer, on synthetic look-alikes. The full pipeline is not yet measured.", "الدقة تخص طبقة فحص العنوان على عناوين مقلّدة مصطنعة. لم يُقَس النظام الكامل بعد."), { font: "Nunito-Regular", size: 24, color: C.muted, x: 960, y: 1000, name: "[fixed] footnote" });
     enter(f, 1.6, { dy: 0, d: 0.5 });
     for (var j = 1; j <= c.numLayers; j++) {
       var Lj = c.layer(j);
@@ -438,12 +444,12 @@
   // ====================================================================== 10 VISION
   scene("10 Today the link, next the claim", 4.0, function (c) {
     paperBg(c);
-    var a = text(c, "Today we check the link.", { font: "Nunito-Black", size: 104, color: C.ink, x: 960, y: 430 });
+    var a = text(c, tr("Today we check the link.", "اليوم نفحص الرابط."), { font: "Nunito-Black", size: 104, color: C.ink, x: 960, y: 430 });
     enter(a, 0.15, { dy: 36, d: 0.6, blur: 28 });
-    var b = text(c, "Next, with TAMM: the claim.", { font: "Nunito-Black", size: 104, color: C.brand, x: 960, y: 580 });
+    var b = text(c, tr("Next, with TAMM: the claim.", "وغداً مع «تم»: نتحقق من الادعاء."), { font: "Nunito-Black", size: 104, color: C.brand, x: 960, y: 580 });
     enter(b, 1.2, { dy: 36, d: 0.6, blur: 28 });
     var tagBg = rrect(c, "Concept tag", 210, 54, 27, null, C.warn, 3, 960, 720, false);
-    var tag = text(c, "CONCEPT", { font: "Nunito-ExtraBold", size: 24, color: C.warn, x: 960, y: 720, track: 260 });
+    var tag = text(c, tr("CONCEPT", "تصوّر مستقبلي"), { font: "Nunito-ExtraBold", size: AR ? 28 : 24, color: C.warn, x: 960, y: AR ? 716 : 720, track: 260 });
     enter(tagBg, 1.85, { dy: 14, d: 0.4 });
     enter(tag, 1.85, { dy: 14, d: 0.4 });
     for (var j = 1; j <= c.numLayers; j++) {
@@ -459,8 +465,8 @@
     ph.name = "Phone shot (Blender, frames 301-540)";
     ph.startTime = -5.0;
     var logo = image(c, "logo_1024.png", { x: 1640, y: 372, scale: 13.5, name: "Logo mark" });
-    var name = text(c, "ScamHisn AI", { font: "Nunito-Black", size: 74, color: C.ink, x: 1640, y: 500 });
-    var tag = text(c, "Check before you click.", { font: "Nunito-SemiBold", size: 34, color: C.ink, x: 1640, y: 568 });
+    var name = text(c, tr("ScamHisn AI", "حصن الاحتيال"), { font: "Nunito-Black", size: 74, color: C.ink, x: 1640, y: 500 });
+    var tag = text(c, tr("Check before you click.", "افحص قبل ما تضغط."), { font: "Nunito-SemiBold", size: 34, color: C.ink, x: 1640, y: 568 });
     var url = text(c, "scamhisn-ai-v1.onrender.com", { font: "Nunito-ExtraBold", size: 27, color: C.brand, x: 1640, y: 634 });
     var all = [logo, name, tag, url];
     for (var i = 0; i < all.length; i++) {

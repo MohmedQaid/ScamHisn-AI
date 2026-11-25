@@ -16,16 +16,16 @@
     var it = rq.items.add(m);
     it.applyTemplate("Best Settings");
     it.outputModule(1).applyTemplate("H.264 - Match Render Settings - 15 Mbps");
-    it.outputModule(1).file = new File(dir + "ScamHisn-AI_pitch_1080p60.mp4");
+    it.outputModule(1).file = new File(dir + "ScamHisn-AI_pitch_1080p60" + (LANG_AR ? "_ar" : "") + ".mp4");
     var om2 = it.outputModules.add();
     om2.applyTemplate("H.264 - Match Render Settings - 40 Mbps");
-    om2.file = new File(dir + "ScamHisn-AI_pitch_1080p60_master.mp4");
+    om2.file = new File(dir + "ScamHisn-AI_pitch_1080p60_master" + (LANG_AR ? "_ar" : "") + ".mp4");
     var s = find("MASTER with sound effects");
     if (s) {
       var it2 = rq.items.add(s);
       it2.applyTemplate("Best Settings");
       it2.outputModule(1).applyTemplate("H.264 - Match Render Settings - 15 Mbps");
-      it2.outputModule(1).file = new File(dir + "ScamHisn-AI_pitch_1080p60_with_sfx.mp4");
+      it2.outputModule(1).file = new File(dir + "ScamHisn-AI_pitch_1080p60_with_sfx" + (LANG_AR ? "_ar" : "") + ".mp4");
     }
     app.project.save();
     var t0 = new Date().getTime();
